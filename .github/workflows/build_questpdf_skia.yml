@@ -3,6 +3,8 @@ name: Build Skia + QuestPDF
 on:
   push:
     branches: [ "main" ]
+    
+  workflow_dispatch:
 
 jobs:
   build:

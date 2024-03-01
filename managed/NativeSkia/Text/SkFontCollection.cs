@@ -16,7 +16,6 @@ internal sealed class SkFontCollection : IDisposable
     {
         public IntPtr FontManager;
         public IntPtr TypefaceProvider;
-        [MarshalAs(UnmanagedType.I1)] public bool UseGlobalFonts;
         [MarshalAs(UnmanagedType.I1)] public bool EnableFontFallback;
     }
 
@@ -32,7 +31,6 @@ internal sealed class SkFontCollection : IDisposable
         {
             FontManager = fontManager.Instance,
             TypefaceProvider = typefaceProvider.Instance,
-            UseGlobalFonts = useGlobalFonts,
             EnableFontFallback = enableFontFallback
         };
         

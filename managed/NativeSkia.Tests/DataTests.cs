@@ -13,7 +13,7 @@ public class DataTests
      
         // read file via C# API
         var expectedContent = File.ReadAllBytes(path);
-        expectedContent.Length.Should().Be(30_167);
+        expectedContent.Length.Should().Be(28_357);
         
         // // read file via NativeSkia API
         using var data = SkData.FromFile(path);
@@ -30,7 +30,7 @@ public class DataTests
      
         // read file via C# API
         var expectedContent = File.ReadAllBytes(path);
-        expectedContent.Length.Should().Be(30_167);
+        expectedContent.Length.Should().Be(28_357);
         
         // read file via NativeSkia API
         using var data = SkData.FromBinary(expectedContent);

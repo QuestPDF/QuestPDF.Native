@@ -5,12 +5,13 @@
 extern "C" {
 
 struct TextStyleConfiguration {
+    static const int FONT_FAMILIES_LENGTH = 16;
+
     SkScalar fontSize;
     SkFontStyle::Weight fontWeight;
     bool isItalic;
 
-    char *fontFamily;
-    char *fontFamilyFallback;
+    char* fontFamilies[FONT_FAMILIES_LENGTH];
 
     SkColor foregroundColor;
     SkColor backgroundColor;
@@ -37,11 +38,13 @@ QUEST_API skia::textlayout::TextStyle *text_style_create(TextStyleConfiguration 
 
     // set font families
     std::vector<SkString> fontFamilies;
-    fontFamilies.emplace_back(configuration.fontFamily);
 
-    if (configuration.fontFamilyFallback)
-        fontFamilies.emplace_back(configuration.fontFamilyFallback);
+    for (auto & fontFamily : configuration.fontFamilies) {
+        if (fontFamily == nullptr)
+            continue;
 
+        fontFamilies.emplace_back(fontFamily);
+    }
 
     textStyle->setFontFamilies(fontFamilies);
     // end
@@ -76,4 +79,5 @@ QUEST_API skia::textlayout::TextStyle *text_style_create(TextStyleConfiguration 
 QUEST_API void text_style_delete(skia::textlayout::TextStyle *textStyle) {
     delete textStyle;
 }
+
 }

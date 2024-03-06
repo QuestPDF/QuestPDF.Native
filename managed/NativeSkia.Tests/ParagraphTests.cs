@@ -19,7 +19,7 @@ public class ParagraphTests
         typefaceProvider.AddTypefaceFromData(latoTypefaceData);
         
         // build simple paragraph;
-        var fontCollection = SkFontCollection.Create(typefaceProvider, true, true);   
+        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);   
  
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
@@ -35,7 +35,7 @@ public class ParagraphTests
             FontSize = 18,
             FontWeight = TextStyleConfiguration.FontWeights.Normal,
             
-            FontFamily = new SkText("Times New Roman"),
+            FontFamilies = GetFontFamilyPointers("Times New Roman"),
             
             BackgroundColor = 0x00000000,
             ForegroundColor = 0xFF000000,
@@ -53,8 +53,8 @@ public class ParagraphTests
         using var textStyle = new SkTextStyle(textStyleConfiguration);
         using var textStyleUnderline = new SkTextStyle(textStyleConfiguration with { DecorationType = TextStyleConfiguration.TextDecoration.Underline });
         
-        using var monoTypefaceStyle = new SkTextStyle(textStyleConfiguration with { FontFamily = new SkText("JetBrains Mono"), BackgroundColor = 0x33000000 });
-        using var latoTypefaceStyle = new SkTextStyle(textStyleConfiguration with { FontFamily = new SkText("Lato"), BackgroundColor = 0x22000000 });
+        using var monoTypefaceStyle = new SkTextStyle(textStyleConfiguration with { FontFamilies = GetFontFamilyPointers("JetBrains Mono"), BackgroundColor = 0x33000000 });
+        using var latoTypefaceStyle = new SkTextStyle(textStyleConfiguration with { FontFamilies = GetFontFamilyPointers("Lato"), BackgroundColor = 0x22000000 });
         
         paragraphBuilder.AddText("Lorem Ipsum is simply \ndummy text of the printing and typesetting industry. ", textStyle);
         paragraphBuilder.AddText("🥰😅🥰🥰🥰 ", textStyle);
@@ -100,7 +100,8 @@ public class ParagraphTests
     [Test]
     public void GetLineHeights()
     {
-        using var fontCollection = SkFontCollection.Create(null, true, true);
+        using var typefaceProvider = new SkTypefaceProvider();
+        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);
 
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
@@ -114,7 +115,7 @@ public class ParagraphTests
         {
             FontSize = 18,
             FontWeight = TextStyleConfiguration.FontWeights.Normal,
-            FontFamily = new SkText("Times New Roman")
+            FontFamilies = GetFontFamilyPointers("Times New Roman")
         });
         
         paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 20, Height = 20, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
@@ -141,7 +142,7 @@ public class ParagraphTests
         using var latoTypefaceData = SkData.FromFile("input/Lato/Lato-Light.ttf");
         typefaceProvider.AddTypefaceFromData(latoTypefaceData);
 
-        using var fontCollection = SkFontCollection.Create(typefaceProvider, false, true);
+        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);
 
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration();
         using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
@@ -151,7 +152,7 @@ public class ParagraphTests
             FontSize = 20,
             FontWeight = TextStyleConfiguration.FontWeights.Normal,
             ForegroundColor = 0xFF000000,
-            FontFamily = new SkText("Lato")
+            FontFamilies = GetFontFamilyPointers("Lato")
         });
         
         const string text = "Fire as emoji 🔥 and in Japanese 火.";
@@ -168,8 +169,9 @@ public class ParagraphTests
     [Test]
     public void Subscript()
     {
-        // build simple paragraph;
-        var fontCollection = SkFontCollection.Create(null, true, true);   
+        // build simple paragraph
+        using var typefaceProvider = new SkTypefaceProvider();
+        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);   
  
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
@@ -185,7 +187,7 @@ public class ParagraphTests
             FontSize = 18,
             FontWeight = TextStyleConfiguration.FontWeights.Normal,
             
-            FontFamily = new SkText("Times New Roman"),
+            FontFamilies = GetFontFamilyPointers("Times New Roman"),
             
             BackgroundColor = 0x00000000,
             ForegroundColor = 0xFF000000,
@@ -232,7 +234,8 @@ public class ParagraphTests
     [Test]
     public void DrawParagraphWithHyperlink()
     {
-        using var fontCollection = SkFontCollection.Create(null, true, true);
+        using var typefaceProvider = new SkTypefaceProvider();
+        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);
         
         using var stream = new SkWriteStream();
         using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata());
@@ -271,7 +274,7 @@ public class ParagraphTests
                 FontSize = 18,
                 ForegroundColor = 0xFF000000,
                 FontWeight = TextStyleConfiguration.FontWeights.Medium,
-                FontFamily = new SkText("Times New Roman")
+                FontFamilies = GetFontFamilyPointers("Times New Roman")
             };
 
             var linkStyleConfiguration = baseTextStyleConfiguration with
@@ -292,5 +295,15 @@ public class ParagraphTests
             
             return paragraphBuilder.CreateParagraph();
         }
+    }
+    
+    IntPtr[] GetFontFamilyPointers(params string[] texts)
+    {
+        var result = new IntPtr[TextStyleConfiguration.FONT_FAMILIES_LENGTH];
+                
+        for (var i = 0; i < Math.Min(result.Length, texts.Length); i++)
+            result[i] = new SkText(texts[i]).Instance;
+                
+        return result;
     }
 }

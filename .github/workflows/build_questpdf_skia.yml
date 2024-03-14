@@ -50,17 +50,20 @@ jobs:
             skia_use_system_freetype2=false
             skia_use_dng_sdk=false
             skia_use_harfbuzz=true
-            skia_use_icu=true
+            skia_use_icu=false
             skia_use_icu4x=false
+            skia_use_libgrapheme=true
             skia_use_fontconfig=false
             skia_use_gl=false
             skia_use_libjpeg_turbo_decode=true
             skia_use_libjpeg_turbo_encode=true
             skia_use_libpng_encode=true
             skia_use_libpng_decode=true
+            skia_use_libwebp_encode=true
+            skia_use_libwebp_decode=true
             skia_enable_android_utils=false
             skia_enable_spirv_validation=false
-            skia_enable_gpu = true
+            skia_enable_gpu = false
             skia_enable_gpu_debug_layers=false
             skia_use_jpeg_gainmaps=false
             skia_use_libheif=false
@@ -101,17 +104,20 @@ jobs:
             skia_use_system_freetype2=false
             skia_use_dng_sdk=false
             skia_use_harfbuzz=true
-            skia_use_icu=true
+            skia_use_icu=false
             skia_use_icu4x=false
+            skia_use_libgrapheme=true
             skia_use_fontconfig=false
             skia_use_gl=false
             skia_use_libjpeg_turbo_decode=true
             skia_use_libjpeg_turbo_encode=true
             skia_use_libpng_encode=true
             skia_use_libpng_decode=true
+            skia_use_libwebp_encode=true
+            skia_use_libwebp_decode=true
             skia_enable_android_utils=false
             skia_enable_spirv_validation=false
-            skia_enable_gpu = true
+            skia_enable_gpu = false
             skia_enable_gpu_debug_layers=false
             skia_use_jpeg_gainmaps=false
             skia_use_libheif=false
@@ -141,6 +147,8 @@ jobs:
           bin/gn gen out/release --args='
             is_official_build=true
             is_component_build=false
+            is_debug=false
+            skia_enable_optimize_size=true
             skia_enable_tools=true
             skia_use_system_expat=false
             skia_use_system_icu=false
@@ -152,17 +160,20 @@ jobs:
             skia_use_system_freetype2=false
             skia_use_dng_sdk=false
             skia_use_harfbuzz=true
-            skia_use_icu=true
+            skia_use_icu=false
             skia_use_icu4x=false
+            skia_use_libgrapheme=true
             skia_use_fontconfig=false
             skia_use_gl=false
             skia_use_libjpeg_turbo_decode=true
             skia_use_libjpeg_turbo_encode=true
             skia_use_libpng_encode=true
             skia_use_libpng_decode=true
+            skia_use_libwebp_encode=true
+            skia_use_libwebp_decode=true
             skia_enable_android_utils=false
             skia_enable_spirv_validation=false
-            skia_enable_gpu = true
+            skia_enable_gpu = false
             skia_enable_gpu_debug_layers=false
             skia_use_jpeg_gainmaps=false
             skia_use_libheif=false
@@ -202,6 +213,7 @@ jobs:
           name: questpdf-native-libraries-${{ matrix.environment }}
           path: |
             **/*.so
+            **/*.so.6
             **/*.dylib
             **/*.dll 
             **/*.dat 

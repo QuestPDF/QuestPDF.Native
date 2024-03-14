@@ -8,6 +8,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     set(CMAKE_EXE_LINKER_FLAGS "-static-libstdc++ -static-libgcc")
 endif()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti")
+
+
 project(QuestPdfSkia)
 
 

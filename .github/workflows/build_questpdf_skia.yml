@@ -6,10 +6,6 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.environment }}
-    
-    env:
-      CC: clang
-      CXX: clang++
       
     strategy:
       fail-fast: false
@@ -95,7 +91,7 @@ jobs:
             skia_enable_fontmgr_custom_embedded=true'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
-            COMMON_ARGS+=' skia_enable_optimize_size=true'
+            COMMON_ARGS+=' skia_enable_optimize_size=true cc="clang" cxx="clang++"'
           fi
           
           if [ "${{ runner.os }}" = "macOS" ]; then

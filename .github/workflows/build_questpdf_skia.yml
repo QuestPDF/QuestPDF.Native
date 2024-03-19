@@ -23,137 +23,29 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Build Windows
-        if: runner.os == 'Windows' && false
-        run: |
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-          echo "${{ github.workspace }}/depot_tools" >> $GITHUB_PATH
-          export PATH="${PWD}/depot_tools:${PATH}"
-          git clone https://github.com/google/skia.git --branch chrome/m122 --single-branch
-          cd skia
-          bin/fetch-ninja
-          python tools/git-sync-deps
-          bin/gn gen out/release --args='
-            is_official_build=true
-            is_component_build=false
-            is_debug=false
-            skia_enable_optimize_size=true
-            skia_enable_tools=true
-            skia_use_system_expat=false
-            skia_use_system_icu=false
-            skia_use_system_harfbuzz=false
-            skia_use_system_libjpeg_turbo=false
-            skia_use_system_libpng=false
-            skia_use_system_libwebp=false
-            skia_use_system_zlib=false
-            skia_use_system_freetype2=false
-            skia_use_dng_sdk=false
-            skia_use_harfbuzz=true
-            skia_use_icu=false
-            skia_use_icu4x=false
-            skia_use_libgrapheme=true
-            skia_use_fontconfig=false
-            skia_use_gl=false
-            skia_use_libjpeg_turbo_decode=true
-            skia_use_libjpeg_turbo_encode=true
-            skia_use_libpng_encode=true
-            skia_use_libpng_decode=true
-            skia_use_libwebp_encode=true
-            skia_use_libwebp_decode=true
-            skia_enable_android_utils=false
-            skia_enable_spirv_validation=false
-            skia_enable_gpu = false
-            skia_enable_gpu_debug_layers=false
-            skia_use_jpeg_gainmaps=false
-            skia_use_libheif=false
-            skia_use_lua=false
-            skia_enable_svg=true
-            skia_use_expat=true
-            skia_enable_skshaper=true
-            skia_enable_skunicode=true
-            skia_pdf_subset_harfbuzz=true
-            skia_enable_pdf=true
-            skia_compile_modules=true
-            skia_use_safe_libcxx=true
-            skia_enable_fontmgr_custom_embedded=true'
-          ninja -C out/release skia svg skparagraph
-        shell: bash     
-
-      - name: Build Linux
+      - name: Update GCC and G++
         if: runner.os == 'Linux'
+        shell: bash
         run: |
-          gcc --version
-          sudo apt update
-          sudo apt install gcc-10 g++-10 --yes
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10
-          gcc --version
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-          echo "${{ github.workspace }}/depot_tools" >> $GITHUB_PATH
-          export PATH="${PWD}/depot_tools:${PATH}"
-          git clone https://github.com/google/skia.git --branch chrome/m122 --single-branch
-          cd skia
-          bin/fetch-ninja
-          python tools/git-sync-deps
-          bin/gn gen out/release --args='
-            is_official_build=true
-            is_component_build=false
-            is_debug=false
-            skia_enable_tools=true
-            skia_use_system_expat=false
-            skia_use_system_icu=false
-            skia_use_system_harfbuzz=false
-            skia_use_system_libjpeg_turbo=false
-            skia_use_system_libpng=false
-            skia_use_system_libwebp=false
-            skia_use_system_zlib=false
-            skia_use_system_freetype2=false
-            skia_use_dng_sdk=false
-            skia_use_harfbuzz=true
-            skia_use_icu=false
-            skia_use_icu4x=false
-            skia_use_libgrapheme=true
-            skia_use_fontconfig=false
-            skia_use_gl=false
-            skia_use_libjpeg_turbo_decode=true
-            skia_use_libjpeg_turbo_encode=true
-            skia_use_libpng_encode=true
-            skia_use_libpng_decode=true
-            skia_use_libwebp_encode=true
-            skia_use_libwebp_decode=true
-            skia_enable_android_utils=false
-            skia_enable_spirv_validation=false
-            skia_enable_gpu = false
-            skia_enable_gpu_debug_layers=false
-            skia_use_jpeg_gainmaps=false
-            skia_use_libheif=false
-            skia_use_lua=false
-            skia_enable_svg=true
-            skia_use_expat=true
-            skia_enable_skshaper=true
-            skia_enable_skunicode=true
-            skia_pdf_subset_harfbuzz=true
-            skia_enable_pdf=true
-            skia_compile_modules=true
-            skia_use_safe_libcxx=true
-            skia_enable_fontmgr_custom_embedded=true'
-          ninja -C out/release skia svg skparagraph
-        shell: bash          
+            sudo apt install gcc-10 g++-10 --yes
+            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10
+            gcc --version
 
-      - name: MacOS
-        if: runner.os == 'macOS' && false
+      - name: Install dependencies and build Skia
+        shell: bash
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${{ github.workspace }}/depot_tools" >> $GITHUB_PATH
           export PATH="${PWD}/depot_tools:${PATH}"
+          
           git clone https://github.com/google/skia.git --branch chrome/m122 --single-branch
           cd skia
           bin/fetch-ninja
           python tools/git-sync-deps
-          bin/gn gen out/release --args='
-            is_official_build=true
+          
+          COMMON_ARGS='
             is_component_build=false
             is_debug=false
-            skia_enable_optimize_size=true
             skia_enable_tools=true
             skia_use_system_expat=false
             skia_use_system_icu=false
@@ -178,7 +70,7 @@ jobs:
             skia_use_libwebp_decode=true
             skia_enable_android_utils=false
             skia_enable_spirv_validation=false
-            skia_enable_gpu = false
+            skia_enable_gpu=false
             skia_enable_gpu_debug_layers=false
             skia_use_jpeg_gainmaps=false
             skia_use_libheif=false
@@ -187,14 +79,22 @@ jobs:
             skia_use_expat=true
             skia_enable_skshaper=true
             skia_enable_skunicode=true
-            skia_use_fonthost_mac=true
             skia_pdf_subset_harfbuzz=true
             skia_enable_pdf=true
             skia_compile_modules=true
             skia_use_safe_libcxx=true
             skia_enable_fontmgr_custom_embedded=true'
+            
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            COMMON_ARGS+=' skia_enable_optimize_size=true'
+          fi
+          
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            COMMON_ARGS+=' skia_use_fonthost_mac=true'
+          fi
+
+          bin/gn gen out/release --args="$COMMON_ARGS"
           ninja -C out/release skia svg skparagraph
-        shell: bash    
 
       - name: Configure CMake
         run: >
@@ -219,4 +119,4 @@ jobs:
           path: |
             **/*.so
             **/*.dylib
-            **/*.dll 
+            **/*.dll

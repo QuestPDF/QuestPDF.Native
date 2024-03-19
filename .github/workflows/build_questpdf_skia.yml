@@ -85,6 +85,7 @@ jobs:
           gcc --version
           sudo apt update
           sudo apt install gcc-10 g++-10 --yes
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10
           gcc --version
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${{ github.workspace }}/depot_tools" >> $GITHUB_PATH

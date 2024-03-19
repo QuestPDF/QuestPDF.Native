@@ -26,7 +26,17 @@ jobs:
 
       - name: Install Clang
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y clang
+        run: |
+          sudo apt-get update && sudo apt-get install -y clang
+          
+          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
+
+          sudo update-alternatives --config cc
+          sudo update-alternatives --config c++
+
+          cc --version
+          c++ --version
 
       - name: Update GCC and G++
         if: runner.os == 'Linux'

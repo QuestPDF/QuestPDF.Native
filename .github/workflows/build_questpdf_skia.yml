@@ -24,7 +24,7 @@ jobs:
           python-version: '3.x'
 
       - name: Build Windows
-        if: matrix.environment == 'windows-latest-large'
+        if: runner.os == 'Windows'
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${{ github.workspace }}/depot_tools" >> $GITHUB_PATH
@@ -80,7 +80,7 @@ jobs:
         shell: bash     
 
       - name: Build Linux
-        if: matrix.environment == 'ubuntu-latest-large'
+        if: runner.os == 'Linux'
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${{ github.workspace }}/depot_tools" >> $GITHUB_PATH
@@ -135,7 +135,7 @@ jobs:
         shell: bash          
 
       - name: MacOS
-        if: (matrix.environment == 'macos-latest-large' || matrix.environment == 'macos-latest-xlarge')
+        if: runner.os == 'macOS'
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${{ github.workspace }}/depot_tools" >> $GITHUB_PATH

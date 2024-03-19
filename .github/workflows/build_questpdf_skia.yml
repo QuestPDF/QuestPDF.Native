@@ -12,7 +12,7 @@ jobs:
         environment:
           - macos-latest-large
           - macos-latest-xlarge
-          - ubuntu-latest-large
+          - ubuntu-18-large
           - windows-latest-large
 
     steps:

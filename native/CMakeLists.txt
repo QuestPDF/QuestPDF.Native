@@ -44,7 +44,6 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     file(GLOB SKIA_LIBRARY "${SKIA_DIR}/out/release/*.a")
     target_link_libraries(QuestPdfSkia PRIVATE ${SKIA_LIBRARY})
-    set_target_properties(QuestPdfSkia PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
 

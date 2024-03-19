@@ -27,24 +27,24 @@ jobs:
       - name: Install Clang
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update && sudo apt-get install -y clang
+          sudo apt-get update
+          sudo apt-get install wget
+
+          sudo apt-get install -y software-properties-common
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
+
+          sudo apt-get update
+          sudo apt-get install -y clang-15 lldb-15 lld-15
           
-          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
-          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
+          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
 
           sudo update-alternatives --config cc
           sudo update-alternatives --config c++
 
           cc --version
           c++ --version
-
-      - name: Update GCC and G++
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-            sudo apt install gcc-10 g++-10 --yes
-            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10
-            gcc --version
 
       - name: Install dependencies and build Skia
         shell: bash

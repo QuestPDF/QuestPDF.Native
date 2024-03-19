@@ -102,7 +102,7 @@ jobs:
             skia_enable_fontmgr_custom_embedded=true'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
-            COMMON_ARGS+=' cc="clang" cxx="clang++" extra_cflags_cc=["-fPIC"]'
+            COMMON_ARGS+=' cc="clang" cxx="clang++" extra_cflags_cc=["-fPIC", "-fno-rtti"]'
           fi
           
           if [ "${{ runner.os }}" = "macOS" ]; then

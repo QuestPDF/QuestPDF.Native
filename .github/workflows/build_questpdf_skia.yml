@@ -11,10 +11,10 @@ jobs:
       fail-fast: false
       matrix:
         environment:
-          - macos-latest-large
-          - macos-latest-xlarge
+          #- macos-latest-large
+          #- macos-latest-xlarge
           - ubuntu-18-large
-          - windows-latest-large
+          #- windows-latest-large
 
     steps:
       - uses: actions/checkout@v3
@@ -102,7 +102,7 @@ jobs:
             skia_enable_fontmgr_custom_embedded=true'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
-            COMMON_ARGS+=' cc="clang" cxx="clang++" extra_cflags_cc=["-fPIC", "-fno-rtti"]'
+            COMMON_ARGS+=' cc="clang" cxx="clang++" extra_cflags=["-fPIC", "-fno-rtti"]'
           fi
           
           if [ "${{ runner.os }}" = "macOS" ]; then

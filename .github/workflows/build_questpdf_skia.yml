@@ -3,8 +3,6 @@ name: Build Skia + QuestPDF
 on:
   push:
     branches: [ "main" ]
-    
-  workflow_dispatch:
 
 jobs:
   build:
@@ -19,7 +17,7 @@ jobs:
           - windows-latest-large
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Set up Python 3.x
         uses: actions/setup-python@v5
@@ -216,7 +214,5 @@ jobs:
           name: questpdf-native-libraries-${{ matrix.environment }}
           path: |
             **/*.so
-            **/*.so.6
             **/*.dylib
             **/*.dll 
-            **/*.dat 

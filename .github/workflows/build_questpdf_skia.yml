@@ -83,7 +83,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           gcc --version
-          apt install gcc-11 g++-11
+          sudop apt install gcc-11 g++-11 --yes
           gcc --version
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${{ github.workspace }}/depot_tools" >> $GITHUB_PATH

@@ -15,27 +15,19 @@ jobs:
         runtime: 
         - name: windows-x64
           runs-on: windows-latest-large
-          container:
         - name: linux-x64
           runs-on: ubuntu-18-large
-          container: 
+          container: ubuntu:18.04
         - name: linux-arm64
           runs-on: ubuntu-latest-large
           container: ubuntu:18.04
         - name: macos-x64
           runs-on: macos-latest-large
-          container:
         - name: macos-arm64
           runs-on: macos-latest-xlarge
-          container:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set up Python 3.x
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
 
       - name: Install Clang
         if: runner.os == 'Linux'
@@ -58,6 +50,29 @@ jobs:
 
           cc --version
           c++ --version
+
+
+      - name: Set up Python 3.8
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+            apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
+
+            wget https://www.python.org/ftp/python/3.8.18/Python-3.8.18.tgz
+            tar xzf Python-3.8.18.tgz
+            cd Python-3.8.18
+            
+            ./configure --enable-optimizations
+            make
+            make install
+
+
+      - name: Set up Python 3.x
+        if: runner.os != 'Linux'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
 
       - name: Install dependencies and build Skia
         shell: bash
@@ -126,6 +141,7 @@ jobs:
           bin/gn gen out/release --args="$COMMON_ARGS"
           ninja -C out/release skia svg skparagraph
 
+
       - name: Configure CMake
         run: >
           cmake
@@ -136,11 +152,13 @@ jobs:
           -DCMAKE_C_COMPILER=clang 
           -DCMAKE_BUILD_TYPE=Release
 
+
       - name: Build CMake
         run: >
           cmake 
           --build ${{ github.workspace }}/native/build 
           --config Release
+
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3

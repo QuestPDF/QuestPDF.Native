@@ -51,8 +51,8 @@ jobs:
           cc --version
           c++ --version
 
-          update-alternatives --install /usr/bin/cc clang /usr/bin/clang-15 100
-          update-alternatives --install /usr/bin/c++ clang++ /usr/bin/clang++-15 100
+          update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 100
+          update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 100
           
           update-alternatives --config clang
           update-alternatives --config clang++

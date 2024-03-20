@@ -40,21 +40,21 @@ jobs:
       - name: Install Clang
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install wget
+          apt-get update
+          apt-get install wget
 
-          sudo apt-get install -y software-properties-common
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
+          apt-get install -y software-properties-common
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+          add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
 
-          sudo apt-get update
-          sudo apt-get install -y clang-15 lldb-15 lld-15
+          apt-get update
+          apt-get install -y clang-15 lldb-15 lld-15
           
-          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
-          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
+          update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
+          update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
 
-          sudo update-alternatives --config cc
-          sudo update-alternatives --config c++
+          update-alternatives --config cc
+          update-alternatives --config c++
 
           cc --version
           c++ --version

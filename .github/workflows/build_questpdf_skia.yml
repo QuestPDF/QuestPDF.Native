@@ -5,6 +5,7 @@ on:
 
 jobs:
   build:
+    name: ${{ matrix.runtime.name }}
     runs-on: ${{ matrix.runtime.runs-on }}
     container: ${{ matrix.runtime.container }}
       
@@ -19,7 +20,7 @@ jobs:
           runs-on: ubuntu-18-large
           container: 
         - name: linux-arm64
-          runs-on: ubuntu-18-large
+          runs-on: ubuntu-latest-large
           container: ubuntu:18.04
         - name: macos-x64
           runs-on: macos-latest-large

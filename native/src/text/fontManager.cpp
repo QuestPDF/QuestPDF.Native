@@ -25,10 +25,10 @@ sk_sp<SkFontMgr> font_manager_create_default_internal() {
 
 #ifdef __linux__
 
-#include "include/ports/SkFontMgr_fontconfig.h"
+#include "include/ports/SkFontMgr_empty.h"
 
 sk_sp<SkFontMgr> font_manager_create_default_internal() {
-    return SkFontMgr_New_FontConfig(nullptr);
+    return SkFontMgr_New_Custom_Empty();
 }
 
 #endif

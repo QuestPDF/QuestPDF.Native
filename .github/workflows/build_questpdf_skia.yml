@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        # - name: windows-x64
-        #   runs-on: windows-latest-large
+        - name: windows-x64
+          runs-on: windows-latest-large
         - name: linux-x64
           runs-on: ubuntu-latest-large
           container: ubuntu:18.04
@@ -33,7 +33,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           apt-get update --yes
-          apt-get install wget git cmake --yes
+          apt-get install wget git cmake fontconfig --yes
 
       - name: Install Clang
         if: runner.os == 'Linux'

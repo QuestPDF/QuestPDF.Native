@@ -167,6 +167,6 @@ jobs:
         with:
           name: questpdf-native-libraries-${{ matrix.runtime.name }}
           path: |
-            **/*.so
-            **/*.dylib
-            **/*.dll
+            **/native/build/*.so
+            **/native/build/*.dylib
+            **/native/build/*.dll

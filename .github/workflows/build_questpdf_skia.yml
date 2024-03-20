@@ -29,18 +29,10 @@ jobs:
     steps:
       - name: Debugging
         run: |
-          ls -l
+          apt-get update --yes
+          apt-get install tree --yes
+          tree -L 3
           echo ${{ github.workspace }}
-
-      - name: Install Cmake
-        if: runner.os == 'Linux'
-        run: |
-          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
-          apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
-          apt-get update
-          apt install cmake --yes
-          cmake --version
-          
 
       - name: Install Build Tools
         if: runner.os == 'Linux'

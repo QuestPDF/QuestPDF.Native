@@ -169,9 +169,9 @@ jobs:
       - name: Configure CMake
         run: >
           cmake
-          -S native
-          -B native/build 
-          -DSKIA_DIR=skia 
+          -S ${PWD}/native
+          -B ${PWD}/native/build 
+          -DSKIA_DIR=${PWD}/skia 
           -DCMAKE_CXX_COMPILER=clang++ 
           -DCMAKE_C_COMPILER=clang 
           -DCMAKE_BUILD_TYPE=Release
@@ -180,7 +180,7 @@ jobs:
       - name: Build CMake
         run: >
           cmake 
-          --build native/build 
+          --build ${PWD}/native/build 
           --config Release
 
 

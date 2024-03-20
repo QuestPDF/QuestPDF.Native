@@ -63,8 +63,8 @@ jobs:
             cd Python-3.8.18
             
             ./configure --enable-optimizations
-            make
-            make install
+            make --silent
+            make install --silent
 
             python3 --version
 

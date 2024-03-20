@@ -41,7 +41,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           apt-get update --yes
-          apt-get install wget --yes
+          apt-get install wget git --yes
 
           apt-get install --yes software-properties-common
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -

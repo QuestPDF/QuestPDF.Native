@@ -35,6 +35,7 @@ jobs:
         run: |
           apt-get update --yes
           apt-get install tree --yes
+          pwd
           tree -L 3
           echo ${{ github.workspace }}
 

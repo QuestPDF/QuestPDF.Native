@@ -13,21 +13,34 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        - name: windows-x64
-          runs-on: windows-latest-large
+        # - name: windows-x64
+        #   runs-on: windows-latest-large
         - name: linux-x64
-          runs-on: ubuntu-18-large
-          container: ubuntu:18.04
-        - name: linux-arm64
           runs-on: ubuntu-latest-large
           container: ubuntu:18.04
-        - name: macos-x64
-          runs-on: macos-latest-large
-        - name: macos-arm64
-          runs-on: macos-latest-xlarge
+        # - name: linux-arm64
+        #   runs-on: macos-latest-xlarge
+        #   container: ubuntu:18.04
+        # - name: macos-x64
+        #   runs-on: macos-latest-large
+        # - name: macos-arm64
+        #   runs-on: macos-latest-xlarge
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Debugging
+        run: |
+          ls -l
+          echo ${{ github.workspace }}
+
+      - name: Install Cmake
+        if: runner.os == 'Linux'
+        run: |
+          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
+          apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+          apt-get update
+          apt install cmake --yes
+          cmake --version
+          
 
       - name: Install Build Tools
         if: runner.os == 'Linux'
@@ -63,6 +76,7 @@ jobs:
           clang --version
           clang++ --version
 
+
       - name: Install Cmake
         if: runner.os == 'Linux'
         run: |
@@ -94,7 +108,7 @@ jobs:
         if: runner.os != 'Linux'
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.x'
           
 
       - name: Install dependencies and build Skia

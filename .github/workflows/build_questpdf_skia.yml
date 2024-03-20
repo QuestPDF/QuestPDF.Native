@@ -29,12 +29,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Clang
+      - name: Install Build Tools
         if: runner.os == 'Linux'
         run: |
           apt-get update --yes
-          apt-get install wget git --yes
-          
+          apt-get install wget git cmake --yes
+
+      - name: Install Clang
+        if: runner.os == 'Linux'
+        run: |
           apt-get install --yes software-properties-common
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
           add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
@@ -60,8 +63,17 @@ jobs:
           clang --version
           clang++ --version
 
+      - name: Install Cmake
+        if: runner.os == 'Linux'
+        run: |
+          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
+          apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+          apt-get update
+          apt install cmake --yes
+          cmake --version
 
-      - name: Set up Python 3.8
+
+      - name: Install Python 3.8
         if: runner.os == 'Linux'
         shell: bash
         run: |
@@ -78,11 +90,11 @@ jobs:
             python3 --version
 
 
-      - name: Set up Python 3.x
+      - name: Install 3.x
         if: runner.os != 'Linux'
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.8'
           
 
       - name: Install dependencies and build Skia

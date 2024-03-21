@@ -19,7 +19,7 @@ jobs:
           runs-on: ubuntu-latest-large
           container: ubuntu:18.04
         - name: linux-arm64
-          runs-on: ubuntu-latest-arm64-self-hosted
+          runs-on: [self-hosted, linux, arm64]
           container: ubuntu:18.04
         - name: macos-x64
           runs-on: macos-latest-large

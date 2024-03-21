@@ -149,8 +149,7 @@ jobs:
             skia_enable_skunicode=true
             skia_pdf_subset_harfbuzz=true
             skia_enable_pdf=true
-            skia_compile_modules=true
-            extra_cflags=["-fPIC", "-fno-rtti"]'
+            skia_compile_modules=true'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
             COMMON_ARGS+=' cc="clang" cxx="clang++"'

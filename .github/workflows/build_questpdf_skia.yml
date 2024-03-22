@@ -207,8 +207,12 @@ jobs:
       - name: Test build artifacts
         shell: bash
         run: |
+          brew install tree
+          tree managed
           dotnet build managed --configuration Debug
+          tree managed
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net6.0
+          tree managed
           dotnet test managed --framework net6.0
           mkdir -p testOutput/${{ matrix.runtime.name }} managed/NativeSkia.Tests/bin/Debug/net6.0/output
 

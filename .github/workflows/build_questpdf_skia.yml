@@ -13,16 +13,16 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        - name: windows-x64
-          runs-on: windows-latest-large
-        - name: linux-x64
-          runs-on: ubuntu-latest-large
-          container: ubuntu:18.04
-        - name: linux-arm64
-          runs-on: [self-hosted, linux, arm64]
-          container: ubuntu:18.04
-        - name: macos-x64
-          runs-on: macos-latest-large
+        # - name: windows-x64
+        #   runs-on: windows-latest-large
+        # - name: linux-x64
+        #   runs-on: ubuntu-latest-large
+        #   container: ubuntu:18.04
+        # - name: linux-arm64
+        #   runs-on: [self-hosted, linux, arm64]
+        #   container: ubuntu:18.04
+        # - name: macos-x64
+        #   runs-on: macos-latest-large
         - name: macos-arm64
           runs-on: macos-latest-xlarge
 
@@ -149,7 +149,8 @@ jobs:
             skia_enable_skunicode=true
             skia_pdf_subset_harfbuzz=true
             skia_enable_pdf=true
-            skia_compile_modules=true'
+            skia_compile_modules=true
+            extra_cflags=["-fPIC", "-frtti"]'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
             COMMON_ARGS+=' cc="clang" cxx="clang++"'
@@ -183,6 +184,12 @@ jobs:
           --config Release
 
 
+      - name: Copy build artifact to output directory
+        run: |
+          mkdir output/Runtimes/${{ matrix.runtime.name }}/native
+          find **/native/build \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/Runtimes/${{ matrix.runtime.name }}/native \;
+
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -191,3 +198,26 @@ jobs:
             **/native/build/*.so
             **/native/build/*.dylib
             **/native/build/**/*.dll
+
+
+      - name: Upload build artifacts 2
+        uses: actions/upload-artifact@v3
+        with:
+          name: questpdf-native-libraries-new
+          path: |
+            **/output
+            
+
+      - name: Setup .NET 6.0 SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
+
+          
+      - name: Restore Nuget Packages
+        shell: bash
+        run: |
+          dotnet build -c Debug
+          cp -d ../output NativeSkia.Tests/bin/Debug/net6.0/
+          dotnet test --framework net6.0
+        working-directory: ./managed

@@ -208,10 +208,8 @@ jobs:
       - name: Test build artifacts
         shell: bash
         run: |
-          apt install tree --yes
           dotnet build managed --configuration Debug --framework net8.0
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
-          tree managed
           dotnet test managed --framework net8.0
           mkdir -p testOutput/${{ matrix.runtime.name }} managed/NativeSkia.Tests/bin/Debug/net8.0/output
 

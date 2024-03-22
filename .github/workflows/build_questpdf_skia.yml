@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        # - name: windows-x64
-        #   runs-on: windows-latest-large
+        - name: windows-x64
+          runs-on: windows-latest-large
         - name: linux-x64
           runs-on: ubuntu-latest-large
           container: ubuntu:18.04
@@ -189,7 +189,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p output/Runtimes/${{ matrix.runtime.name }}/native
-          find native/build \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/Runtimes/${{ matrix.runtime.name }}/native \;
+          find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/Runtimes/${{ matrix.runtime.name }}/native \;
 
 
       - name: Upload build artifacts 2

@@ -217,7 +217,7 @@ jobs:
       - name: Restore Nuget Packages
         shell: bash
         run: |
-          dotnet build -c Debug
-          cp -d ../output NativeSkia.Tests/bin/Debug/net6.0/
+          dotnet build --configuration Debug
+          cp -R ../output NativeSkia.Tests/bin/Debug/net6.0/
           dotnet test --framework net6.0
         working-directory: ./managed

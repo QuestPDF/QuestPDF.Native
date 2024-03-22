@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        - name: windows-x64
+        - name: win-x64
           runs-on: windows-latest-large
         - name: linux-x64
           runs-on: ubuntu-latest-large
@@ -199,23 +199,23 @@ jobs:
           path: output
             
 
-      # - name: Setup .NET 8.0 SDK
-      #   uses: actions/setup-dotnet@v3
-      #   with:
-      #     dotnet-version: '8.0.x'
+      - name: Setup .NET 8.0 SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
 
           
-      # - name: Test build artifacts
-      #   shell: bash
-      #   run: |
-      #     dotnet build managed --configuration Debug --framework net8.0
-      #     cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
-      #     dotnet test managed --framework net8.0
-      #     mkdir -p testOutput/${{ matrix.runtime.name }} managed/NativeSkia.Tests/bin/Debug/net8.0/output
+      - name: Test build artifacts
+        shell: bash
+        run: |
+          dotnet build managed --configuration Debug --framework net8.0
+          cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
+          dotnet test managed --framework net8.0
+          mkdir -p testOutput/${{ matrix.runtime.name }} managed/NativeSkia.Tests/bin/Debug/net8.0/output
 
 
-      # - name: Upload test results
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: questpdf-test-results
-      #     path: testOutput
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: questpdf-test-results
+          path: testOutput

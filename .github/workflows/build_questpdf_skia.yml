@@ -208,7 +208,7 @@ jobs:
         shell: bash
         run: |
           dotnet build managed --configuration Debug
-          cp -R output managed/NativeSkia.Tests/bin/Debug/net6.0
+          cp -R output/* managed/NativeSkia.Tests/bin/Debug/net6.0
           dotnet test managed --framework net6.0
           mkdir -p testOutput/${{ matrix.runtime.name }} managed/NativeSkia.Tests/bin/Debug/net6.0/output
 

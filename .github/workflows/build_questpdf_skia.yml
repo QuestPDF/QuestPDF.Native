@@ -111,6 +111,7 @@ jobs:
           python3 tools/git-sync-deps
           
           COMMON_ARGS='
+            is_official_build=true
             is_component_build=false
             is_debug=false
             skia_enable_optimize_size=true
@@ -150,7 +151,7 @@ jobs:
             skia_pdf_subset_harfbuzz=true
             skia_enable_pdf=true
             skia_compile_modules=true
-            extra_cflags=["-fPIC", "-frtti"]'
+            extra_cflags=["-fPIC", "-fno-rtti"]'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
             COMMON_ARGS+=' cc="clang" cxx="clang++"'

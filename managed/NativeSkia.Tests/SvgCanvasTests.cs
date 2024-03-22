@@ -14,7 +14,7 @@ public class SvgCanvasTests
         using var image = SkImage.FromData(imageData);
         
         // load SVG
-        var svgContent = File.ReadAllText("input/icon.svg");
+        var svgContent = File.ReadAllText("Input/icon.svg");
         using var svgImage = new SkSvgImage(svgContent);
         
         // draw svg in a pdf document

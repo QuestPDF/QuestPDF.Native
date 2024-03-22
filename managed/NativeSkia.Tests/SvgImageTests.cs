@@ -9,7 +9,7 @@ public class SvgImageTests
     [Test]
     public void Load()
     {
-        var svgContent = File.ReadAllText("input/icon.svg");
+        var svgContent = File.ReadAllText("Input/icon.svg");
         using var svg = new SkSvgImage(svgContent);
 
         svg.Instance.Should().NotBe(0);
@@ -20,7 +20,7 @@ public class SvgImageTests
     public void Svg()
     {
         // read SVG
-        var svgContent = File.ReadAllText("input/icon.svg");
+        var svgContent = File.ReadAllText("Input/icon.svg");
         using var svg = new SkSvgImage(svgContent);
         
         // draw svg in a pdf document

@@ -13,10 +13,10 @@ public class ParagraphTests
     public void DrawParagraphOnPdfCanvas()
     {
         var typefaceProvider = new SkTypefaceProvider();
-        using var monoTypefaceData = SkData.FromFile("input/JetBrainsMono-Regular.ttf");
+        using var monoTypefaceData = SkData.FromFile("Input/JetBrainsMono-Regular.ttf");
         typefaceProvider.AddTypefaceFromData(monoTypefaceData, "JetBrains Mono");
         
-        using var latoTypefaceData = SkData.FromFile("input/Lato/Lato-Light.ttf");
+        using var latoTypefaceData = SkData.FromFile("Input/Lato/Lato-Light.ttf");
         typefaceProvider.AddTypefaceFromData(latoTypefaceData);
         
         // build simple paragraph;
@@ -149,7 +149,7 @@ public class ParagraphTests
     public void GetUnresolvedCodepoints()
     {
         using var typefaceProvider = new SkTypefaceProvider();
-        using var latoTypefaceData = SkData.FromFile("input/Lato/Lato-Light.ttf");
+        using var latoTypefaceData = SkData.FromFile("Input/Lato/Lato-Light.ttf");
         typefaceProvider.AddTypefaceFromData(latoTypefaceData);
 
         using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);

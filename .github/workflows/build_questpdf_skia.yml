@@ -187,7 +187,7 @@ jobs:
       - name: Copy build artifact to output directory
         run: |
           mkdir -p output/Runtimes/${{ matrix.runtime.name }}/native
-          find **/native/build \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/Runtimes/${{ matrix.runtime.name }}/native \;
+          find native/build \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/Runtimes/${{ matrix.runtime.name }}/native \;
 
 
       - name: Upload build artifacts

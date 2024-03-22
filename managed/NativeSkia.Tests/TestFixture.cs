@@ -7,8 +7,8 @@ namespace NativeSkia.Tests;
 [SetUpFixture]
 public class TestFixture
 {
-    public const string OutputPath = "output";
-    public const string InputPath = "input";
+    public const string OutputPath = "Output";
+    public const string InputPath = "Input";
     
     [OneTimeSetUp]
     public void SetUp()

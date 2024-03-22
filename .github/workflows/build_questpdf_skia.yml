@@ -195,8 +195,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: questpdf-native-libraries
-          path: |
-            output
+          path: output
             
 
       - name: Setup .NET 6.0 SDK
@@ -218,5 +217,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: questpdf-test-results
-          path: |
-            testOutput
+          path: testOutput

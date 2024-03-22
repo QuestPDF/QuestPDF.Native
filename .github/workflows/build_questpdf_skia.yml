@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        - name: windows-x64
-          runs-on: windows-latest-large
+        # - name: windows-x64
+        #   runs-on: windows-latest-large
         - name: linux-x64
           runs-on: ubuntu-latest-large
           container: ubuntu:18.04
@@ -188,7 +188,7 @@ jobs:
       - name: Copy build artifact to output directory
         shell: bash
         run: |
-          mkdir -p output/Runtimes/${{ matrix.runtime.name }}/native
+          mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
           find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/Runtimes/${{ matrix.runtime.name }}/native \;
 
 
@@ -208,6 +208,7 @@ jobs:
       - name: Test build artifacts
         shell: bash
         run: |
+          apt install tree --yes
           dotnet build managed --configuration Debug --framework net8.0
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
           tree

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using NUnit.Framework;
 using QuestPDF.Skia;
@@ -131,8 +132,17 @@ public class ParagraphTests
         
         paragraph.PlanLayout(400);
 
-        var lineMetrics = paragraph.GetLineMetrics();
-        lineMetrics.Select(x => x.Height).Should().BeEquivalentTo(new[] { 21, 31, 41 });
+        // values differ slightly between platforms
+        var lineHeights = paragraph.GetLineMetrics().Select(x => x.Height);
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            lineHeights.Should().BeEquivalentTo(new[] { 20, 30, 40 });
+        }
+        else
+        {
+            lineHeights.Should().BeEquivalentTo(new[] { 21, 31, 41 });
+        }
     }
     
     [Test]

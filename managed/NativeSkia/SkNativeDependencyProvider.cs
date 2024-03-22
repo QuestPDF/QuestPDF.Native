@@ -1,21 +1,39 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace QuestPDF.Skia;
 
 internal static class SkNativeDependencyProvider
 {
+    public static readonly string[] SupportedPlatforms =
+    {
+        "win-x64",
+        "linux-x64",
+        "linux-arm64",
+        "osx-x64",
+        "osx-arm64"
+    };
+    
     public static void EnsureNativeFileAvailability()
     {
-        var nativeFiles = Directory.GetFiles(GetNativeFileSourcePath());
+        var nativeFilesPath = GetNativeFileSourcePath();
+        
+        if (nativeFilesPath == null)
+            return;
 
-        foreach (var nativeFileSourcePath in nativeFiles)
+        foreach (var nativeFilePath in Directory.GetFiles(nativeFilesPath))
         {
-            var nativeFileName = Path.GetFileName(nativeFileSourcePath);
-            var runtimePath = GetNativeFileRuntimePath(nativeFileName);
-
-            CopyFileIfNewer(nativeFileSourcePath, runtimePath);
+            var targetDirectory = new FileInfo(nativeFilePath)
+                .Directory
+                .Parent // native
+                .Parent // platform
+                .Parent // runtimes
+                .FullName;
+            
+            var targetPath = Path.Combine(targetDirectory, Path.GetFileName(nativeFilePath));
+            CopyFileIfNewer(nativeFilePath, targetPath);
         }
     }
     
@@ -32,40 +50,63 @@ internal static class SkNativeDependencyProvider
         }
     }
     
-    static string GetNativeFileSourcePath()
+    static string? GetNativeFileSourcePath()
     {
-        var applicationDirectory = AppDomain.CurrentDomain.BaseDirectory;
         var platform = GetRuntimePlatform();
-        return Path.Combine(applicationDirectory, "runtimes", platform, "native");
+
+        var availableLocations = new[]
+        {
+            AppDomain.CurrentDomain.RelativeSearchPath, 
+            AppDomain.CurrentDomain.BaseDirectory,
+            new FileInfo(typeof(SkNativeDependencyProvider).Assembly.Location).Directory?.FullName
+        };
+        
+        foreach (var location in availableLocations)
+        {
+            if (string.IsNullOrEmpty(location))
+                continue;
+
+            var nativeFileSourcePath = Path.Combine(location, "runtimes", platform, "native");
+
+            if (Directory.Exists(nativeFileSourcePath))
+                return nativeFileSourcePath;
+        }
+
+        return null;
     }
         
     static string GetRuntimePlatform()
     {
-        if (RuntimeInformation.ProcessArchitecture == Architecture.X64)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return "win-x64";
-                
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                return "linux-x64";
-                
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                return "osx-x64";
-        }
-            
-        if (RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                return "osx-arm64";
-        }
+        var identifier = $"{GetSystemIdentifier()}-{GetProcessArchitecture()}";
+        
+        if (SupportedPlatforms.Contains(identifier))
+            return identifier;
 
         throw new Exception("Your runtime is currently not supported by QuestPDF.");
-    }
-        
-    static string GetNativeFileRuntimePath(string fileName)
-    {
-        var applicationDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        return Path.Combine(applicationDirectory, fileName);
+
+        static string GetSystemIdentifier()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return "win";
+                
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return "linux";
+                
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return "osx";
+            
+            throw new Exception("Your runtime is currently not supported by QuestPDF.");
+        }
+
+        static string GetProcessArchitecture()
+        {
+            return RuntimeInformation.ProcessArchitecture switch
+            {
+                Architecture.X64 => "x64",
+                Architecture.Arm64 => "arm64",
+                _ => throw new Exception("Your runtime is currently not supported by QuestPDF.")
+            };
+        }
     }
 
     static void CopyFileIfNewer(string sourcePath, string targetPath)

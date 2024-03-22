@@ -198,19 +198,19 @@ jobs:
           path: output
             
 
-      - name: Setup .NET 6.0 SDK
+      - name: Setup .NET 8.0 SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '8.0.x'
 
           
       - name: Test build artifacts
         shell: bash
         run: |
-          dotnet build managed --configuration Debug --framework net6.0
-          cp -R output/* managed/NativeSkia.Tests/bin/Debug/net6.0
-          dotnet test managed --framework net6.0
-          mkdir -p testOutput/${{ matrix.runtime.name }} managed/NativeSkia.Tests/bin/Debug/net6.0/output
+          dotnet build managed --configuration Debug --framework net8.0
+          cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
+          dotnet test managed --framework net8.0
+          mkdir -p testOutput/${{ matrix.runtime.name }} managed/NativeSkia.Tests/bin/Debug/net8.0/output
 
 
       - name: Upload test results

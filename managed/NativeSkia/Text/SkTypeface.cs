@@ -9,6 +9,7 @@ public sealed class SkTypeface : IDisposable
     public SkTypeface(IntPtr instance)
     {
         Instance = instance;
+        SkiaAPI.EnsureNotNull(Instance);
     }
     
     ~SkTypeface()

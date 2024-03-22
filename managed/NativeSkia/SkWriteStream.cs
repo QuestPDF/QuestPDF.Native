@@ -9,6 +9,7 @@ internal sealed class SkWriteStream : IDisposable
     public SkWriteStream()
     {
         Instance = API.write_stream_create();
+        SkiaAPI.EnsureNotNull(Instance);
     }
     
     public SkData DetachData()

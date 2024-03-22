@@ -12,6 +12,7 @@ internal sealed class SkFontManager
     private SkFontManager(IntPtr instance)
     {
         Instance = instance;
+        SkiaAPI.EnsureNotNull(Instance);
     }
     
     public SkTypeface CreateTypeface(SkData data)

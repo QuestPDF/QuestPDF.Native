@@ -10,6 +10,7 @@ internal class SkText : IDisposable
     public SkText(string? text)
     {
         Instance = MarshalFromManagedToNative(text);
+        SkiaAPI.EnsureNotNull(Instance);
     }
 
     ~SkText()

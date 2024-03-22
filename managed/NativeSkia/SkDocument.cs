@@ -9,6 +9,7 @@ internal sealed class SkDocument : IDisposable
     internal SkDocument(IntPtr instance)
     {
         Instance = instance;
+        SkiaAPI.EnsureNotNull(Instance);
     }
 
     public SkCanvas BeginPage(float width, float height)

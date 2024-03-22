@@ -11,6 +11,8 @@ internal sealed class SkCanvas : IDisposable
     public SkCanvas(IntPtr instance, bool disposeNativeObject = true)
     {
         Instance = instance;
+        SkiaAPI.EnsureNotNull(Instance);
+        
         DisposeNativeObject = disposeNativeObject;
     }
     

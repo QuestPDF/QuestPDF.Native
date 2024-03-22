@@ -9,6 +9,7 @@ internal sealed class SkData : IDisposable
     public SkData(IntPtr instance)
     {
         Instance = instance;
+        SkiaAPI.EnsureNotNull(Instance);
     }
     
     public static SkData FromFile(string filePath)

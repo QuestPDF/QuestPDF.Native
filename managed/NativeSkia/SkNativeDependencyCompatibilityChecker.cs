@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace QuestPDF.Skia;
 
-public static class SkNativeDependencyCompatibilityChecker
+internal static class SkNativeDependencyCompatibilityChecker
 {
     private static bool IsCompatibilityChecked = false;
         

@@ -209,7 +209,7 @@ jobs:
         run: |
           brew install tree
           tree managed
-          dotnet build managed --configuration Debug
+          dotnet build managed --configuration Debug --framework net6.0
           tree managed
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net6.0
           tree managed

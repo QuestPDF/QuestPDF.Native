@@ -189,7 +189,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
-          find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/Runtimes/${{ matrix.runtime.name }}/native \;
+          find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;
 
 
       - name: Upload build artifacts 2

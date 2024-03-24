@@ -400,3 +400,4 @@ FodyWeavers.xsd
 .vscode
 .idea
 .DS_STORE
+cmake-build-*

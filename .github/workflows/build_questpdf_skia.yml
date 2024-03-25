@@ -41,11 +41,27 @@ jobs:
           apt-get install --yes software-properties-common
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
           add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
-          add-apt-repository ppa:ubuntu-toolchain-r/test --yes
           
-          sudo apt install gcc-10 g++-10 --yes
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10
-          gcc --version
+          apt-get update --yes
+          apt-get install --yes clang-15 lldb-15 lld-15
+          
+          update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
+          update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
+          
+          update-alternatives --config cc
+          update-alternatives --config c++
+          
+          cc --version
+          c++ --version
+
+          update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 100
+          update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 100
+          
+          update-alternatives --config clang
+          update-alternatives --config clang++
+          
+          clang --version
+          clang++ --version
 
 
       - name: Install Cmake
@@ -98,6 +114,7 @@ jobs:
             is_official_build=true
             is_component_build=false
             is_debug=false
+            skia_enable_optimize_size=true
             skia_enable_tools=true
             skia_use_system_expat=false
             skia_use_system_icu=false
@@ -137,7 +154,7 @@ jobs:
             extra_cflags=["-fPIC", "-fno-rtti"]'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
-            COMMON_ARGS+=' skia_use_freetype=true'
+            COMMON_ARGS+=' skia_use_freetype=true cc="clang" cxx="clang++"'
           fi
           
           if [ "${{ runner.os }}" = "macOS" ]; then

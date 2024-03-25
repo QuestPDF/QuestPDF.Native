@@ -154,7 +154,7 @@ jobs:
             extra_cflags=["-fPIC", "-fno-rtti"]'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
-            COMMON_ARGS+=' skia_use_freetype=true cc="clang" cxx="clang++"'
+            COMMON_ARGS+=' is_linux=true skia_use_freetype=true cc="clang" cxx="clang++"'
           fi
           
           if [ "${{ runner.os }}" = "macOS" ]; then

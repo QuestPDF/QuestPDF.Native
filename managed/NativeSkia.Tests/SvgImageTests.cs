@@ -23,11 +23,11 @@ public class SvgImageTests
         var svgContent = File.ReadAllText("Input/icon.svg");
         using var svg = new SkSvgImage(svgContent);
         
-        // draw svg in a pdf document
+        // create document
         using var stream = new SkWriteStream();
         using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata() { CompressDocument = true });
         
-        // draw text
+        // draw svg in a pdf document
         using var pageCanvas = pdf.BeginPage(800, 600);
         pageCanvas.DrawSvg(svg, 400, 600);
         

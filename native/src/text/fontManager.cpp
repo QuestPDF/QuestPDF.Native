@@ -25,10 +25,10 @@ sk_sp<SkFontMgr> font_manager_create_default_internal() {
 
 #ifdef __linux__
 
-#include "include/ports/SkFontMgr_empty.h"
+#include "include/ports/SkFontMgr_directory.h"
 
 sk_sp<SkFontMgr> font_manager_create_default_internal() {
-    return SkFontMgr_New_Custom_Empty();
+    return SkFontMgr_New_Custom_Directory("/usr/share/fonts/");
 }
 
 #endif

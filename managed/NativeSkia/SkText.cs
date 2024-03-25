@@ -43,7 +43,7 @@ internal class SkText : IDisposable
         if (Instance == IntPtr.Zero)
             return;
         
-        Marshal.FreeHGlobal(Instance);
+        //Marshal.FreeHGlobal(Instance);
         Instance = IntPtr.Zero;
     }
 }

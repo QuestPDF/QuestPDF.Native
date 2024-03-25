@@ -134,15 +134,7 @@ public class ParagraphTests
 
         // values differ slightly between platforms
         var lineHeights = paragraph.GetLineMetrics().Select(x => x.Height);
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            lineHeights.Should().BeEquivalentTo(new[] { 20, 30, 40 });
-        }
-        else
-        {
-            lineHeights.Should().BeEquivalentTo(new[] { 21, 31, 41 });
-        }
+        lineHeights.Should().BeEquivalentTo(new[] { 21, 31, 41 });
     }
     
     [Test]

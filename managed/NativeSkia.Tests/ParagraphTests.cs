@@ -20,7 +20,7 @@ public class ParagraphTests
         typefaceProvider.AddTypefaceFromData(latoTypefaceData);
         
         // build simple paragraph;
-        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);   
+        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);   
  
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
@@ -102,7 +102,7 @@ public class ParagraphTests
     public void GetLineHeights()
     {
         using var typefaceProvider = new SkTypefaceProvider();
-        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);
+        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);
 
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
@@ -116,7 +116,8 @@ public class ParagraphTests
         {
             FontSize = 18,
             FontWeight = TextStyleConfiguration.FontWeights.Normal,
-            FontFamilies = GetFontFamilyPointers("Times New Roman")
+            FontFamilies = GetFontFamilyPointers("Times New Roman"),
+            ForegroundColor = 0xFF000000
         });
         
         paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 20, Height = 20, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
@@ -181,7 +182,7 @@ public class ParagraphTests
     {
         // build simple paragraph
         using var typefaceProvider = new SkTypefaceProvider();
-        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);   
+        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);   
  
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {

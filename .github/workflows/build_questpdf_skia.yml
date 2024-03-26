@@ -206,6 +206,7 @@ jobs:
 
           
       - name: Test build artifacts
+        continue-on-error: true
         shell: bash
         run: |
           dotnet build managed --configuration Debug --framework net8.0

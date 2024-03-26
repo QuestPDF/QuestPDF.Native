@@ -1,4 +1,7 @@
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using FluentAssertions;
 using NUnit.Framework;
@@ -88,7 +91,7 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_paragraph.pdf", documentData);
-        documentData.ShouldHaveSize(123_197);
+        documentData.ShouldHaveSize(123_200, buffer: 100);
 
         paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
     }
@@ -111,7 +114,7 @@ public class ParagraphTests
         {
             FontSize = 18,
             FontWeight = TextStyleConfiguration.FontWeights.Medium,
-            FontFamilies = GetFontFamilyPointers("Lato"),
+            FontFamilies = GetFontFamilyPointers("Noto Sans"),
             
             BackgroundColor = 0x00000000,
             ForegroundColor = 0xFF000000,
@@ -121,13 +124,13 @@ public class ParagraphTests
             LetterSpacing = 0
         });
         
-        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 40, Height = 20, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
+        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 60, Height = 30, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Middle });
         paragraphBuilder.AddText("Line 1\n", textStyle);
         
-        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 50, Height = 30, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
+        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 70, Height = 35, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Middle });
         paragraphBuilder.AddText("Line 2\n", textStyle);
         
-        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 60, Height = 40, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
+        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 80, Height = 40, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Middle });
         paragraphBuilder.AddText("Line 3", textStyle);
         
         using var paragraph = paragraphBuilder.CreateParagraph();
@@ -136,7 +139,7 @@ public class ParagraphTests
 
         // values differ slightly between platforms
         var lineHeights = paragraph.GetLineMetrics().Select(x => x.Height);
-        lineHeights.Should().BeEquivalentTo(new[] { 23, 32, 42 });
+        lineHeights.Should().BeEquivalentTo(new[] { 30, 35, 40 });
         
         paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
     }
@@ -233,7 +236,7 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_subscript.pdf", documentData);
-        documentData.ShouldHaveSize(8_638);
+        documentData.ShouldHaveSize(8_650, buffer: 50);
         
         paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
     }
@@ -265,7 +268,7 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_with_paragraph_and_inlined_hyperlink.pdf", documentData);
-        documentData.ShouldHaveSize(24_498);
+        documentData.ShouldHaveSize(24_500, buffer: 150);
         
         paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
         

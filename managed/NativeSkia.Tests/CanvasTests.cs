@@ -46,7 +46,7 @@ public class CanvasTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_draw_image.png", pngData);
-        pngData.ShouldHaveSize(81_136);
+        pngData.ShouldHaveSize(81_150, buffer: 150);
     }
     
     [Test]

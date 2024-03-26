@@ -36,8 +36,6 @@ public class SvgImageTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_svg.pdf", documentData);
-        
-        var documentSize = documentData.ToBytes().Length;
-        documentSize.Should().BeLessThan(175_000);
+        documentData.ShouldHaveSize(3_314);
     }
 }

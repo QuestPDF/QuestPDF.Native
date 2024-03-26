@@ -24,6 +24,7 @@ public class CanvasTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_draw_rectangle.png", pngData);
+        pngData.ShouldHaveSize(1_273);
     }
     
     [Test]
@@ -45,6 +46,7 @@ public class CanvasTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_draw_image.png", pngData);
+        pngData.ShouldHaveSize(81_136);
     }
     
     [Test]
@@ -69,6 +71,7 @@ public class CanvasTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_translate.png", pngData);
+        pngData.ShouldHaveSize(1_191);
     }
     
     [Test]
@@ -93,6 +96,7 @@ public class CanvasTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_rotate.png", pngData);
+        pngData.ShouldHaveSize(11_060);
     }
     
     [Test]
@@ -117,6 +121,7 @@ public class CanvasTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_scale.png", pngData);
+        pngData.ShouldHaveSize(1_141);
     }
     
     [Test]
@@ -147,6 +152,7 @@ public class CanvasTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_scale.png", pngData);
+        pngData.ShouldHaveSize(973);
     }
 
     [Test]
@@ -168,6 +174,7 @@ public class CanvasTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_svg_path.png", pngData);
+        pngData.ShouldHaveSize(10_349);
     }
     
     [Test]
@@ -196,6 +203,7 @@ public class CanvasTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_overflow_area.png", pngData);
+        pngData.ShouldHaveSize(15_075);
     }
     
     [Test]

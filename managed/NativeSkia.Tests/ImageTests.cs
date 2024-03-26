@@ -14,13 +14,12 @@ public class ImageTests
         image.Height.Should().Be(300);
         image.EncodedDataSize.Should().Be(1659);
         
-        var content = image.GetEncodedData().ToBytes();
-        content.Length.Should().Be(1659);
+        var content = image.GetEncodedData();
+        content.ShouldHaveSize(1_659);
         
         // blue (top left)
         // purple (bottom right)
-        var path = Path.Combine(TestFixture.InputPath, "placeholder.jpg");
-        File.WriteAllBytes(path, content);
+        TestFixture.SaveOutput("placeholder.png", content);
     }
     
     [Test]
@@ -38,7 +37,7 @@ public class ImageTests
         
         biggerImage.Width.Should().Be(800);
         biggerImage.Height.Should().Be(600);
-        biggerImageData.ToBytes().Length.Should().BeLessThan(100_000);
+        biggerImageData.ShouldHaveSize(67_817);
         
         // scale images to if target resolution is smaller than original
         using var smallerImage = sampleImage.ResizeAndCompress(80, 60, 90);
@@ -46,7 +45,7 @@ public class ImageTests
         
         smallerImage.Width.Should().Be(80);
         smallerImage.Height.Should().Be(60);
-        smallerImageData.ToBytes().Length.Should().BeLessThan(5_000);
+        smallerImageData.ShouldHaveSize(2_707);
     }
     
     [Test]
@@ -58,13 +57,13 @@ public class ImageTests
         // high quality
         using var highQualityImage = sampleImage.ResizeAndCompress(400, 300, 90);
         using var highQualityImageData = highQualityImage.GetEncodedData();
-        highQualityImageData.ToBytes().Length.Should().BeInRange(30_000, 32_000);
+        highQualityImageData.ShouldHaveSize(31_763);
         TestFixture.SaveOutput("image_resize_high_quality.jpg", highQualityImageData);
         
         // low quality
         using var lowQualityImage = sampleImage.ResizeAndCompress(400, 300, 10);
         using var lowQualityImageData = lowQualityImage.GetEncodedData();
-        lowQualityImageData.ToBytes().Length.Should().BeInRange(3_500, 4_500);
+        lowQualityImageData.ShouldHaveSize(4_495);
         TestFixture.SaveOutput("image_resize_low_quality.jpg", lowQualityImageData);
     }
     
@@ -82,7 +81,7 @@ public class ImageTests
         
         resizedImage.Width.Should().Be(200);
         resizedImage.Height.Should().Be(150);
-        resizedImageData.ToBytes().Length.Should().BeInRange(6_000, 8_000);
+        resizedImageData.ShouldHaveSize(7_234);
         
         TestFixture.SaveOutput("image_transparent_resized.png", resizedImageData);
         // check if image is transparent

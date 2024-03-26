@@ -93,9 +93,7 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_paragraph.pdf", documentData);
-        
-        var documentSize = documentData.ToBytes().Length;
-        documentSize.Should().BeLessThan(300_000);
+        documentData.ShouldHaveSize(206_457);
     }
     
     [Test]
@@ -231,6 +229,7 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_subscript.pdf", documentData);
+        documentData.ShouldHaveSize(35_029);
     }
     
     [Test]
@@ -260,7 +259,8 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_with_paragraph_and_inlined_hyperlink.pdf", documentData);
-
+        documentData.ShouldHaveSize(61_572);
+        
         SkParagraph BuildParagraph()
         {
             var paragraphStyleConfiguration = new ParagraphStyleConfiguration

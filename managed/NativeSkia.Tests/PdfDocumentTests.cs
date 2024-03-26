@@ -23,6 +23,7 @@ public class PdfDocumentTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_without_metadata.pdf", documentData);
+        documentData.ShouldHaveSize(709);
     }
     
     [Test]
@@ -61,6 +62,7 @@ public class PdfDocumentTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("simple_document.pdf", documentData);
+        documentData.ShouldHaveSize(5_827);
     }
     
     [Test]
@@ -82,6 +84,7 @@ public class PdfDocumentTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_with_url.pdf", documentData);
+        documentData.ShouldHaveSize(249_678);
     }
     
     [Test]
@@ -113,5 +116,6 @@ public class PdfDocumentTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_with_internal_destination_and_link.pdf", documentData);
+        documentData.ShouldHaveSize(1_375);
     }
 }

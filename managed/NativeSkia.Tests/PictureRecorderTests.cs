@@ -38,5 +38,6 @@ public class PictureRecorderTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("picture.png", pngData);
+        pngData.ShouldHaveSize(1_269);
     }
 }

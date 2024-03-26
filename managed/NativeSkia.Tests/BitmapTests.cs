@@ -20,11 +20,14 @@ public class BitmapTests
 
         using var jpegData = bitmap.EncodeAsJpeg(10);
         TestFixture.SaveOutput("bitmap_encode.jpg", jpegData);
+        jpegData.ShouldHaveSize(2_662);
         
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("bitmap_encode.png", pngData);
+        pngData.ShouldHaveSize(95_831);
         
         using var webpData = bitmap.EncodeAsWebp(10);
         TestFixture.SaveOutput("bitmap_encode.webp", webpData);
+        webpData.ShouldHaveSize(1_992);
     }
 }

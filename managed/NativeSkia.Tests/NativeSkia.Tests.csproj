@@ -30,7 +30,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="input\**\*.*">
+      <None Update="Input\**\*.*">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Input\OFL.txt">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

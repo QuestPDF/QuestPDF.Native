@@ -12,15 +12,10 @@ public class ParagraphTests
     [Test]
     public void DrawParagraphOnPdfCanvas()
     {
-        var typefaceProvider = new SkTypefaceProvider();
-        using var monoTypefaceData = SkData.FromFile("Input/JetBrainsMono-Regular.ttf");
-        typefaceProvider.AddTypefaceFromData(monoTypefaceData, "JetBrains Mono");
-        
-        using var latoTypefaceData = SkData.FromFile("Input/Lato/Lato-Light.ttf");
-        typefaceProvider.AddTypefaceFromData(latoTypefaceData);
+        using var typefaceProvider = CreateTypefaceProvider();
         
         // build simple paragraph;
-        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);   
+        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);   
  
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
@@ -34,9 +29,9 @@ public class ParagraphTests
         var textStyleConfiguration = new TextStyleConfiguration
         {
             FontSize = 18,
-            FontWeight = TextStyleConfiguration.FontWeights.Normal,
+            FontWeight = TextStyleConfiguration.FontWeights.Medium,
             
-            FontFamilies = GetFontFamilyPointers("Times New Roman"),
+            FontFamilies = GetFontFamilyPointers("Noto Sans", "Noto Emoji", "Noto Sans Arabic"),
             
             BackgroundColor = 0x00000000,
             ForegroundColor = 0xFF000000,
@@ -93,7 +88,9 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_paragraph.pdf", documentData);
-        documentData.ShouldHaveSize(206_457);
+        documentData.ShouldHaveSize(123_197);
+
+        paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
     }
     
     [Test]
@@ -113,17 +110,24 @@ public class ParagraphTests
         using var textStyle = new SkTextStyle(new TextStyleConfiguration
         {
             FontSize = 18,
-            FontWeight = TextStyleConfiguration.FontWeights.Normal,
-            FontFamilies = GetFontFamilyPointers("Times New Roman")
+            FontWeight = TextStyleConfiguration.FontWeights.Medium,
+            FontFamilies = GetFontFamilyPointers("Lato"),
+            
+            BackgroundColor = 0x00000000,
+            ForegroundColor = 0xFF000000,
+                        
+            LineHeight = 1.25f,
+            WordSpacing = 0,
+            LetterSpacing = 0
         });
         
-        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 20, Height = 20, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
+        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 40, Height = 20, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
         paragraphBuilder.AddText("Line 1\n", textStyle);
         
-        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 30, Height = 30, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
-        paragraphBuilder.AddText("Line 2 \n", textStyle);
+        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 50, Height = 30, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
+        paragraphBuilder.AddText("Line 2\n", textStyle);
         
-        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 40, Height = 40, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
+        paragraphBuilder.AddPlaceholder(new SkPlaceholderStyle { Width = 60, Height = 40, Alignment = SkPlaceholderStyle.PlaceholderAlignment.Bottom });
         paragraphBuilder.AddText("Line 3", textStyle);
         
         using var paragraph = paragraphBuilder.CreateParagraph();
@@ -132,15 +136,15 @@ public class ParagraphTests
 
         // values differ slightly between platforms
         var lineHeights = paragraph.GetLineMetrics().Select(x => x.Height);
-        lineHeights.Should().BeEquivalentTo(new[] { 21, 31, 41 });
+        lineHeights.Should().BeEquivalentTo(new[] { 23, 32, 42 });
+        
+        paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
     }
     
     [Test]
     public void GetUnresolvedCodepoints()
     {
-        using var typefaceProvider = new SkTypefaceProvider();
-        using var latoTypefaceData = SkData.FromFile("Input/Lato/Lato-Light.ttf");
-        typefaceProvider.AddTypefaceFromData(latoTypefaceData);
+        using var typefaceProvider = CreateTypefaceProvider();
 
         using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);
 
@@ -170,8 +174,8 @@ public class ParagraphTests
     public void Subscript()
     {
         // build simple paragraph
-        using var typefaceProvider = new SkTypefaceProvider();
-        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);   
+        using var typefaceProvider = CreateTypefaceProvider();
+        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);   
  
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
@@ -187,7 +191,7 @@ public class ParagraphTests
             FontSize = 18,
             FontWeight = TextStyleConfiguration.FontWeights.Normal,
             
-            FontFamilies = GetFontFamilyPointers("Times New Roman"),
+            FontFamilies = GetFontFamilyPointers("Noto Sans"),
             
             BackgroundColor = 0x00000000,
             ForegroundColor = 0xFF000000,
@@ -229,14 +233,16 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_subscript.pdf", documentData);
-        documentData.ShouldHaveSize(35_029);
+        documentData.ShouldHaveSize(8_638);
+        
+        paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
     }
     
     [Test]
     public void DrawParagraphWithHyperlink()
     {
-        using var typefaceProvider = new SkTypefaceProvider();
-        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);
+        using var typefaceProvider = CreateTypefaceProvider();
+        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);
         
         using var stream = new SkWriteStream();
         using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata());
@@ -259,7 +265,9 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_with_paragraph_and_inlined_hyperlink.pdf", documentData);
-        documentData.ShouldHaveSize(61_572);
+        documentData.ShouldHaveSize(24_498);
+        
+        paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
         
         SkParagraph BuildParagraph()
         {
@@ -276,7 +284,7 @@ public class ParagraphTests
                 FontSize = 18,
                 ForegroundColor = 0xFF000000,
                 FontWeight = TextStyleConfiguration.FontWeights.Medium,
-                FontFamilies = GetFontFamilyPointers("Times New Roman")
+                FontFamilies = GetFontFamilyPointers("Noto Sans")
             };
 
             var linkStyleConfiguration = baseTextStyleConfiguration with
@@ -298,6 +306,23 @@ public class ParagraphTests
             return paragraphBuilder.CreateParagraph();
         }
     }
+
+    static SkTypefaceProvider CreateTypefaceProvider()
+    {
+        var typefaceProvider = new SkTypefaceProvider();
+
+        var executionPath = AppDomain.CurrentDomain.RelativeSearchPath ?? AppDomain.CurrentDomain.BaseDirectory;
+        var fontFilePaths = Directory.GetFiles(executionPath, "*.ttf", SearchOption.AllDirectories);
+
+        foreach (var fileName in fontFilePaths)
+        {
+            using var typefaceData = SkData.FromFile(fileName);
+            typefaceProvider.AddTypefaceFromData(typefaceData);
+        }
+
+        return typefaceProvider;
+    }
+    
     
     IntPtr[] GetFontFamilyPointers(params string[] texts)
     {

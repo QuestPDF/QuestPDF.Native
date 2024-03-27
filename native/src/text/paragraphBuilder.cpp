@@ -46,6 +46,10 @@ QUEST_API skia::textlayout::Paragraph *paragraph_builder_create_paragraph(skia::
     return paragraph.release();
 }
 
+QUEST_API void paragraph_builder_reset(skia::textlayout::ParagraphBuilder *paragraphBuilder) {
+    paragraphBuilder->Reset();
+}
+
 QUEST_API void paragraph_builder_delete(skia::textlayout::ParagraphBuilder *paragraphBuilder) {
     delete paragraphBuilder;
 }

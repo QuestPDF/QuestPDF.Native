@@ -16,6 +16,7 @@ QUEST_API skia::textlayout::FontCollection *font_collection_create(CreateFontCol
     fontCollection->setAssetFontManager(sk_ref_sp(command.typefaceFontProvider));
     fontCollection->setDefaultFontManager(sk_ref_sp(command.fontManager));
     fontCollection->enableFontFallback();
+    fontCollection->getParagraphCache()->turnOn(false);
 
     return fontCollection;
 }

@@ -112,6 +112,11 @@ internal sealed class SkParagraphBuilder : IDisposable
         return new SkParagraph(instance);
     }
     
+    public void Reset()
+    {
+        API.paragraph_builder_reset(Instance);
+    }
+    
     ~SkParagraphBuilder()
     {
         Dispose();
@@ -139,6 +144,9 @@ internal sealed class SkParagraphBuilder : IDisposable
         
         [DllImport(SkiaAPI.LibraryName)]
         public static extern IntPtr paragraph_builder_create_paragraph(IntPtr paragraphBuilder);
+        
+        [DllImport(SkiaAPI.LibraryName)]
+        public static extern void paragraph_builder_reset(IntPtr paragraphBuilder);
         
         [DllImport(SkiaAPI.LibraryName)]
         public static extern void paragraph_builder_delete(IntPtr paragraphBuilder);

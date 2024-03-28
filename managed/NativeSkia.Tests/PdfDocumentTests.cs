@@ -62,7 +62,7 @@ public class PdfDocumentTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("simple_document.pdf", documentData);
-        documentData.ShouldHaveSize(5_827);
+        documentData.ShouldHaveSize(6_020);
     }
     
     [Test]

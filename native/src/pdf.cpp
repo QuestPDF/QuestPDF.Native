@@ -45,6 +45,21 @@ struct PdfDocumentMetadata {
 
 }
 
+SkPDF::DateTime map_datetime(DateTime datetime) {
+    SkPDF::DateTime result;
+
+    result.fTimeZoneMinutes = datetime.timeZoneMinutes;
+    result.fYear = datetime.year;
+    result.fMonth = datetime.month;
+    result.fDayOfWeek = datetime.dayOfWeek;
+    result.fDay = datetime.day;
+    result.fHour = datetime.hour;
+    result.fMinute = datetime.minute;
+    result.fSecond = datetime.second;
+
+    return result;
+}
+
 SkPDF::Metadata map_pdf_metadata(PdfDocumentMetadata metadata) {
     SkPDF::Metadata result;
 
@@ -55,8 +70,12 @@ SkPDF::Metadata map_pdf_metadata(PdfDocumentMetadata metadata) {
     result.fCreator = metadata.creator;
     result.fProducer = metadata.producer;
 
+    result.fCreation = map_datetime(metadata.creationDate);
+    result.fModified = map_datetime(metadata.modificationDate);
+
     result.fRasterDPI = metadata.rasterDPI;
     result.fPDFA = metadata.supportPDFA;
+
     result.fEncodingQuality = metadata.imageEncodingQuality;
     result.fCompressionLevel = metadata.compressDocument ? SkPDF::Metadata::CompressionLevel::LowButFast : SkPDF::Metadata::CompressionLevel::None;
 

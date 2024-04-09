@@ -7,9 +7,12 @@
 
 extern "C" {
 
-QUEST_API SkSVGDOM *svg_create(SkData *data) {
+QUEST_API SkSVGDOM *svg_create(SkData *data, SkFontMgr *fontManager) {
     auto svgStream = SkMemoryStream(sk_ref_sp(data));
-    auto svg = SkSVGDOM::MakeFromStream(svgStream);
+
+    auto svg = SkSVGDOM::Builder()
+        .setFontManager(sk_ref_sp(fontManager))
+        .make(svgStream);
 
     return svg.release();
 }

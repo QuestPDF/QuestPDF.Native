@@ -1,6 +1,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 using QuestPDF.Skia;
+using QuestPDF.Skia.Text;
 
 namespace NativeSkia.Tests;
 
@@ -15,7 +16,7 @@ public class SvgCanvasTests
         
         // load SVG
         var svgContent = File.ReadAllText("Input/icon.svg");
-        using var svgImage = new SkSvgImage(svgContent);
+        using var svgImage = new SkSvgImage(svgContent, SkFontManager.Global);
         
         // draw svg in a pdf document
         using var svgOutputStream = new SkWriteStream();

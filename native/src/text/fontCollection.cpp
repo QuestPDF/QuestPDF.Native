@@ -5,16 +5,11 @@
 
 extern "C" {
 
-struct CreateFontCollectionCommand {
-    SkFontMgr *fontManager;
-    skia::textlayout::TypefaceFontProvider *typefaceFontProvider;
-};
-
-QUEST_API skia::textlayout::FontCollection *font_collection_create(CreateFontCollectionCommand command) {
+QUEST_API skia::textlayout::FontCollection *font_collection_create(SkFontMgr *fontManager, skia::textlayout::TypefaceFontProvider *typefaceFontProvider) {
     auto fontCollection = new skia::textlayout::FontCollection();
 
-    fontCollection->setAssetFontManager(sk_ref_sp(command.typefaceFontProvider));
-    fontCollection->setDefaultFontManager(sk_ref_sp(command.fontManager));
+    fontCollection->setAssetFontManager(sk_ref_sp(typefaceFontProvider));
+    fontCollection->setDefaultFontManager(sk_ref_sp(fontManager));
     fontCollection->enableFontFallback();
     fontCollection->getParagraphCache()->turnOn(false);
 

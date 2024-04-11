@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+using System;
 
 namespace QuestPDF.Skia;
 
@@ -9,6 +9,6 @@ internal static class SkiaAPI
     public static void EnsureNotNull(IntPtr instance)
     {
         if (instance == IntPtr.Zero)
-            throw new InvalidOperationException($"Cannot instantiate native object.");
+            throw new InvalidOperationException($"QuestPDF cannot instantiate native object.");
     }
 }

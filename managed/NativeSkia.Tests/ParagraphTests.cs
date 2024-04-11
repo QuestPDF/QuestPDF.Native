@@ -18,7 +18,7 @@ public class ParagraphTests
         using var typefaceProvider = CreateTypefaceProvider();
         
         // build simple paragraph;
-        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);   
+        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Local);   
  
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
@@ -149,7 +149,7 @@ public class ParagraphTests
     {
         using var typefaceProvider = CreateTypefaceProvider();
 
-        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);
+        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Local);
 
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration();
         using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
@@ -178,7 +178,7 @@ public class ParagraphTests
     {
         // build simple paragraph
         using var typefaceProvider = CreateTypefaceProvider();
-        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);   
+        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Local);   
  
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
@@ -245,7 +245,7 @@ public class ParagraphTests
     public void DrawParagraphWithHyperlink()
     {
         using var typefaceProvider = CreateTypefaceProvider();
-        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Empty);
+        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Local);
         
         using var stream = new SkWriteStream();
         using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata());

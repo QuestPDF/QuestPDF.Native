@@ -1,5 +1,6 @@
 #include "../export.h"
 
+#include "include/ports/SkFontMgr_directory.h"
 #include "modules/skparagraph/include/ParagraphBuilder.h"
 #include "modules/skparagraph/include/TypefaceFontProvider.h"
 
@@ -35,11 +36,11 @@ sk_sp<SkFontMgr> font_manager_create_default_internal() {
 
 extern "C" {
 
-QUEST_API SkFontMgr *font_manager_get_empty() {
-    return SkFontMgr::RefEmpty().release();
+QUEST_API SkFontMgr *font_manager_create_local(char* path) {
+    return SkFontMgr_New_Custom_Directory(path).release();
 }
 
-QUEST_API SkFontMgr *font_manager_create_default() {
+QUEST_API SkFontMgr *font_manager_create_global() {
     return font_manager_create_default_internal().release();
 }
 

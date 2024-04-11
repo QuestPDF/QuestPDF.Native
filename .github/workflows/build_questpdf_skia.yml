@@ -141,6 +141,8 @@ jobs:
             skia_enable_spirv_validation=false
             skia_enable_gpu=false
             skia_enable_gpu_debug_layers=false
+            skia_enable_fontmgr_custom_directory=true
+            skia_use_freetype=true
             skia_use_jpeg_gainmaps=false
             skia_use_libheif=false
             skia_use_lua=false
@@ -154,7 +156,7 @@ jobs:
             extra_cflags=["-fPIC", "-fno-rtti"]'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
-            COMMON_ARGS+=' skia_use_freetype=true cc="clang" cxx="clang++"'
+            COMMON_ARGS+=' cc="clang" cxx="clang++"'
           fi
           
           if [ "${{ runner.os }}" = "macOS" ]; then

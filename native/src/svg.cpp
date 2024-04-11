@@ -10,11 +10,10 @@ extern "C" {
 QUEST_API SkSVGDOM *svg_create(SkData *data, SkFontMgr *fontManager) {
     auto svgStream = SkMemoryStream(sk_ref_sp(data));
 
-    auto svg = SkSVGDOM::Builder()
+    return SkSVGDOM::Builder()
         .setFontManager(sk_ref_sp(fontManager))
-        .make(svgStream);
-
-    return svg.release();
+        .make(svgStream)
+        .release();
 }
 
 QUEST_API void svg_unref(SkSVGDOM *svg) {

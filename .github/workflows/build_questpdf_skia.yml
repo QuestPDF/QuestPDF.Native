@@ -13,21 +13,21 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        # - name: win-x64
-        #   runs-on: windows-latest-large
+        - name: win-x64
+          runs-on: windows-latest-large
         - name: linux-x64
           runs-on: ubuntu-latest-large
           container: ubuntu:18.04
         - name: linux-arm64
           runs-on: [self-hosted, linux, arm64]
           container: ubuntu:18.04
-        - name: linux-muls-arm64
+        - name: linux-musl-x64
           runs-on: ubuntu-latest-large
-          container: alpine:3.15  
-        # - name: osx-x64
-        #   runs-on: macos-latest-large
-        # - name: osx-arm64
-        #   runs-on: macos-latest-xlarge
+          container: ubuntu:18.04  
+        - name: osx-x64
+          runs-on: macos-latest-large
+        - name: osx-arm64
+          runs-on: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v3
@@ -38,7 +38,6 @@ jobs:
           apt-get update --yes
           apt-get install wget git cmake fontconfig --yes
 
-
       - name: Install Clang
         if: runner.os == 'Linux'
         run: |
@@ -46,11 +45,26 @@ jobs:
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
           add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
           
-          apt-get install --yes software-properties-common
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-          add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
-          
           apt-get update --yes
+          apt-get install --yes clang-15 lldb-15 lld-15
+          
+          update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
+          update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
+          
+          update-alternatives --config cc
+          update-alternatives --config c++
+          
+          cc --version
+          c++ --version
+
+          update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 100
+          update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 100
+          
+          update-alternatives --config clang
+          update-alternatives --config clang++
+          
+          clang --version
+          clang++ --version
 
 
       - name: Install Cmake
@@ -143,6 +157,10 @@ jobs:
             skia_enable_pdf=true
             skia_compile_modules=true
             extra_cflags=["-fPIC", "-fno-rtti"]'
+            
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            COMMON_ARGS+=' cc="clang" cxx="clang++"'
+          fi
           
           if [ "${{ runner.os }}" = "macOS" ]; then
             COMMON_ARGS+=' skia_use_fonthost_mac=true'

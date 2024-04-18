@@ -39,6 +39,20 @@ jobs:
           apt-get install wget git cmake fontconfig --yes
 
 
+      - name: Install Clang
+        if: runner.os == 'Linux'
+        run: |
+          apt-get install --yes software-properties-common
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+          add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
+          
+          apt-get install --yes software-properties-common
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+          add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
+          
+          apt-get update --yes
+
+
       - name: Install Cmake
         if: runner.os == 'Linux'
         run: |

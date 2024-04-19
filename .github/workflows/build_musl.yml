@@ -20,7 +20,7 @@ jobs:
         runtime: 
         - name: linux-x64
           runs-on: ubuntu-latest
-          container: alpine:3.17
+          container: alpine:3.16
 
     steps:
       - uses: actions/checkout@v3

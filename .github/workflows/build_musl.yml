@@ -28,7 +28,7 @@ jobs:
       - name: Configure Alpine 
         uses: jirutka/setup-alpine@v1
         with:
-          branch: v3.19
+          branch: v3.17
           packages: bash wget git python3 build-base cmake clang llvm17 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto
           
           

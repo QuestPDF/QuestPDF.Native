@@ -33,7 +33,11 @@ jobs:
           runs-on: macos-latest-xlarge
 
     steps:
+      - uses: actions/checkout@v3
+        if: matrix.runtime.name != 'linux-musl-x64' && matrix.runtime.name != 'linux-musl-arm64'
+
       - uses: actions/checkout@v4
+        if: matrix.runtime.name == 'linux-musl-x64' || matrix.runtime.name == 'linux-musl-arm64'  
 
       - name: Install Build Tools
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
@@ -102,7 +106,7 @@ jobs:
 
       - name: Install Build Tools (Alpine)
         if: matrix.runtime.name == 'linux-musl-x64' || matrix.runtime.name == 'linux-musl-arm64'
-        shell: bash
+        shell: sh
         run: |
           apk update
           apk upgrade

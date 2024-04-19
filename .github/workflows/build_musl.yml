@@ -41,7 +41,7 @@ jobs:
           
           
       - name: Install dependencies and build Skia
-        shell: alpine.sh {0}
+        shell: sh
         run: |          
           git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch ./skia
           cd skia
@@ -98,7 +98,7 @@ jobs:
 
 
       - name: Configure CMake
-        shell: alpine.sh {0}
+        shell: sh
         run: >
           cmake
           -S ${PWD}/native
@@ -110,7 +110,7 @@ jobs:
 
 
       - name: Build CMake
-        shell: alpine.sh {0}
+        shell: sh
         run: >
           cmake 
           --build ${PWD}/native/build 
@@ -118,7 +118,7 @@ jobs:
 
 
       - name: Copy build artifact to output directory
-        shell: alpine.sh {0}
+        shell: sh
         run: |
           mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
           find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;
@@ -132,7 +132,7 @@ jobs:
             
 
       - name: Setup .NET 8.0 SDK
-        shell: alpine.sh {0}
+        shell: sh
         run: |
           wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
           chmod +x ./dotnet-install.sh
@@ -140,7 +140,7 @@ jobs:
           echo "${HOME}/.dotnet" >> $GITHUB_PATH
           
       - name: Test build artifacts
-        shell: alpine.sh {0}
+        shell: sh
         run: |
           dotnet build managed --configuration Debug --framework net8.0
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0

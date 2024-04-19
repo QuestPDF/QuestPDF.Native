@@ -33,7 +33,7 @@ jobs:
           runs-on: macos-latest-xlarge
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Build Tools
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
@@ -102,11 +102,11 @@ jobs:
 
       - name: Install Build Tools (Alpine)
         if: matrix.runtime.name == 'linux-musl-x64' || matrix.runtime.name == 'linux-musl-arm64'
-        shell: sh
+        shell: bash
         run: |
           apk update
           apk upgrade
-          apk add git python3 cmake llvm clang
+          apk add git python3 cmake llvm clang bash
 
 
       - name: Install 3.x
@@ -117,7 +117,7 @@ jobs:
           
 
       - name: Install dependencies and build Skia
-        shell: sh
+        shell: bash
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${PWD}/depot_tools" >> $GITHUB_PATH
@@ -186,7 +186,7 @@ jobs:
 
 
       - name: Configure CMake
-        shell: sh
+        shell: bash
         run: >
           cmake
           -S ${PWD}/native
@@ -198,7 +198,7 @@ jobs:
 
 
       - name: Build CMake
-        shell: sh
+        shell: bash
         run: >
           cmake 
           --build ${PWD}/native/build 
@@ -206,7 +206,7 @@ jobs:
 
 
       - name: Copy build artifact to output directory
-        shell: sh
+        shell: bash
         run: |
           mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
           find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;
@@ -226,7 +226,7 @@ jobs:
 
           
       - name: Test build artifacts
-        shell: sh
+        shell: bash
         run: |
           dotnet build managed --configuration Debug --framework net8.0
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0

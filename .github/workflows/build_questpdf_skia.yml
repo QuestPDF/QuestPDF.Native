@@ -36,13 +36,15 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Build Tools
-        if: matrix.name == 'linux-x64' || matrix.name == 'linux-arm64'
+        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        shell: bash
         run: |
           apt-get update --yes
           apt-get install wget git cmake fontconfig --yes
 
       - name: Install Clang
-        if: matrix.name == 'linux-x64' || matrix.name == 'linux-arm64'
+        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        shell: bash
         run: |
           apt-get install --yes software-properties-common
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
@@ -71,7 +73,8 @@ jobs:
 
 
       - name: Install Cmake
-        if: matrix.name == 'linux-x64' || matrix.name == 'linux-arm64'
+        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        shell: bash
         run: |
           wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
           apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
@@ -81,7 +84,7 @@ jobs:
 
 
       - name: Install Python 3.8
-        if: matrix.name == 'linux-x64' || matrix.name == 'linux-arm64'
+        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
         run: |
             apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
@@ -98,7 +101,8 @@ jobs:
 
 
       - name: Install Build Tools (Alpine)
-        if: matrix.name == 'linux-musl-x64' || matrix.name == 'linux-musl-arm64'
+        if: matrix.runtime.name == 'linux-musl-x64' || matrix.runtime.name == 'linux-musl-arm64'
+        shell: sh
         run: |
           apk update
           apk upgrade
@@ -113,7 +117,7 @@ jobs:
           
 
       - name: Install dependencies and build Skia
-        shell: bash
+        shell: sh
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${PWD}/depot_tools" >> $GITHUB_PATH
@@ -182,7 +186,7 @@ jobs:
 
 
       - name: Configure CMake
-        shell: bash
+        shell: sh
         run: >
           cmake
           -S ${PWD}/native
@@ -194,7 +198,7 @@ jobs:
 
 
       - name: Build CMake
-        shell: bash
+        shell: sh
         run: >
           cmake 
           --build ${PWD}/native/build 
@@ -202,7 +206,7 @@ jobs:
 
 
       - name: Copy build artifact to output directory
-        shell: bash
+        shell: sh
         run: |
           mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
           find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;
@@ -222,7 +226,7 @@ jobs:
 
           
       - name: Test build artifacts
-        shell: bash
+        shell: sh
         run: |
           dotnet build managed --configuration Debug --framework net8.0
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0

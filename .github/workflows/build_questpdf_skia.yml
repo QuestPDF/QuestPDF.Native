@@ -23,7 +23,10 @@ jobs:
           container: ubuntu:18.04
         - name: linux-musl-x64
           runs-on: ubuntu-latest-large
-          container: ubuntu:18.04  
+          container: alpine:3.17
+        - name: linux-musl-arm64
+          runs-on: [self-hosted, linux, arm64]
+          container: alpine:3.17  
         - name: osx-x64
           runs-on: macos-latest-large
         - name: osx-arm64
@@ -33,13 +36,13 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Build Tools
-        if: runner.os == 'Linux'
+        if: matrix.name == 'linux-x64' || matrix.name == 'linux-arm64'
         run: |
           apt-get update --yes
           apt-get install wget git cmake fontconfig --yes
 
       - name: Install Clang
-        if: runner.os == 'Linux'
+        if: matrix.name == 'linux-x64' || matrix.name == 'linux-arm64'
         run: |
           apt-get install --yes software-properties-common
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
@@ -68,7 +71,7 @@ jobs:
 
 
       - name: Install Cmake
-        if: runner.os == 'Linux'
+        if: matrix.name == 'linux-x64' || matrix.name == 'linux-arm64'
         run: |
           wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
           apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
@@ -78,7 +81,7 @@ jobs:
 
 
       - name: Install Python 3.8
-        if: runner.os == 'Linux'
+        if: matrix.name == 'linux-x64' || matrix.name == 'linux-arm64'
         shell: bash
         run: |
             apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
@@ -92,6 +95,14 @@ jobs:
             make install --silent
 
             python3 --version
+
+
+      - name: Install Build Tools (Alpine)
+        if: matrix.name == 'linux-musl-x64' || matrix.name == 'linux-musl-arm64'
+        run: |
+          apk update
+          apk upgrade
+          apk add git python3 cmake llvm clang
 
 
       - name: Install 3.x

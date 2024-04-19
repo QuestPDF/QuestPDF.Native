@@ -29,7 +29,7 @@ jobs:
         uses: jirutka/setup-alpine@v1
         with:
           branch: v3.17
-          packages: bash wget git python3 build-base cmake clang llvm17 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto
+          packages: bash wget git python3 build-base cmake clang llvm15 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto
           
           
       - name: Install dependencies and build Skia

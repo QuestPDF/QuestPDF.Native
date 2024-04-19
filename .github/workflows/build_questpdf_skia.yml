@@ -126,7 +126,7 @@ jobs:
 
 
       - name: Build Skia
-        shell: bash
+        shell: sh
         run: |
           git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch
           cd skia

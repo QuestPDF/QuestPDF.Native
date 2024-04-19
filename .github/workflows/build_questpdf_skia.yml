@@ -183,11 +183,11 @@ jobs:
             extra_cflags=["-fPIC", "-fno-rtti"]'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
-            COMMON_ARGS+=' cc="clang" cxx="clang++"'
+            COMMON_ARGS='$COMMON_ARGS cc="clang" cxx="clang++"'
           fi
           
           if [ "${{ runner.os }}" = "macOS" ]; then
-            COMMON_ARGS+=' skia_use_fonthost_mac=true'
+            COMMON_ARGS='$COMMON_ARGS skia_use_fonthost_mac=true'
           fi
 
           bin/gn gen out/release --args="$COMMON_ARGS"

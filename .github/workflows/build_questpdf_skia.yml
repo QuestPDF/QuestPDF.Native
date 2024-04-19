@@ -23,7 +23,7 @@ jobs:
         #   container: ubuntu:18.04
         - name: linux-musl-x64
           runs-on: ubuntu-latest-large
-          container: alpine:3.19
+          container: alpine:3.17
         # - name: osx-x64
         #   runs-on: macos-latest-large
         # - name: osx-arm64
@@ -101,12 +101,12 @@ jobs:
 
 
       - name: Install Build Tools (Alpine)
-        if: matrix.runtime.name == 'linux-musl-x64' || matrix.runtime.name == 'linux-musl-arm64'
+        if: matrix.runtime.name == 'linux-musl-x64'
         shell: sh
         run: |
           apk update
           apk upgrade
-          apk add bash wget git python3 build-base cmake clang llvm17 icu-libs linux-headers bsd-compat-headers gn fontconfig
+          apk add bash wget git python3 build-base cmake clang llvm15 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto
 
 
       - name: Install 3.x

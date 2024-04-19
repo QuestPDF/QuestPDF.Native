@@ -126,15 +126,11 @@ jobs:
 
 
       - name: Build Skia
-        shell: sh
+        shell: sh # bash does not work on Alpine
         run: |
           git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch
           cd skia
-
-          if [ "${{ matrix.runtime.name }}" != "linux-musl-x64" ]; then
-            bin/fetch-ninja
-          fi
-          
+          bin/fetch-ninja
           python3 tools/git-sync-deps
           
           COMMON_ARGS='

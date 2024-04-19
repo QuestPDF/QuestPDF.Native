@@ -106,7 +106,7 @@ jobs:
         run: |
           apk update
           apk upgrade
-          apk add git python3 cmake llvm15 clang bash gn build-base
+          apk add bash wget git python3 build-base cmake clang llvm17 icu-libs linux-headers bsd-compat-headers gn fontconfig
 
 
       - name: Install 3.x

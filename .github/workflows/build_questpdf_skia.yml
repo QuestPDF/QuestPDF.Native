@@ -130,7 +130,11 @@ jobs:
         run: |
           git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch
           cd skia
-          bin/fetch-ninja
+
+          if [ "${{ matrix.runtime.name }}" = "linux-musl-x64" ]; then
+            bin/fetch-ninja
+          fi
+          
           python3 tools/git-sync-deps
           
           COMMON_ARGS='

@@ -106,7 +106,7 @@ jobs:
         run: |
           apk update
           apk upgrade
-          apk add git python3 cmake llvm17 clang bash gn build-base
+          apk add git python3 cmake llvm15 clang bash gn build-base
 
 
       - name: Install 3.x

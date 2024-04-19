@@ -20,16 +20,24 @@ jobs:
         runtime: 
         - name: linux-x64
           runs-on: ubuntu-latest
+          container: alpine:3.17
 
     steps:
       - uses: actions/checkout@v3
         
         
-      - name: Configure Alpine 
-        uses: jirutka/setup-alpine@v1
-        with:
-          branch: v3.17
-          packages: bash wget git python3 build-base cmake clang llvm15 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto
+      # - name: Configure Alpine 
+      #   uses: jirutka/setup-alpine@v1
+      #   with:
+      #     branch: v3.17
+      #     packages: bash wget git python3 build-base cmake clang llvm15 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto
+
+      - name: Install Build Tools (Alpine)
+        shell: sh
+        run: |
+          apk update
+          apk upgrade
+          apk add bash wget git python3 build-base cmake clang llvm15 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto
           
           
       - name: Install dependencies and build Skia

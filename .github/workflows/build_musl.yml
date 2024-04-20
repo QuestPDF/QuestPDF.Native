@@ -93,7 +93,7 @@ jobs:
             skia_use_freetype=true'
 
           if [ "${{ runner.os }}" = "Linux" ]; then
-            COMMON_ARGS='$COMMON_ARGS cc="clang" cxx="clang++"'
+            COMMON_ARGS += ' cc="clang" cxx="clang++"'
           fi
           
           gn gen out/release --args="$COMMON_ARGS"

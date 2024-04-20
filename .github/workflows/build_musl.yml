@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies and build Skia
         shell: bash
         run: |          
-          git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch ./skia
+git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch
           cd skia
           bin/fetch-ninja
           python3 tools/git-sync-deps
@@ -79,6 +79,8 @@ jobs:
             skia_enable_spirv_validation=false
             skia_enable_gpu=false
             skia_enable_gpu_debug_layers=false
+            skia_enable_fontmgr_custom_directory=true
+            skia_use_freetype=true
             skia_use_jpeg_gainmaps=false
             skia_use_libheif=false
             skia_use_lua=false
@@ -89,14 +91,17 @@ jobs:
             skia_pdf_subset_harfbuzz=true
             skia_enable_pdf=true
             skia_compile_modules=true
-            extra_cflags=["-fPIC", "-fno-rtti"]
-            skia_use_freetype=true'
-
+            extra_cflags=["-fPIC", "-fno-rtti"]'
+            
           if [ "${{ runner.os }}" = "Linux" ]; then
-            COMMON_ARGS += ' cc="clang" cxx="clang++"'
+            COMMON_ARGS+=' cc="clang" cxx="clang++"'
           fi
           
-          gn gen out/release --args="$COMMON_ARGS"
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            COMMON_ARGS+=' skia_use_fonthost_mac=true'
+          fi
+
+          bin/gn gen out/release --args="$COMMON_ARGS"
           ninja -C out/release skia svg skparagraph
 
 

@@ -101,7 +101,8 @@ jobs:
             COMMON_ARGS+=' skia_use_fonthost_mac=true'
           fi
 
-          bin/gn gen out/release --args="$COMMON_ARGS"
+          # bin/gn gen out/release --args="$COMMON_ARGS"
+          gn gen out/release --args="$COMMON_ARGS"
           ninja -C out/release skia svg skparagraph
 
 

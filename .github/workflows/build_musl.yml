@@ -41,7 +41,7 @@ jobs:
           
           
       - name: Install dependencies and build Skia
-        shell: sh
+        shell: bash
         run: |          
           git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch ./skia
           cd skia
@@ -99,7 +99,7 @@ jobs:
 
 
       - name: Configure CMake
-        shell: sh
+        shell: bash
         run: >
           cmake
           -S ${PWD}/native
@@ -111,7 +111,7 @@ jobs:
 
 
       - name: Build CMake
-        shell: sh
+        shell: bash
         run: >
           cmake 
           --build ${PWD}/native/build 
@@ -119,7 +119,7 @@ jobs:
 
 
       - name: Copy build artifact to output directory
-        shell: sh
+        shell: bash
         run: |
           mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
           find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;

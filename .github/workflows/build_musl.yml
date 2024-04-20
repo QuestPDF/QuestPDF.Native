@@ -45,6 +45,7 @@ jobs:
         run: |          
           git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch ./skia
           cd skia
+          bin/fetch-ninja
           python3 tools/git-sync-deps
           
           COMMON_ARGS='

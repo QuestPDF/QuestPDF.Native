@@ -90,10 +90,12 @@ jobs:
             skia_enable_pdf=true
             skia_compile_modules=true
             extra_cflags=["-fPIC", "-fno-rtti"]
-            skia_use_freetype=true
-            cc="clang"
-            cxx="clang++"'
+            skia_use_freetype=true'
 
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            COMMON_ARGS='$COMMON_ARGS cc="clang" cxx="clang++"'
+          fi
+          
           gn gen out/release --args="$COMMON_ARGS"
           ninja -C out/release skia svg skparagraph
 

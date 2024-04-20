@@ -13,21 +13,21 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        # - name: win-x64
-        #   runs-on: windows-latest-large
-        # - name: linux-x64
-        #   runs-on: ubuntu-latest-large
-        #   container: ubuntu:18.04
+        - name: win-x64
+          runs-on: windows-latest-large
+        - name: linux-x64
+          runs-on: ubuntu-latest-large
+          container: ubuntu:18.04
         # - name: linux-arm64
         #   runs-on: [self-hosted, linux, arm64]
         #   container: ubuntu:18.04
         - name: linux-musl-x64
           runs-on: ubuntu-latest-large
           container: alpine:3.17
-        # - name: osx-x64
-        #   runs-on: macos-latest-large
-        # - name: osx-arm64
-        #   runs-on: macos-latest-xlarge
+        - name: osx-x64
+          runs-on: macos-latest-large
+        - name: osx-arm64
+          runs-on: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v3
@@ -116,18 +116,13 @@ jobs:
           python-version: '3.x'
 
 
-      - name: Install Skia dependencies
-        if: matrix.runtime.name != 'linux-musl-x64'
+      - name: Build Skia
         shell: bash
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${PWD}/depot_tools" >> $GITHUB_PATH
           export PATH="${PWD}/depot_tools:${PATH}"
-
-
-      - name: Build Skia
-        shell: sh # bash does not work on Alpine
-        run: |
+        
           git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch
           cd skia
           bin/fetch-ninja
@@ -179,14 +174,14 @@ jobs:
             extra_cflags=["-fPIC", "-fno-rtti"]'
             
           if [ "${{ runner.os }}" = "Linux" ]; then
-            COMMON_ARGS='$COMMON_ARGS cc="clang" cxx="clang++"'
+            COMMON_ARGS+=' cc="clang" cxx="clang++"'
           fi
           
           if [ "${{ runner.os }}" = "macOS" ]; then
-            COMMON_ARGS='$COMMON_ARGS skia_use_fonthost_mac=true'
+            COMMON_ARGS+=' skia_use_fonthost_mac=true'
           fi
 
-          bin/gn gen out/release --args="$COMMON_ARGS"
+          gn gen out/release --args="$COMMON_ARGS"
           ninja -C out/release skia svg skparagraph
 
 

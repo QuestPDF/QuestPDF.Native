@@ -116,13 +116,17 @@ jobs:
           python-version: '3.x'
 
 
-      - name: Build Skia
+      - name: Install Skia Build System
+        if: matrix.runtime.name != 'linux-musl-x64'
         shell: bash
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${PWD}/depot_tools" >> $GITHUB_PATH
           export PATH="${PWD}/depot_tools:${PATH}"
-        
+
+      - name: Build Skia
+        shell: bash
+        run: |
           git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch
           cd skia
           bin/fetch-ninja

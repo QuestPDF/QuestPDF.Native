@@ -15,19 +15,19 @@ jobs:
         runtime: 
         - name: win-x64
           runs-on: windows-latest-large
-        # - name: linux-x64
-        #   runs-on: ubuntu-latest-large
-        #   container: ubuntu:18.04
-        # - name: linux-arm64
-        #   runs-on: [self-hosted, linux, arm64]
-        #   container: ubuntu:18.04
+        - name: linux-x64
+          runs-on: ubuntu-latest-large
+          container: ubuntu:18.04
+        - name: linux-arm64
+          runs-on: [self-hosted, linux, arm64]
+          container: ubuntu:18.04
         - name: linux-musl-x64
           runs-on: ubuntu-latest-large
           container: alpine:3.17
-        # - name: osx-x64
-        #   runs-on: macos-latest-large
-        # - name: osx-arm64
-        #   runs-on: macos-latest-xlarge
+        - name: osx-x64
+          runs-on: macos-latest-large
+        - name: osx-arm64
+          runs-on: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v3
@@ -185,7 +185,12 @@ jobs:
             COMMON_ARGS+=' skia_use_fonthost_mac=true'
           fi
 
-          bin/gn gen out/release --args="$COMMON_ARGS"
+          if [ "${{ matrix.runtime.name }}" = "linux-musl-x64" ]; then
+            gn gen out/release --args="$COMMON_ARGS"
+          elif
+            bin/gn gen out/release --args="$COMMON_ARGS"
+          fi
+
           ninja -C out/release skia svg skparagraph
 
 

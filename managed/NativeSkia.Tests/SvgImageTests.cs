@@ -14,6 +14,13 @@ public class SvgImageTests
         using var svg = new SkSvgImage(svgContent, SkFontManager.Local);
 
         svg.Instance.Should().NotBe(0);
+        
+        svg.Size.Width.Should().Be(75.3201294f);
+        svg.Size.WidthUnit.Should().Be(SkSvgImageSize.Unit.Millimeters);
+        
+        svg.Size.Height.Should().Be(92.6041641f);
+        svg.Size.HeightUnit.Should().Be(SkSvgImageSize.Unit.Millimeters);
+        
         svg.ViewBox.Should().Be(new SkRect(0, 0, 76f, 93f));
     }
 

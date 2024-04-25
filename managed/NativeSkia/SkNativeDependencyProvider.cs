@@ -88,8 +88,6 @@ internal static class SkNativeDependencyProvider
 
         static string GetSystemIdentifier()
         {
-            var output = IsLinuxMusl();
-            
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return "win";
                 

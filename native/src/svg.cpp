@@ -20,14 +20,51 @@ QUEST_API void svg_unref(SkSVGDOM *svg) {
     svg->unref();
 }
 
-QUEST_API void svg_get_viewbox(SkSVGDOM *svg, SkRect *size) {
-    auto viewBox = svg->getRoot()->getViewBox().getMaybeNull();
+enum SkSvgSizeUnit {
+    kUnknown,
+    kNumber,
+    kPercentage,
+    kPX,
+    kCM,
+    kMM,
+    kIN,
+    kPT,
+    kPC,
+};
 
-    if (viewBox != nullptr)
-        size->setXYWH(viewBox->left(), viewBox->top(), viewBox->right(), viewBox->bottom());
+struct SkSvgSize {
+    float width;
+    float height;
 
-    else
-        size->setXYWH(0, 0, svg->getRoot()->getWidth().value(), svg->getRoot()->getHeight().value());
+    SkSvgSizeUnit widthUnit;
+    SkSvgSizeUnit heightUnit;
+};
+
+QUEST_API void svg_get_size(SkSVGDOM *svg, SkSvgSize *size, SkRect* viewBox) {
+    auto convertUnit = [](SkSVGLength::Unit unit) -> SkSvgSizeUnit {
+        switch (unit) {
+            case SkSVGLength::Unit::kNumber: return SkSvgSizeUnit::kNumber;
+            case SkSVGLength::Unit::kPercentage: return SkSvgSizeUnit::kPercentage;
+            case SkSVGLength::Unit::kPX: return SkSvgSizeUnit::kPX;
+            case SkSVGLength::Unit::kCM: return SkSvgSizeUnit::kCM;
+            case SkSVGLength::Unit::kMM: return SkSvgSizeUnit::kMM;
+            case SkSVGLength::Unit::kIN: return SkSvgSizeUnit::kIN;
+            case SkSVGLength::Unit::kPT: return SkSvgSizeUnit::kPT;
+            case SkSVGLength::Unit::kPC: return SkSvgSizeUnit::kPC;
+            default: return SkSvgSizeUnit::kUnknown;
+        }
+    };
+
+    size->width = svg->getRoot()->getWidth().value();
+    size->widthUnit = convertUnit(svg->getRoot()->getWidth().unit());
+
+    size->height = svg->getRoot()->getHeight().value();
+    size->heightUnit = convertUnit(svg->getRoot()->getHeight().unit());
+
+    auto inputViewBox = svg->getRoot()->getViewBox().getMaybeNull();
+
+    if (inputViewBox != nullptr)
+        viewBox->setLTRB(inputViewBox->left(), inputViewBox->top(), inputViewBox->right(), inputViewBox->bottom());
 }
 
 }

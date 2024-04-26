@@ -29,7 +29,7 @@ jobs:
         # - name: osx-arm64
         #   runs-on: macos-latest-xlarge
         - name: browser-wasm
-          runs-on: ubuntu-latest-xlarge
+          runs-on: ubuntu-latest-large
 
     steps:
       - uses: actions/checkout@v3

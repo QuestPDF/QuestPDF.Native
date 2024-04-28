@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using FluentAssertions;
 using NUnit.Framework;
 using QuestPDF.Skia;
@@ -12,6 +13,78 @@ namespace NativeSkia.Tests;
 
 public class ParagraphTests
 {
+    [Test]
+    public void MySimpleFontFeatureTest()
+    {
+        using var typefaceProvider = CreateTypefaceProvider();
+        
+        // build simple paragraph;
+        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Local);   
+ 
+        var paragraphStyleConfiguration = new ParagraphStyleConfiguration
+        {
+            Alignment = ParagraphStyleConfiguration.TextAlign.Justify,
+            Direction = ParagraphStyleConfiguration.TextDirection.Ltr,
+            MaxLinesVisible = 40
+        };
+        
+        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
+
+        var textStyleConfiguration = new TextStyleConfiguration
+        {
+            FontSize = 18,
+            FontWeight = TextStyleConfiguration.FontWeights.Medium,
+            
+            FontFamilies = GetFontFamilyPointers("Calibri"), //add Calibri.ttf to Input folder!
+            
+            BackgroundColor = 0x00000000,
+            ForegroundColor = 0xFF000000,
+            
+            DecorationColor = 0xFF009688,
+            DecorationStyle = TextStyleConfiguration.TextDecorationStyle.Solid,
+            DecorationType = TextStyleConfiguration.TextDecoration.NoDecoration,
+            DecorationMode = TextStyleConfiguration.TextDecorationMode.Gaps, 
+            
+            LineHeight = 1.25f,
+            WordSpacing = 0,
+            LetterSpacing = 0,
+            
+        };
+        using var defaultTextStyle = new SkTextStyle(textStyleConfiguration);
+        
+        using var ligaturesDisabledStyle = new SkTextStyle(textStyleConfiguration with
+        {
+            FontFeatures = GetFontFeaturePointers(("liga", 0))
+        });
+        
+        using var smallCapsEnabledStyle = new SkTextStyle(textStyleConfiguration with
+        {
+            FontFeatures = GetFontFeaturePointers(("smcp", 1))
+        });
+        
+        paragraphBuilder.AddText("Unterschrift\n", defaultTextStyle);
+        paragraphBuilder.AddText("Unterschrift\n", ligaturesDisabledStyle);
+        paragraphBuilder.AddText("Unterschrift\n", smallCapsEnabledStyle);
+        
+        var paragraph = paragraphBuilder.CreateParagraph();
+        // draw paragraph
+        using var stream = new SkWriteStream();
+        using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata());
+        
+        // draw text
+        using var pageCanvas = pdf.BeginPage(500, 800);
+        
+        pageCanvas.Translate(50, 50);
+        paragraph.PlanLayout(400);
+        pageCanvas.DrawParagraph(paragraph);
+        
+        pdf.EndPage();
+        pdf.Close();
+
+        using var documentData = stream.DetachData();
+        TestFixture.SaveOutput("document_fontFeatures.pdf", documentData);
+    }
+    
     [Test]
     public void DrawParagraphOnPdfCanvas()
     {
@@ -336,4 +409,21 @@ public class ParagraphTests
                 
         return result;
     }
+
+    IntPtr[] GetFontFeaturePointers(params (string tag, int value)[] features)
+    {
+        var result = new IntPtr[TextStyleConfiguration.FONT_FEATURES_LENGTH];
+
+        for (var i = 0; i < Math.Min(result.Length, features.Length); i++)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(features[i].tag);
+            //encode tag (always 4 byte string) to an integer
+            int encoded = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+            var fontFeature = new SkFontFeature.FontFeature() { Tag = encoded, Value = features[i].value };
+            result[i] = SkFontFeature.StructToIntPtr(fontFeature);
+        }
+
+        return result;
+    }
+    
 }

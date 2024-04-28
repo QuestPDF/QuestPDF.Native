@@ -25,6 +25,9 @@ internal struct TextStyleConfiguration
     public float LetterSpacing;
     public float WordSpacing;
     public float BaselineOffset;
+
+    public const int FONT_FEATURES_LENGTH = 16;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = FONT_FEATURES_LENGTH)] public IntPtr[] FontFeatures;
     
     public enum FontWeights
     {

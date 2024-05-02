@@ -67,8 +67,12 @@ QUEST_API skia::textlayout::TextStyle *text_style_create(TextStyleConfiguration 
     textStyle->setDecorationStyle(configuration.decorationStyle);
     textStyle->setDecorationThicknessMultiplier(configuration.decorationThickness);
 
-    textStyle->setHeight(configuration.lineHeight);
-    textStyle->setHeightOverride(true);
+    // when lineHeight is 0, use the default line height from the font metrics
+    if (configuration.lineHeight != 0) {
+        textStyle->setHeight(configuration.lineHeight);
+        textStyle->setHeightOverride(true);
+    }
+
     textStyle->setLetterSpacing(configuration.letterSpacing);
     textStyle->setWordSpacing(configuration.wordSpacing);
     textStyle->setBaselineShift(configuration.baselineOffset);

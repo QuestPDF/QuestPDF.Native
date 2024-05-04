@@ -52,10 +52,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     file(GLOB SKIA_LIBRARY "${SKIA_DIR}/out/release/*.lib")
     target_link_libraries(QuestPdfSkia PRIVATE ${SKIA_LIBRARY})
 
-    # Set architecture flags for x86
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-
     set(WINDOWS_SDK_PATH "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22000.0/um/x86")
     target_link_libraries(QuestPdfSkia PRIVATE "${WINDOWS_SDK_PATH}/fontsub.lib")
     target_link_libraries(QuestPdfSkia PRIVATE "${WINDOWS_SDK_PATH}/dwrite.lib")

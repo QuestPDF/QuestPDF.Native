@@ -13,21 +13,21 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        - name: win-x64
+        - name: win-x86
           runs-on: windows-latest-large
-        - name: linux-x64
-          runs-on: ubuntu-latest-large
-          container: ubuntu:18.04
-        - name: linux-arm64
-          runs-on: [self-hosted, linux, arm64]
-          container: ubuntu:18.04
-        - name: linux-musl-x64
-          runs-on: ubuntu-latest-large
-          container: alpine:3.17
-        - name: osx-x64
-          runs-on: macos-latest-large
-        - name: osx-arm64
-          runs-on: macos-latest-xlarge
+        # - name: linux-x64
+        #   runs-on: ubuntu-latest-large
+        #   container: ubuntu:18.04
+        # - name: linux-arm64
+        #   runs-on: [self-hosted, linux, arm64]
+        #   container: ubuntu:18.04
+        # - name: linux-musl-x64
+        #   runs-on: ubuntu-latest-large
+        #   container: alpine:3.17
+        # - name: osx-x64
+        #   runs-on: macos-latest-large
+        # - name: osx-arm64
+        #   runs-on: macos-latest-xlarge
         # - name: browser-wasm
         #   runs-on: ubuntu-latest-large
 
@@ -187,6 +187,10 @@ jobs:
             COMMON_ARGS+=' skia_use_fonthost_mac=true'
           fi
 
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            COMMON_ARGS+=' target_cpu="x86"'
+          fi
+
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
             COMMON_ARGS+=' target_os="wasm"'
           fi
@@ -210,6 +214,8 @@ jobs:
           -DCMAKE_CXX_COMPILER=clang++ 
           -DCMAKE_C_COMPILER=clang 
           -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_C_FLAGS=-m32 
+          -DCMAKE_CXX_FLAGS=-m32
 
 
       - name: Build CMake

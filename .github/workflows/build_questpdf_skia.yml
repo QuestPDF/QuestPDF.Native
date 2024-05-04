@@ -127,7 +127,6 @@ jobs:
           export PATH="${PWD}/depot_tools:${PATH}"
 
       - name: Build Skia
-        shell: bash
         run: |
           git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch
           cd skia

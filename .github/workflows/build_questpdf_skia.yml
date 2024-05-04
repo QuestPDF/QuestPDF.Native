@@ -188,7 +188,7 @@ jobs:
           fi
 
           if [ "${{ runner.os }}" = "Windows" ]; then
-            COMMON_ARGS+=' target_cpu="x86"'
+            COMMON_ARGS+=' target_cpu="x86" win_vc = "C:\toolchain\VC win_sdk = "C:\toolchain\win_sdk"'
           fi
 
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then

@@ -24,7 +24,8 @@ public class ParagraphTests
         {
             Alignment = ParagraphStyleConfiguration.TextAlign.Justify,
             Direction = ParagraphStyleConfiguration.TextDirection.Ltr,
-            MaxLinesVisible = 40
+            MaxLinesVisible = 40,
+            LineClampEllipsis = new SkText("...").Instance
         };
         
         using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
@@ -104,8 +105,7 @@ public class ParagraphTests
 
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
-            Direction = ParagraphStyleConfiguration.TextDirection.Ltr,
-            MaxLinesVisible = 1000
+            Direction = ParagraphStyleConfiguration.TextDirection.Ltr
         };
         
         using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
@@ -184,7 +184,8 @@ public class ParagraphTests
         {
             Alignment = ParagraphStyleConfiguration.TextAlign.Left,
             Direction = ParagraphStyleConfiguration.TextDirection.Ltr,
-            MaxLinesVisible = 40
+            MaxLinesVisible = 40,
+            LineClampEllipsis = new SkText(" [...]").Instance
         };
         
         using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
@@ -277,7 +278,7 @@ public class ParagraphTests
             var paragraphStyleConfiguration = new ParagraphStyleConfiguration
             {
                 MaxLinesVisible = 1000,
-                Direction = ParagraphStyleConfiguration.TextDirection.Ltr
+                Direction = ParagraphStyleConfiguration.TextDirection.Ltr,
             };
             
             using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);

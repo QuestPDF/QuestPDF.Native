@@ -10,6 +10,7 @@ struct ParagraphStyleConfiguration {
     skia::textlayout::TextAlign alignment;
     skia::textlayout::TextDirection direction;
     int maxLinesVisible;
+    char* lineClampEllipsis;
 };
 
 QUEST_API skia::textlayout::ParagraphBuilder *paragraph_builder_create(ParagraphStyleConfiguration configuration, skia::textlayout::FontCollection *fontCollection) {
@@ -20,7 +21,7 @@ QUEST_API skia::textlayout::ParagraphBuilder *paragraph_builder_create(Paragraph
     paragraphStyle.setTextHeightBehavior(skia::textlayout::kAll);
 
     if (configuration.maxLinesVisible > 0) {
-        paragraphStyle.setEllipsis(SkString("..."));
+        paragraphStyle.setEllipsis(SkString(configuration.lineClampEllipsis));
         paragraphStyle.setMaxLines(configuration.maxLinesVisible);
     } else {
         const int infiniteLines = std::numeric_limits<int>::max();

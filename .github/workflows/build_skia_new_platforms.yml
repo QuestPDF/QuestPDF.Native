@@ -145,6 +145,9 @@ jobs:
 
             source "${EMSDK_PATH}/emsdk_env.sh"
             echo 'source "${EMSDK_PATH}/emsdk_env.sh"' >> $HOME/.bash_profile
+
+            mkdir -p out/release
+            chmod -R +x out/release
           fi
           
           COMMON_ARGS='
@@ -201,7 +204,6 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
-            chmod -R +x out/release
             COMMON_ARGS+=' is_wasm=true skia_emsdk_dir="'$EMSDK_PATH'" is_trivial_abi=true target_os="wasm" target_cpu="wasm"'
           fi
 
@@ -273,7 +275,7 @@ jobs:
           TEST_ARGS='--framework net8.0'
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            TEST_ARGS+=" --platform x86"
+            TEST_ARGS+=" --arch x86"
           fi
         
           dotnet build managed --configuration Debug --framework net8.0

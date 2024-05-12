@@ -135,8 +135,11 @@ jobs:
           python3 tools/git-sync-deps
 
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
-            sudo /home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk/emsdk_env.sh
-            'source "/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk/emsdk_env.sh"' >> $HOME/.bash_profile
+            EMSDK_PATH='/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk/emsdk_env.sh'
+          
+            chmod +x $EMSDK_PATH
+            $EMSDK_PATH
+            'source "$EMSDK_PATH"' >> $HOME/.bash_profile
           fi
           
           COMMON_ARGS='
@@ -197,7 +200,7 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            COMMON_ARGS+=' target_cpu="x86"'
+            COMMON_ARGS+=' win_sdk = \"C:/Program Files (x86)/Windows Kits/10\" target_cpu="x86"'
           fi
 
           if [ "${{ matrix.runtime.name }}" = "linux-musl-x64" ]; then

@@ -147,7 +147,7 @@ jobs:
             cmake --version
             cc --version
             c++ --version
-            echo '${EMSDK_PATH}'
+            echo $EMSDK_PATH
           fi
           
           COMMON_ARGS='
@@ -205,7 +205,7 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
-            COMMON_ARGS+=' skia_emsdk_dir="$EMSDK_PATH" is_trivial_abi=true target_os="wasm"'
+            COMMON_ARGS+=' skia_emsdk_dir="'+$EMSDK_PATH+'" is_trivial_abi=true target_os="wasm"'
           fi
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then

@@ -189,7 +189,7 @@ jobs:
             skia_enable_skunicode=true
             skia_pdf_subset_harfbuzz=true
             skia_enable_pdf=true
-            skia_compile_modules=true
+            skia_compile_modules=false
             extra_cflags=["-fPIC", "-fno-rtti"]'
             
           if [ "${{ matrix.runtime.name }}" = linux-* ]; then

@@ -1,0 +1,261 @@
+name: Build Skia + QuestPDF (win-x86, wasm)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.runtime.name }}
+    runs-on: ${{ matrix.runtime.runs-on }}
+    container: ${{ matrix.runtime.container }}
+      
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: 
+        - name: win-x86
+          runs-on: windows-latest-xlarge
+        # - name: linux-x64
+        #   runs-on: ubuntu-latest-large
+        #   container: ubuntu:18.04
+        # - name: linux-arm64
+        #   runs-on: [self-hosted, linux, arm64]
+        #   container: ubuntu:18.04
+        # - name: linux-musl-x64
+        #   runs-on: ubuntu-latest-large
+        #   container: alpine:3.17
+        # - name: osx-x64
+        #   runs-on: macos-latest-large
+        # - name: osx-arm64
+        #   runs-on: macos-latest-xlarge
+        - name: browser-wasm
+          runs-on: ubuntu-latest-xlarge
+
+    steps:
+      - uses: actions/checkout@v3
+      
+
+      - name: Install Build Tools
+        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        shell: bash
+        run: |
+          apt-get update --yes
+          apt-get upgrade --yes
+          apt-get install wget git cmake fontconfig --yes
+
+
+      - name: Install Clang
+        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        shell: bash
+        run: |
+          apt-get install --yes software-properties-common
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+          add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
+          
+          apt-get update --yes
+          apt-get install --yes clang-15 lldb-15 lld-15
+          
+          update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
+          update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
+          
+          update-alternatives --config cc
+          update-alternatives --config c++
+          
+          cc --version
+          c++ --version
+
+          update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 100
+          update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 100
+          
+          update-alternatives --config clang
+          update-alternatives --config clang++
+          
+          clang --version
+          clang++ --version
+
+
+      - name: Install Cmake
+        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        shell: bash
+        run: |
+          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
+          apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+          apt-get update
+          apt install cmake --yes
+          cmake --version
+
+
+      - name: Install Python 3.8
+        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        shell: bash
+        run: |
+            apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
+
+            wget https://www.python.org/ftp/python/3.8.18/Python-3.8.18.tgz
+            tar xzf Python-3.8.18.tgz
+            cd Python-3.8.18
+            
+            ./configure --enable-optimizations
+            make --silent
+            make install --silent
+
+            python3 --version
+
+
+      - name: Install Build Tools (Alpine)
+        if: matrix.runtime.name == 'linux-musl-x64'
+        shell: sh
+        run: |
+          apk update
+          apk upgrade
+          apk add bash wget git python3 build-base cmake clang llvm15 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto
+
+
+      - name: Install 3.x
+        if: runner.os != 'Linux'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+
+      - name: Install Skia Build System
+        if: matrix.runtime.name != 'linux-musl-x64'
+        shell: bash
+        run: |
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          echo "${PWD}/depot_tools" >> $GITHUB_PATH
+          export PATH="${PWD}/depot_tools:${PATH}"
+
+      - name: Build Skia
+        shell: bash
+        run: |
+          git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch
+          cd skia
+          bin/fetch-ninja
+          python3 tools/git-sync-deps
+          
+          COMMON_ARGS='
+            is_official_build=true
+            is_component_build=false
+            is_debug=false
+            skia_enable_optimize_size=true
+            skia_enable_tools=true
+            skia_use_system_expat=false
+            skia_use_system_icu=false
+            skia_use_system_harfbuzz=false
+            skia_use_system_libjpeg_turbo=false
+            skia_use_system_libpng=false
+            skia_use_system_libwebp=false
+            skia_use_system_zlib=false
+            skia_use_system_freetype2=false
+            skia_use_dng_sdk=false
+            skia_use_harfbuzz=true
+            skia_use_icu=false
+            skia_use_icu4x=false
+            skia_use_libgrapheme=true
+            skia_use_fontconfig=false
+            skia_use_gl=false
+            skia_use_libjpeg_turbo_decode=true
+            skia_use_libjpeg_turbo_encode=true
+            skia_use_libpng_encode=true
+            skia_use_libpng_decode=true
+            skia_use_libwebp_encode=true
+            skia_use_libwebp_decode=true
+            skia_enable_android_utils=false
+            skia_enable_spirv_validation=false
+            skia_enable_gpu=false
+            skia_enable_gpu_debug_layers=false
+            skia_enable_fontmgr_custom_directory=true
+            skia_use_freetype=true
+            skia_use_jpeg_gainmaps=false
+            skia_use_libheif=false
+            skia_use_lua=false
+            skia_enable_svg=true
+            skia_use_expat=true
+            skia_enable_skshaper=true
+            skia_enable_skunicode=true
+            skia_pdf_subset_harfbuzz=true
+            skia_enable_pdf=true
+            skia_compile_modules=true
+            extra_cflags=["-fPIC", "-fno-rtti"]'
+            
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            COMMON_ARGS+=' cc="clang" cxx="clang++"'
+          fi
+          
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            COMMON_ARGS+=' skia_use_fonthost_mac=true'
+          fi
+
+          if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
+            COMMON_ARGS+=' target_os="wasm"'
+          fi
+
+          if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
+            COMMON_ARGS+=' target_os="x86"'
+          fi
+
+          if [ "${{ matrix.runtime.name }}" = "linux-musl-x64" ]; then
+            gn gen out/release --args="$COMMON_ARGS"
+          else
+            bin/gn gen out/release --args="$COMMON_ARGS"
+          fi
+
+          ninja -C out/release skia svg skparagraph
+
+
+      - name: Configure CMake
+        shell: bash
+        run: >
+          cmake
+          -S ${PWD}/native
+          -B ${PWD}/native/build 
+          -DSKIA_DIR=${PWD}/skia 
+          -DCMAKE_CXX_COMPILER=clang++ 
+          -DCMAKE_C_COMPILER=clang 
+          -DCMAKE_BUILD_TYPE=Release
+
+
+      - name: Build CMake
+        shell: bash
+        run: >
+          cmake 
+          --build ${PWD}/native/build 
+          --config Release
+
+
+      - name: Copy build artifact to output directory
+        shell: bash
+        run: |
+          mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
+          find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;
+
+
+      - name: Upload build artifacts 2
+        uses: actions/upload-artifact@v3
+        with:
+          name: questpdf-native-libraries
+          path: output
+            
+
+      - name: Setup .NET 8.0 SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+          
+      - name: Test build artifacts
+        shell: bash
+        run: |
+          dotnet build managed --configuration Debug --framework net8.0
+          cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
+          dotnet test managed --framework net8.0
+          mkdir -p testOutput/${{ matrix.runtime.name }} 
+          cp -r managed/NativeSkia.Tests/bin/Debug/net8.0/Output/* testOutput/${{ matrix.runtime.name }} 
+
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: questpdf-test-results
+          path: testOutput

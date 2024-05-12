@@ -15,8 +15,8 @@ jobs:
         runtime: 
         # - name: win-x64
         #   runs-on: windows-latest-xlarge
-        # - name: win-x86
-        #   runs-on: windows-latest-xlarge
+        - name: win-x86
+          runs-on: windows-latest-xlarge
         # - name: linux-x64
         #   runs-on: ubuntu-latest-large
         #   container: ubuntu:18.04

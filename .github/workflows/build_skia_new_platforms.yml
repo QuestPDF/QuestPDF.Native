@@ -233,7 +233,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release"
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            CMAKE_ARGS="$cmake_args -A Win32"
+            CMAKE_ARGS+=" -A Win32"
           fi
           
           cmake $CMAKE_ARGS

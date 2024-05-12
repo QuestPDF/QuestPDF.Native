@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        - name: win-x64
-          runs-on: windows-latest-xlarge
+        # - name: win-x64
+        #   runs-on: windows-latest-xlarge
         - name: win-x86
           runs-on: windows-latest-xlarge
         # - name: linux-x64
@@ -201,7 +201,7 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
-            chmod -R +x out/release/character
+            chmod -R +x out/release
             COMMON_ARGS+=' is_wasm=true skia_emsdk_dir="'$EMSDK_PATH'" is_trivial_abi=true target_os="wasm" target_cpu="wasm"'
           fi
 
@@ -273,12 +273,12 @@ jobs:
           TEST_ARGS='--framework net8.0'
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            TEST_ARGS+=" --Platform x86"
+            TEST_ARGS+=" --platform x86"
           fi
         
           dotnet build managed --configuration Debug --framework net8.0
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
-          dotnet test managed --framework net8.0
+          dotnet test managed $TEST_ARGS
           mkdir -p testOutput/${{ matrix.runtime.name }} 
           cp -r managed/NativeSkia.Tests/bin/Debug/net8.0/Output/* testOutput/${{ matrix.runtime.name }} 
 

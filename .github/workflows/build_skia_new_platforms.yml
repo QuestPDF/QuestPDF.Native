@@ -134,6 +134,8 @@ jobs:
           bin/fetch-ninja
           python3 tools/git-sync-deps
 
+          EMSDK_PATH=''
+
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
             bin/activate-emsdk
 
@@ -207,7 +209,7 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            sed -i 's|env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|#env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|' skia/gn/toolchain/BUILD.gn
+            sed -i 's|env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|#env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|' gn/toolchain/BUILD.gn
             COMMON_ARGS+=' target_cpu="x86"'
           fi
 

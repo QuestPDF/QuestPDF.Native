@@ -187,7 +187,8 @@ jobs:
             skia_compile_modules=true
             extra_cflags=["-fPIC", "-fno-rtti"]'
             
-          if [ "${{ runner.os }}" = "Linux" ]; then
+          if [ "${{ matrix.runtime.name }}" = linux-* ]; then
+            echo "Setting clang compiler for linux"
             COMMON_ARGS+=' cc="clang" cxx="clang++"'
           fi
           
@@ -200,7 +201,7 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            COMMON_ARGS+=' win_sdk="/"C:/Program Files (x86)/Windows Kits/10/"" target_cpu="x86"'
+            COMMON_ARGS+=' win_sdk="/"C://Program Files (x86)//Windows Kits//10//"" target_cpu="x86"'
           fi
 
           if [ "${{ matrix.runtime.name }}" = "linux-musl-x64" ]; then

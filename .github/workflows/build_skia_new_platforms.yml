@@ -136,6 +136,10 @@ jobs:
 
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
              bin/activate-emsdk
+             cmake --version
+             cc --version
+             c++ --version
+             echo "${EMSDK}"
           fi
           
           COMMON_ARGS='
@@ -193,19 +197,21 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
-            COMMON_ARGS+=' is_trivial_abi=true target_os="wasm"'
+            COMMON_ARGS+=' skia_emsdk_dir="${EMSDK}" is_trivial_abi=true target_os="wasm"'
           fi
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
             COMMON_ARGS+=' win_sdk="C:/Program\ Files\ (x86)/Windows\ Kits/10" target_cpu="x86"'
           fi
 
+          echo "$COMMON_ARGS"
+
           if [ "${{ matrix.runtime.name }}" = "linux-musl-x64" ]; then
             gn gen out/release --args="$COMMON_ARGS"
           else
             bin/gn gen out/release --args="$COMMON_ARGS"
           fi
-
+          
           ninja -C out/release skia svg skparagraph
 
 

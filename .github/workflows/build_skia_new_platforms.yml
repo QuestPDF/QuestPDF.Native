@@ -147,11 +147,10 @@ jobs:
             echo 'source "${EMSDK_PATH}/emsdk_env.sh"' >> $HOME/.bash_profile
 
             mkdir -p out/release 
-            # mkdir -p out/release/line 
-            # mkdir -p out/release/bidirectional
-            # mkdir -p out/release/case
-            # mkdir -p out/release/character
-            chmod -R +x out/release
+            cd out/release
+            touch line bidirectional case character sentence word
+            chmod -R +x .
+            cd ../../
           fi
           
           COMMON_ARGS='

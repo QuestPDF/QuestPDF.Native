@@ -51,7 +51,7 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     if(CMAKE_GENERATOR_PLATFORM MATCHES "Win32")
         set(WIN_ARCH "x86")
-    elseif(CMAKE_GENERATOR_PLATFORM MATCHES "x64")
+    else()
         set(WIN_ARCH "x64")
     endif()
 

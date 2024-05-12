@@ -193,7 +193,6 @@ jobs:
             extra_cflags=["-fPIC", "-fno-rtti"]'
             
           if [ "${{ matrix.runtime.name }}" = linux-* ]; then
-            echo "Setting clang compiler for linux"
             COMMON_ARGS+=' cc="clang" cxx="clang++"'
           fi
           
@@ -202,6 +201,7 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
+            chmod -R +x out/release/character
             COMMON_ARGS+=' is_wasm=true skia_emsdk_dir="'$EMSDK_PATH'" is_trivial_abi=true target_os="wasm" target_cpu="wasm"'
           fi
 
@@ -209,8 +209,6 @@ jobs:
             sed -i 's|env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|#env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|' gn/toolchain/BUILD.gn
             COMMON_ARGS+=' target_cpu="x86"'
           fi
-
-          echo "$COMMON_ARGS"
 
           if [ "${{ matrix.runtime.name }}" = "linux-musl-x64" ]; then
             gn gen out/release --args="$COMMON_ARGS"
@@ -262,14 +260,22 @@ jobs:
             
 
       - name: Setup .NET 8.0 SDK
+        if: matrix.runtime.name != 'browser-wasm'
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
           
       - name: Test build artifacts
+        if: matrix.runtime.name != 'browser-wasm'
         shell: bash
         run: |
+          TEST_ARGS='--framework net8.0'
+
+          if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
+            TEST_ARGS+=" --Platform x86"
+          fi
+        
           dotnet build managed --configuration Debug --framework net8.0
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
           dotnet test managed --framework net8.0
@@ -278,6 +284,7 @@ jobs:
 
 
       - name: Upload test results
+        if: matrix.runtime.name != 'browser-wasm'
         uses: actions/upload-artifact@v3
         with:
           name: questpdf-test-results

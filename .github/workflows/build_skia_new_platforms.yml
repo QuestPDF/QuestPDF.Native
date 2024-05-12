@@ -13,6 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
+        - name: win-x64
+          runs-on: windows-latest-xlarge
         - name: win-x86
           runs-on: windows-latest-xlarge
         # - name: linux-x64
@@ -200,7 +202,7 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
-            COMMON_ARGS+=' skia_emsdk_dir="'$EMSDK_PATH'" is_trivial_abi=true target_os="wasm" target_cpu="wasm"'
+            COMMON_ARGS+=' is_wasm=true skia_emsdk_dir="'$EMSDK_PATH'" is_trivial_abi=true target_os="wasm" target_cpu="wasm"'
           fi
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
@@ -221,15 +223,20 @@ jobs:
 
       - name: Configure CMake
         shell: bash
-        run: >
-          cmake
-          -S ${PWD}/native
-          -B ${PWD}/native/build
-          -A Win32
-          -DSKIA_DIR=${PWD}/skia 
-          -DCMAKE_CXX_COMPILER=clang++ 
-          -DCMAKE_C_COMPILER=clang 
-          -DCMAKE_BUILD_TYPE=Release
+        run: |
+          CMAKE_ARGS="
+            -S ${{ github.workspace }}/native 
+            -B ${{ github.workspace }}/native/build 
+            -DSKIA_DIR=${{ github.workspace }}/skia 
+            -DCMAKE_CXX_COMPILER=clang++ 
+            -DCMAKE_C_COMPILER=clang 
+            -DCMAKE_BUILD_TYPE=Release"
+
+          if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
+            CMAKE_ARGS="$cmake_args -A Win32"
+          fi
+          
+          cmake $CMAKE_ARGS
 
 
       - name: Build CMake

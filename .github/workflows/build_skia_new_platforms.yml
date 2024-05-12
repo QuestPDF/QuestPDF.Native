@@ -137,7 +137,7 @@ jobs:
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
             bin/activate-emsdk
 
-            EMSDK_PATH = '/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk'
+            EMSDK_PATH='/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk'
 
             source "${EMSDK_PATH}/emsdk_env.sh"
             echo 'source "${EMSDK_PATH}/emsdk_env.sh"' >> $HOME/.bash_profile
@@ -207,7 +207,7 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            COMMON_ARGS+=' win_sdk="" target_cpu="x86"'
+            COMMON_ARGS+=' target_cpu="x86"'
           fi
 
           echo "$COMMON_ARGS"

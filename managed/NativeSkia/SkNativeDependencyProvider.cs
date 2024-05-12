@@ -10,7 +10,7 @@ internal static class SkNativeDependencyProvider
 {
     public static readonly string[] SupportedPlatforms =
     {
-        "win-x64",
+        "win-x86",
         "linux-x64",
         "linux-arm64",
         "linux-musl-x64",
@@ -104,7 +104,8 @@ internal static class SkNativeDependencyProvider
         {
             return RuntimeInformation.ProcessArchitecture switch
             {
-                Architecture.X64 => "x64",
+                Architecture.X64 => "x86",
+                Architecture.X86 => "x86",
                 Architecture.Arm64 => "arm64",
                 _ => throw new Exception("Your runtime is currently not supported by QuestPDF.")
             };

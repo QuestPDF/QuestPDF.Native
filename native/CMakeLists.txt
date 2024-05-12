@@ -49,7 +49,12 @@ endif()
 
 # Windows configuration
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(WIN_ARCH ${WIN_ARCH})
+    if(CMAKE_GENERATOR_PLATFORM MATCHES "Win32")
+        set(WIN_ARCH "x86")
+    elseif(CMAKE_GENERATOR_PLATFORM MATCHES "x64")
+        set(WIN_ARCH "x64")
+    endif()
+
 
     file(GLOB SKIA_LIBRARY "${SKIA_DIR}/out/release/*.lib")
     target_link_libraries(QuestPdfSkia PRIVATE ${SKIA_LIBRARY})

@@ -145,9 +145,6 @@ jobs:
 
             source "${EMSDK_PATH}/emsdk_env.sh"
             echo 'source "${EMSDK_PATH}/emsdk_env.sh"' >> $HOME/.bash_profile
-
-            mkdir -p out/release
-            chmod -R +x out/release
           fi
           
           COMMON_ARGS='
@@ -218,7 +215,7 @@ jobs:
             bin/gn gen out/release --args="$COMMON_ARGS"
           fi
           
-          ninja -C out/release skia svg skparagraph
+          sudo ninja -C out/release skia svg skparagraph
 
 
       - name: Configure CMake

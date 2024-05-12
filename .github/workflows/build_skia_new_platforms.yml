@@ -272,7 +272,7 @@ jobs:
           TEST_ARGS='--framework net8.0'
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            TEST_ARGS+=" --arch x86"
+            TEST_ARGS+=" --runtime win-x86"
           fi
         
           dotnet build managed --configuration Debug --framework net8.0

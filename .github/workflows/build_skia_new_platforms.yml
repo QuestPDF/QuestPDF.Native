@@ -203,10 +203,11 @@ jobs:
           fi
 
           if [ "${{ matrix.runtime.name }}" = "browser-wasm" ]; then
-            COMMON_ARGS+=' skia_emsdk_dir="$EMSDK_PATH" is_trivial_abi=true target_os="wasm"'
+            COMMON_ARGS+=' skia_emsdk_dir="${EMSDK_PATH}" is_trivial_abi=true target_os="wasm"'
           fi
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
+            sed -i 's|env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|#env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|' skia/gn/toolchain/BUILD.gn
             COMMON_ARGS+=' target_cpu="x86"'
           fi
 

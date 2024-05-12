@@ -71,9 +71,9 @@ QUEST_API skia::textlayout::TextStyle *text_style_create(TextStyleConfiguration 
     if (configuration.lineHeight != 0) {
         textStyle->setHeight(configuration.lineHeight);
         textStyle->setHeightOverride(true);
-        textStyle->setHalfLeading(true);
     }
 
+    textStyle->setHalfLeading(true);
     textStyle->setLetterSpacing(configuration.letterSpacing);
     textStyle->setWordSpacing(configuration.wordSpacing);
     textStyle->setBaselineShift(configuration.baselineOffset);

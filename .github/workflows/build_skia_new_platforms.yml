@@ -276,7 +276,8 @@ jobs:
         shell: bash
         run: |
           TEST_EXECUTION_PATH='managed/NativeSkia.Tests/bin/Debug/net8.0/${{ matrix.runtime.name }}'
-          
+
+          mkdir -p "$TEST_EXECUTION_PATH"
           cp -R output/* "$TEST_EXECUTION_PATH"
           dotnet test managed --framework net8.0 --runtime ${{ matrix.runtime.name }}
           mkdir -p testOutput/${{ matrix.runtime.name }} 

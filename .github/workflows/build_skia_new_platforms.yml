@@ -275,17 +275,12 @@ jobs:
         if: matrix.runtime.name != 'browser-wasm'
         shell: bash
         run: |
-          TEST_ARGS=(managed)
-          TEST_ARGS+=("--framework" "net8.0")
-
-          if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            TEST_ARGS+=("--arch" "x86")
-          fi
-        
-          cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
-          dotnet test "${TEST_ARGS[@]}"
+          TEST_EXECUTION_PATH='managed/NativeSkia.Tests/bin/Debug/net8.0/${{ matrix.runtime.name }}'
+          
+          cp -R output/* "$TEST_EXECUTION_PATH"
+          dotnet test managed --framework net8.0 --runtime ${{ matrix.runtime.name }}
           mkdir -p testOutput/${{ matrix.runtime.name }} 
-          cp -r managed/NativeSkia.Tests/bin/Debug/net8.0/Output/* testOutput/${{ matrix.runtime.name }} 
+          cp -r "$TEST_EXECUTION_PATH/Output/*" testOutput/${{ matrix.runtime.name }} 
 
 
       - name: Upload test results

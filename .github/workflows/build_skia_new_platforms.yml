@@ -30,8 +30,8 @@ jobs:
         #   runs-on: macos-latest-large
         # - name: osx-arm64
         #   runs-on: macos-latest-xlarge
-        - name: browser-wasm
-          runs-on: ubuntu-latest-xlarge
+        # - name: browser-wasm
+        #   runs-on: ubuntu-latest-xlarge
 
     steps:
       - uses: actions/checkout@v3
@@ -278,7 +278,7 @@ jobs:
           TEST_ARGS='--framework net8.0'
 
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            TEST_ARGS+=" --runtime win-x86"
+            TEST_ARGS+=" --arch x86"
           fi
         
           dotnet build managed --configuration Debug --framework net8.0

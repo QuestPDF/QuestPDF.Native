@@ -26,6 +26,22 @@ internal static class SkNativeDependencyCompatibilityChecker
         }
 
         if (!SkNativeDependencyProvider.IsCurrentPlatformSupported())
+            ThrowCompatibilityException(innerException);
+        
+        // detect platform, copy appropriate native files and test compatibility again
+        SkNativeDependencyProvider.EnsureNativeFileAvailability();
+        
+        innerException = CheckIfExceptionIsThrownWhenLoadingNativeDependencies();
+
+        if (innerException == null)
+        {
+            IsCompatibilityChecked = true;
+            return;
+        }
+
+        ThrowCompatibilityException(innerException);
+        
+        static void ThrowCompatibilityException(Exception innerException)
         {
             var supportedRuntimes = string.Join(", ", SkNativeDependencyProvider.SupportedPlatforms);
             var currentRuntime = SkNativeDependencyProvider.GetRuntimePlatform();
@@ -41,19 +57,6 @@ internal static class SkNativeDependencyCompatibilityChecker
             
             throw new Exception(message, innerException);
         }
-        
-        // detect platform, copy appropriate native files and test compatibility again
-        SkNativeDependencyProvider.EnsureNativeFileAvailability();
-        
-        innerException = CheckIfExceptionIsThrownWhenLoadingNativeDependencies();
-
-        if (innerException == null)
-        {
-            IsCompatibilityChecked = true;
-            return;
-        }
-
-        throw new Exception(exceptionBaseMessage, innerException);
     }
     
     private static Exception? CheckIfExceptionIsThrownWhenLoadingNativeDependencies()

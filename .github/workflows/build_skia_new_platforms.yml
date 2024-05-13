@@ -282,7 +282,6 @@ jobs:
             TEST_ARGS+=("--arch" "x86")
           fi
         
-          dotnet build managed --configuration Debug --framework net8.0
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
           dotnet test "${TEST_ARGS[@]}"
           mkdir -p testOutput/${{ matrix.runtime.name }} 

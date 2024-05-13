@@ -1,7 +1,4 @@
-using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace QuestPDF.Skia;
@@ -42,15 +39,8 @@ internal static class SkNativeDependencyProvider
     
     public static bool IsCurrentPlatformSupported()
     {
-        try
-        {
-            GetRuntimePlatform();
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+        var currentRuntime = GetRuntimePlatform();
+        return SupportedPlatforms.Contains(currentRuntime);
     }
     
     static string? GetNativeFileSourcePath()
@@ -78,14 +68,14 @@ internal static class SkNativeDependencyProvider
         return null;
     }
         
-    static string GetRuntimePlatform()
+    public static string GetRuntimePlatform()
     {
-        var identifier = $"{GetSystemIdentifier()}-{GetProcessArchitecture()}";
+#if NET6_0_OR_GREATER
+        if (RuntimeInformation.ProcessArchitecture == Architecture.Wasm)
+            return "browser-wasm";
+#endif
         
-        if (SupportedPlatforms.Contains(identifier))
-            return identifier;
-
-        throw new Exception("Your runtime is currently not supported by QuestPDF.");
+        return $"{GetSystemIdentifier()}-{GetProcessArchitecture()}";
 
         static string GetSystemIdentifier()
         {
@@ -97,19 +87,13 @@ internal static class SkNativeDependencyProvider
                 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 return "osx";
-            
-            throw new Exception("Your runtime is currently not supported by QuestPDF.");
+
+            return "other";
         }
 
         static string GetProcessArchitecture()
         {
-            return RuntimeInformation.ProcessArchitecture switch
-            {
-                Architecture.X64 => "x64",
-                Architecture.X86 => "x86",
-                Architecture.Arm64 => "arm64",
-                _ => throw new Exception("Your runtime is currently not supported by QuestPDF.")
-            };
+            return RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         }
         
         static bool IsLinuxMusl()

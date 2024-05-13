@@ -281,7 +281,8 @@ jobs:
           cp -R output/* "$TEST_EXECUTION_PATH"
           dotnet test managed --framework net8.0 --runtime ${{ matrix.runtime.name }}
           mkdir -p testOutput/${{ matrix.runtime.name }} 
-          cp -r "$TEST_EXECUTION_PATH/Output/*" testOutput/${{ matrix.runtime.name }} 
+          ls -lR $TEST_EXECUTION_PATH
+          cp -r $TEST_EXECUTION_PATH/Output/* testOutput/${{ matrix.runtime.name }} 
 
 
       - name: Upload test results

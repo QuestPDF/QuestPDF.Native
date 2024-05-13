@@ -284,7 +284,7 @@ jobs:
         
           dotnet build managed --configuration Debug --framework net8.0
           cp -R output/* managed/NativeSkia.Tests/bin/Debug/net8.0
-          dotnet test managed "${TEST_ARGS[@]}"
+          dotnet test "${TEST_ARGS[@]}"
           mkdir -p testOutput/${{ matrix.runtime.name }} 
           cp -r managed/NativeSkia.Tests/bin/Debug/net8.0/Output/* testOutput/${{ matrix.runtime.name }} 
 

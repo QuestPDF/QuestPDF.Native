@@ -179,7 +179,7 @@ jobs:
             skia_compile_modules=false
             extra_cflags=["-fPIC", "-fno-rtti"]'
             
-          if [ "${{ matrix.runtime.name }}" = linux-* ]; then
+          if [[ "${{ matrix.runtime.name }}" == linux-* ]]; then
             COMMON_ARGS+=' cc="clang" cxx="clang++"'
           fi
           
@@ -207,9 +207,9 @@ jobs:
         shell: bash
         run: |
           CMAKE_ARGS="
-            -S ${{ github.workspace }}/native 
-            -B ${{ github.workspace }}/native/build 
-            -DSKIA_DIR=${{ github.workspace }}/skia 
+            -S ${PWD}/native 
+            -B ${PWD}/native/build 
+            -DSKIA_DIR=${PWD}/skia 
             -DCMAKE_CXX_COMPILER=clang++ 
             -DCMAKE_C_COMPILER=clang 
             -DCMAKE_BUILD_TYPE=Release"

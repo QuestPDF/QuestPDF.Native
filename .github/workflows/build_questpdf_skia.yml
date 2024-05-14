@@ -39,21 +39,21 @@ jobs:
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
         run: |
-          apt-get update --yes
-          apt-get upgrade --yes
-          apt-get install wget git cmake fontconfig --yes
+          apt update --yes
+          apt upgrade --yes
+          apt install wget git cmake fontconfig --yes
 
 
       - name: Install Clang
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
         run: |
-          apt-get install --yes software-properties-common
+          apt install --yes software-properties-common
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
           add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
           
-          apt-get update --yes
-          apt-get install --yes clang-15 lldb-15 lld-15
+          apt update --yes
+          apt install --yes clang-15 lldb-15 lld-15
           
           update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
           update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
@@ -80,7 +80,7 @@ jobs:
         run: |
           wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
           apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
-          apt-get update
+          apt update
           apt install cmake --yes
           cmake --version
 

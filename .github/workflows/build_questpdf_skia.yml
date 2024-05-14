@@ -29,7 +29,7 @@ jobs:
         - name: osx-x64
           runs-on: macos-latest-large
         - name: osx-arm64
-          runs-on: macos-latest-large
+          runs-on: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v3

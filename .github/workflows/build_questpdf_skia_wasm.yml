@@ -1,4 +1,4 @@
-name: Build Skia + QuestPDF: WASM
+name: Build Skia + QuestPDF WASM
 
 on:
   workflow_dispatch:

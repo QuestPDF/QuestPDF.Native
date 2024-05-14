@@ -15,8 +15,8 @@ jobs:
         runtime: 
         # - name: win-x64
         #   runs-on: windows-latest-xlarge
-        - name: win-x86
-          runs-on: windows-latest-xlarge
+        # - name: win-x86
+        #   runs-on: windows-latest-xlarge
         # - name: linux-x64
         #   runs-on: ubuntu-latest-large
         #   container: ubuntu:18.04
@@ -30,8 +30,8 @@ jobs:
         #   runs-on: macos-latest-large
         # - name: osx-arm64
         #   runs-on: macos-latest-xlarge
-        # - name: browser-wasm
-        #   runs-on: ubuntu-latest-xlarge
+        - name: browser-wasm
+          runs-on: ubuntu-latest-xlarge
 
     steps:
       - uses: actions/checkout@v3
@@ -149,7 +149,7 @@ jobs:
             mkdir -p out/release 
             cd out/release
             touch line bidirectional case character sentence word
-            chmod -R +x .
+            chmod -R u+w .
             cd ../../
           fi
           

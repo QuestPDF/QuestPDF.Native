@@ -236,7 +236,7 @@ jobs:
           find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;
 
 
-      - name: Upload build artifacts 2
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: questpdf-native-libraries
@@ -244,7 +244,7 @@ jobs:
             
 
       - name: Setup .NET 8.0 SDK
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 

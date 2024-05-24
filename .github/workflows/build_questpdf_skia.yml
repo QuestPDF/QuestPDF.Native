@@ -200,7 +200,7 @@ jobs:
             bin/gn gen out/release --args="$COMMON_ARGS"
           fi
           
-          ninja -C out/release skia svg skparagraph
+          ninja -C out/release skia svg skparagraph skresources
 
 
       - name: Configure CMake

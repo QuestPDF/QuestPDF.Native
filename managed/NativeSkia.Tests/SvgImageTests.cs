@@ -11,7 +11,7 @@ public class SvgImageTests
     public void Load()
     {
         var svgContent = File.ReadAllText("Input/icon.svg");
-        using var svg = new SkSvgImage(svgContent, SkFontManager.Local);
+        using var svg = new SkSvgImage(svgContent, SkResourceProvider.Local, SkFontManager.Local);
 
         svg.Instance.Should().NotBe(0);
         
@@ -29,7 +29,7 @@ public class SvgImageTests
     {
         // read SVG
         var svgContent = File.ReadAllText("Input/icon.svg");
-        using var svg = new SkSvgImage(svgContent, SkFontManager.Local);
+        using var svg = new SkSvgImage(svgContent, SkResourceProvider.Local, SkFontManager.Local);
         
         // create document
         using var stream = new SkWriteStream();

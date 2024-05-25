@@ -1,17 +1,24 @@
 #include "export.h"
 
 #include "include/core/SkStream.h"
+#include "include/codec/SkCodec.h"
+#include "include/codec/SkPngDecoder.h"
+#include "include/codec/SkJpegDecoder.h"
 #include "modules/svg/include/SkSVGDOM.h"
 #include "modules/svg/include/SkSVGSVG.h"
 #include "modules/svg/include/SkSVGRenderContext.h"
+#include "modules/skresources/include/SkResources.h"
+#include "modules/skshaper/utils/FactoryHelpers.h"
 
 extern "C" {
 
-QUEST_API SkSVGDOM *svg_create(SkData *data, SkFontMgr *fontManager) {
+QUEST_API SkSVGDOM *svg_create(SkData *data, skresources::ResourceProvider *resourceProvider, SkFontMgr *fontManager) {
     auto svgStream = SkMemoryStream(sk_ref_sp(data));
 
     return SkSVGDOM::Builder()
         .setFontManager(sk_ref_sp(fontManager))
+        .setTextShapingFactory(SkShapers::BestAvailable())
+        .setResourceProvider(sk_ref_sp(resourceProvider))
         .make(svgStream)
         .release();
 }

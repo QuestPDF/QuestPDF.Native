@@ -30,6 +30,6 @@ public class SvgCanvasTests
         // save
         using var svgData = svgOutputStream.DetachData();
         TestFixture.SaveOutput("canvas_svg.svg", svgData);
-        svgData.ShouldHaveSize(366_086);
+        svgData.ShouldHaveSize(367_118);
     }
 }

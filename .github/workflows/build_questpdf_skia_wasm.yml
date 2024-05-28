@@ -22,7 +22,7 @@ jobs:
       - name: Build Skia
         shell: bash
         run: |
-          git clone https://github.com/google/skia.git --branch chrome/m124 --single-branch
+          git clone https://github.com/google/skia.git --branch chrome/m126 --single-branch
           cd skia
           bin/fetch-ninja
           python3 tools/git-sync-deps

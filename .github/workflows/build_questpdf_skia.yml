@@ -19,10 +19,10 @@ jobs:
         #   runs-on: windows-latest-xlarge
         - name: linux-x64
           runs-on: ubuntu-latest-xlarge
-          container: debian:buster
+          container: debian:stretch
         - name: linux-arm64
           runs-on: [self-hosted, linux, arm64]
-          container: debian:buster
+          container: debian:stretch
         # - name: linux-musl-x64
         #   runs-on: ubuntu-latest-xlarge
         #   container: alpine:3.17

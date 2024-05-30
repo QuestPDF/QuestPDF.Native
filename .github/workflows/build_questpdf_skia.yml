@@ -13,23 +13,23 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        - name: win-x64
-          runs-on: windows-latest-xlarge
-        - name: win-x86
-          runs-on: windows-latest-xlarge
+        # - name: win-x64
+        #   runs-on: windows-latest-xlarge
+        # - name: win-x86
+        #   runs-on: windows-latest-xlarge
         - name: linux-x64
           runs-on: ubuntu-latest-xlarge
-          container: ubuntu:17.04
+          container: debian:buster
         - name: linux-arm64
           runs-on: [self-hosted, linux, arm64]
-          container: ubuntu:17.04
-        - name: linux-musl-x64
-          runs-on: ubuntu-latest-xlarge
-          container: alpine:3.17
-        - name: osx-x64
-          runs-on: macos-latest-large
-        - name: osx-arm64
-          runs-on: macos-latest-xlarge
+          container: debian:buster
+        # - name: linux-musl-x64
+        #   runs-on: ubuntu-latest-xlarge
+        #   container: alpine:3.17
+        # - name: osx-x64
+        #   runs-on: macos-latest-large
+        # - name: osx-arm64
+        #   runs-on: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v3
@@ -48,12 +48,14 @@ jobs:
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
         run: |
-          apt install --yes software-properties-common
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-          add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
+          apt install --yes lsb-release software-properties-common gnupg
+          apt install --yes clang-15 lldb-15 lld-15 clangd-15
+
+          # wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+          # add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
           
-          apt update --yes
-          apt install --yes clang-15 lldb-15 lld-15
+          # apt update --yes
+          # apt install --yes clang-15 lldb-15 lld-15
           
           update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
           update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
@@ -78,11 +80,25 @@ jobs:
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
         run: |
-          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
-          apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
-          apt update
-          apt install cmake --yes
+          if [[ "${{ matrix.runtime.name }}" == linux-x64 ]]; then
+            wget -O cmake-linux.tar.gz https://github.com/Kitware/CMake/releases/download/v3.26.0/cmake-3.26.0-linux-x86_64.sh
+          fi
+
+          if [[ "${{ matrix.runtime.name }}" == linux-arm64 ]]; then
+            wget -O cmake-linux.tar.gz https://github.com/Kitware/CMake/releases/download/v3.26.0/cmake-3.26.0-linux-aarch64.tar.gz
+          fi
+          
+          tar -zxvf cmake-linux.tar.gz
+          mv cmake-linux /opt/cmake-3.26.0
+          export PATH=/opt/cmake-3.26.0/bin:$PATH
+          source ~/.bashrc
           cmake --version
+
+          # wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
+          # apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+          # apt update
+          # apt install cmake --yes
+          # cmake --version
 
 
       - name: Install Python 3.8
@@ -91,9 +107,9 @@ jobs:
         run: |
             apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
 
-            wget https://www.python.org/ftp/python/3.8.18/Python-3.8.18.tgz
-            tar xzf Python-3.8.18.tgz
-            cd Python-3.8.18
+            wget https://www.python.org/ftp/python/3.8.19/Python-3.8.19.tgz
+            tar xzf Python-3.8.19.tgz
+            cd Python-3.8.19
             
             ./configure --enable-optimizations
             make --silent

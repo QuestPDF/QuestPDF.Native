@@ -50,12 +50,13 @@ QUEST_API SkBitmap *image_resize_conditionally(SkImage *image, int targetImageWi
     }
 }
 
-QUEST_API SkImage *image_resize_and_compress(SkImage *image, int targetImageWidth, int targetImageHeight, int quality) {
+QUEST_API SkImage *image_resize_and_compress(SkImage *image, int targetImageWidth, int targetImageHeight, int quality, bool downsample) {
     auto scaledBitmap = image_resize_conditionally(image, targetImageWidth, targetImageHeight);
 
     if (image->isOpaque()) {
         SkJpegEncoder::Options encodingOptions;
         encodingOptions.fQuality = quality;
+        encodingOptions.fDownsample = downsample ?  SkJpegEncoder::Downsample::k444 : SkJpegEncoder::Downsample::k420;
 
         SkDynamicMemoryWStream stream;
         SkJpegEncoder::Encode(&stream, scaledBitmap->pixmap(), encodingOptions);

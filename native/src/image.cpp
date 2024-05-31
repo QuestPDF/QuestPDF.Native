@@ -56,7 +56,7 @@ QUEST_API SkImage *image_resize_and_compress(SkImage *image, int targetImageWidt
     if (image->isOpaque()) {
         SkJpegEncoder::Options encodingOptions;
         encodingOptions.fQuality = quality;
-        encodingOptions.fDownsample = downsample ?  SkJpegEncoder::Downsample::k444 : SkJpegEncoder::Downsample::k420;
+        encodingOptions.fDownsample = downsample ?  SkJpegEncoder::Downsample::k420 : SkJpegEncoder::Downsample::k444;
 
         SkDynamicMemoryWStream stream;
         SkJpegEncoder::Encode(&stream, scaledBitmap->pixmap(), encodingOptions);

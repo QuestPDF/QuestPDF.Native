@@ -13,23 +13,23 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        # - name: win-x64
-        #   runs-on: windows-latest-xlarge
-        # - name: win-x86
-        #   runs-on: windows-latest-xlarge
+        - name: win-x64
+          runs-on: windows-latest-xlarge
+        - name: win-x86
+          runs-on: windows-latest-xlarge
         - name: linux-x64
           runs-on: ubuntu-latest-xlarge
-          container: ubuntu:16.04
+          container: ubuntu:18.04
         - name: linux-arm64
           runs-on: [self-hosted, linux, arm64]
-          container: ubuntu:16.04
-        # - name: linux-musl-x64
-        #   runs-on: ubuntu-latest-xlarge
-        #   container: alpine:3.17
-        # - name: osx-x64
-        #   runs-on: macos-latest-large
-        # - name: osx-arm64
-        #   runs-on: macos-latest-xlarge
+          container: ubuntu:18.04
+        - name: linux-musl-x64
+          runs-on: ubuntu-latest-xlarge
+          container: alpine:3.17
+        - name: osx-x64
+          runs-on: macos-latest-large
+        - name: osx-arm64
+          runs-on: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v3
@@ -42,20 +42,16 @@ jobs:
           apt update --yes
           apt upgrade --yes
           apt install wget git cmake fontconfig --yes
-
-
       - name: Install Clang
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
         run: |
-          apt install --yes lsb-release software-properties-common gnupg
-          apt install --yes clang-15 lldb-15 lld-15 clangd-15
-
-          # wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-          # add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
+          apt install --yes software-properties-common
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+          add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
           
-          # apt update --yes
-          # apt install --yes clang-15 lldb-15 lld-15
+          apt update --yes
+          apt install --yes clang-15 lldb-15 lld-15
           
           update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
           update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
@@ -65,7 +61,6 @@ jobs:
           
           cc --version
           c++ --version
-
           update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 100
           update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 100
           
@@ -74,50 +69,28 @@ jobs:
           
           clang --version
           clang++ --version
-
-
       - name: Install Cmake
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
         run: |
-          if [[ "${{ matrix.runtime.name }}" == linux-x64 ]]; then
-            wget -O cmake-linux.tar.gz https://github.com/Kitware/CMake/releases/download/v3.26.0/cmake-3.26.0-linux-x86_64.sh
-          fi
-
-          if [[ "${{ matrix.runtime.name }}" == linux-arm64 ]]; then
-            wget -O cmake-linux.tar.gz https://github.com/Kitware/CMake/releases/download/v3.26.0/cmake-3.26.0-linux-aarch64.tar.gz
-          fi
-          
-          tar -zxvf cmake-linux.tar.gz
-          mv cmake-linux /opt/cmake-3.26.0
-          export PATH=/opt/cmake-3.26.0/bin:$PATH
-          source ~/.bashrc
+          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
+          apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+          apt update
+          apt install cmake --yes
           cmake --version
-
-          # wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
-          # apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
-          # apt update
-          # apt install cmake --yes
-          # cmake --version
-
-
       - name: Install Python 3.8
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
         run: |
             apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
-
-            wget https://www.python.org/ftp/python/3.8.19/Python-3.8.19.tgz
-            tar xzf Python-3.8.19.tgz
-            cd Python-3.8.19
+            wget https://www.python.org/ftp/python/3.8.18/Python-3.8.18.tgz
+            tar xzf Python-3.8.18.tgz
+            cd Python-3.8.18
             
             ./configure --enable-optimizations
             make --silent
             make install --silent
-
             python3 --version
-
-
       - name: Install Build Tools (Alpine)
         if: matrix.runtime.name == 'linux-musl-x64'
         shell: sh
@@ -125,8 +98,6 @@ jobs:
           apk update
           apk upgrade
           apk add bash wget git python3 build-base cmake clang llvm15 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto
-
-
       - name: Install 3.x
         if: runner.os != 'Linux'
         uses: actions/setup-python@v4
@@ -141,7 +112,6 @@ jobs:
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${PWD}/depot_tools" >> $GITHUB_PATH
           export PATH="${PWD}/depot_tools:${PATH}"
-
       - name: Build Skia
         shell: bash
         run: |
@@ -149,7 +119,6 @@ jobs:
           cd skia
           bin/fetch-ninja
           python3 tools/git-sync-deps
-
           COMMON_ARGS='
             is_official_build=true
             is_component_build=false
@@ -202,14 +171,12 @@ jobs:
           if [ "${{ runner.os }}" = "macOS" ]; then
             COMMON_ARGS+=' skia_use_fonthost_mac=true'
           fi
-
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
             # default Skia configuration contains hardcoded win sdk path with not escaped space, which causes the build to fail
             # this line comments out this incorrect configuration
             sed -i 's|env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|#env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|' gn/toolchain/BUILD.gn
             COMMON_ARGS+=' target_cpu="x86"'
           fi
-
           if [ "${{ matrix.runtime.name }}" = "linux-musl-x64" ]; then
             gn gen out/release --args="$COMMON_ARGS"
           else
@@ -217,8 +184,6 @@ jobs:
           fi
           
           ninja -C out/release skia svg skparagraph skresources
-
-
       - name: Configure CMake
         shell: bash
         run: |
@@ -229,29 +194,22 @@ jobs:
             -DCMAKE_CXX_COMPILER=clang++ 
             -DCMAKE_C_COMPILER=clang 
             -DCMAKE_BUILD_TYPE=Release"
-
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
             CMAKE_ARGS+=" -A Win32"
           fi
           
           cmake $CMAKE_ARGS
-
-
       - name: Build CMake
         shell: bash
         run: >
           cmake 
           --build ${PWD}/native/build 
           --config Release
-
-
       - name: Copy build artifact to output directory
         shell: bash
         run: |
           mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
           find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;
-
-
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -269,15 +227,12 @@ jobs:
         shell: bash
         run: |
           TEST_EXECUTION_PATH='managed/NativeSkia.Tests/bin/Debug/net8.0/${{ matrix.runtime.name }}'
-
           mkdir -p "$TEST_EXECUTION_PATH"
           cp -R output/* "$TEST_EXECUTION_PATH"
           dotnet test managed --framework net8.0 --runtime ${{ matrix.runtime.name }}
           mkdir -p testOutput/${{ matrix.runtime.name }} 
           ls -lR $TEST_EXECUTION_PATH
           cp -r $TEST_EXECUTION_PATH/Output/* testOutput/${{ matrix.runtime.name }} 
-
-
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:

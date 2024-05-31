@@ -38,9 +38,7 @@ struct PdfDocumentMetadata {
 
     bool supportPDFA;
     bool compressDocument;
-
     SkScalar rasterDPI;
-    int imageEncodingQuality;
 };
 
 }
@@ -73,11 +71,10 @@ SkPDF::Metadata map_pdf_metadata(PdfDocumentMetadata metadata) {
     result.fCreation = map_datetime(metadata.creationDate);
     result.fModified = map_datetime(metadata.modificationDate);
 
-    result.fRasterDPI = metadata.rasterDPI;
     result.fPDFA = metadata.supportPDFA;
-
-    result.fEncodingQuality = metadata.imageEncodingQuality;
     result.fCompressionLevel = metadata.compressDocument ? SkPDF::Metadata::CompressionLevel::LowButFast : SkPDF::Metadata::CompressionLevel::None;
+    result.fRasterDPI = metadata.rasterDPI;
+    result.fEncodingQuality = 101;
 
     return result;
 }

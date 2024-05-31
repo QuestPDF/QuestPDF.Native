@@ -43,9 +43,7 @@ public class PdfDocumentTests
             
             SupportPDFA = true,
             CompressDocument = true,
-            
-            RasterDPI = 123,
-            ImageEncodingQuality = 90
+            RasterDPI = 123
         };
         
         using var stream = new SkWriteStream();

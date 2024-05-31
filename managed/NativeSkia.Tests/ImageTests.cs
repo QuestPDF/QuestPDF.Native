@@ -32,7 +32,7 @@ public class ImageTests
         sampleImage.Height.Should().Be(600);
         
         // don't scale images to if target resolution is bigger than original
-        using var biggerImage = sampleImage.ResizeAndCompress(40_000, 30_000, 90);
+        using var biggerImage = sampleImage.ResizeAndCompress(40_000, 30_000, 90, true);
         using var biggerImageData = biggerImage.GetEncodedData();
         
         biggerImage.Width.Should().Be(800);
@@ -40,7 +40,7 @@ public class ImageTests
         biggerImageData.ShouldHaveSize(67_817);
         
         // scale images to if target resolution is smaller than original
-        using var smallerImage = sampleImage.ResizeAndCompress(80, 60, 90);
+        using var smallerImage = sampleImage.ResizeAndCompress(80, 60, 90, true);
         using var smallerImageData = smallerImage.GetEncodedData();
         
         smallerImage.Width.Should().Be(80);
@@ -55,13 +55,13 @@ public class ImageTests
         using var sampleImage = SkImage.FromData(sampleImageData);
         
         // high quality
-        using var highQualityImage = sampleImage.ResizeAndCompress(400, 300, 90);
+        using var highQualityImage = sampleImage.ResizeAndCompress(400, 300, 90, false);
         using var highQualityImageData = highQualityImage.GetEncodedData();
-        highQualityImageData.ShouldHaveSize(31_763);
+        highQualityImageData.ShouldHaveSize(33_970);
         TestFixture.SaveOutput("image_resize_high_quality.jpg", highQualityImageData);
         
         // low quality
-        using var lowQualityImage = sampleImage.ResizeAndCompress(400, 300, 10);
+        using var lowQualityImage = sampleImage.ResizeAndCompress(400, 300, 10, true);
         using var lowQualityImageData = lowQualityImage.GetEncodedData();
         lowQualityImageData.ShouldHaveSize(4_495);
         TestFixture.SaveOutput("image_resize_low_quality.jpg", lowQualityImageData);
@@ -76,7 +76,7 @@ public class ImageTests
         sampleImage.Width.Should().Be(800);
         sampleImage.Height.Should().Be(600);
         
-        using var resizedImage = sampleImage.ResizeAndCompress(200, 150, 90);
+        using var resizedImage = sampleImage.ResizeAndCompress(200, 150, 90, true);
         using var resizedImageData = resizedImage.GetEncodedData();
         
         resizedImage.Width.Should().Be(200);

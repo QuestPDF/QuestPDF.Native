@@ -18,7 +18,6 @@ QUEST_API skia::textlayout::ParagraphBuilder *paragraph_builder_create(Paragraph
     paragraphStyle.setTextAlign(configuration.alignment);
     paragraphStyle.setTextDirection(configuration.direction);
     paragraphStyle.setReplaceTabCharacters(true);
-    paragraphStyle.setTextHeightBehavior(skia::textlayout::TextHeightBehavior::kDisableAll);
     paragraphStyle.turnHintingOff();
     paragraphStyle.setApplyRoundingHack(false);
 

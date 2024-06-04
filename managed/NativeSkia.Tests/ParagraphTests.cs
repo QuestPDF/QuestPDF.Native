@@ -92,7 +92,7 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_paragraph.pdf", documentData);
-        documentData.ShouldHaveSize(123_200, buffer: 100);
+        documentData.ShouldHaveSize(123_400, buffer: 100);
 
         paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
     }

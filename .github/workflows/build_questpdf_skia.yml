@@ -42,6 +42,8 @@ jobs:
           apt update --yes
           apt upgrade --yes
           apt install wget git cmake fontconfig --yes
+
+          
       - name: Install Clang
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
@@ -69,6 +71,8 @@ jobs:
           
           clang --version
           clang++ --version
+
+          
       - name: Install Cmake
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
@@ -78,6 +82,8 @@ jobs:
           apt update
           apt install cmake --yes
           cmake --version
+
+          
       - name: Install Python 3.8
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
@@ -91,6 +97,8 @@ jobs:
             make --silent
             make install --silent
             python3 --version
+
+            
       - name: Install Build Tools (Alpine)
         if: matrix.runtime.name == 'linux-musl-x64'
         shell: sh
@@ -98,6 +106,8 @@ jobs:
           apk update
           apk upgrade
           apk add bash wget git python3 build-base cmake clang llvm15 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto
+
+          
       - name: Install 3.x
         if: runner.os != 'Linux'
         uses: actions/setup-python@v4
@@ -112,6 +122,8 @@ jobs:
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "${PWD}/depot_tools" >> $GITHUB_PATH
           export PATH="${PWD}/depot_tools:${PATH}"
+
+          
       - name: Build Skia
         shell: bash
         run: |
@@ -171,12 +183,14 @@ jobs:
           if [ "${{ runner.os }}" = "macOS" ]; then
             COMMON_ARGS+=' skia_use_fonthost_mac=true'
           fi
+          
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
             # default Skia configuration contains hardcoded win sdk path with not escaped space, which causes the build to fail
             # this line comments out this incorrect configuration
             sed -i 's|env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|#env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|' gn/toolchain/BUILD.gn
             COMMON_ARGS+=' target_cpu="x86"'
           fi
+          
           if [ "${{ matrix.runtime.name }}" = "linux-musl-x64" ]; then
             gn gen out/release --args="$COMMON_ARGS"
           else
@@ -184,6 +198,8 @@ jobs:
           fi
           
           ninja -C out/release skia svg skparagraph skresources
+
+          
       - name: Configure CMake
         shell: bash
         run: |
@@ -199,17 +215,23 @@ jobs:
           fi
           
           cmake $CMAKE_ARGS
+
+          
       - name: Build CMake
         shell: bash
         run: >
           cmake 
           --build ${PWD}/native/build 
           --config Release
+
+          
       - name: Copy build artifact to output directory
         shell: bash
         run: |
           mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
           find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;
+
+          
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -233,6 +255,8 @@ jobs:
           mkdir -p testOutput/${{ matrix.runtime.name }} 
           ls -lR $TEST_EXECUTION_PATH
           cp -r $TEST_EXECUTION_PATH/Output/* testOutput/${{ matrix.runtime.name }} 
+
+          
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:

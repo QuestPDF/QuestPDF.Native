@@ -129,6 +129,8 @@ jobs:
         run: |
           git clone https://github.com/google/skia.git --branch chrome/m126 --single-branch
           cd skia
+          git apply ../patches/*.patch
+          
           bin/fetch-ninja
           python3 tools/git-sync-deps
           COMMON_ARGS='
@@ -185,9 +187,6 @@ jobs:
           fi
           
           if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            # default Skia configuration contains hardcoded win sdk path with not escaped space, which causes the build to fail
-            # this line comments out this incorrect configuration
-            sed -i 's|env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|#env_setup = "\$shell \$win_sdk/bin/SetEnv.cmd /x86 && "|' gn/toolchain/BUILD.gn
             COMMON_ARGS+=' target_cpu="x86"'
           fi
           

@@ -14,7 +14,7 @@ jobs:
       matrix:
         runtime: 
         - name: browser-wasm
-          runs-on: macos-latest-xlarge
+          runs-on: windows-latest-xlarge
 
     steps:
       - uses: actions/checkout@v3
@@ -31,12 +31,12 @@ jobs:
           bin/fetch-ninja
           python3 tools/git-sync-deps
 
-          bin/activate-emsdk
+          # bin/activate-emsdk
 
-          EMSDK_PATH='/Users/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk'
+          # EMSDK_PATH='/Users/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk'
 
-          source "${EMSDK_PATH}/emsdk_env.sh"
-          echo 'source "${EMSDK_PATH}/emsdk_env.sh"' >> $HOME/.bash_profile
+          # source "${EMSDK_PATH}/emsdk_env.sh"
+          # echo 'source "${EMSDK_PATH}/emsdk_env.sh"' >> $HOME/.bash_profile
 
           # an unsuccessful attempt to fix: 
           # [753/1041] ACTION //third_party/libgrapheme:generate_headers(//gn/toolchain:wasm)

@@ -31,6 +31,8 @@ jobs:
           bin/fetch-ninja
           python3 tools/git-sync-deps
 
+          source "/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk/emsdk_env.sh"
+
           # bin/activate-emsdk
 
           # EMSDK_PATH='/Users/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk'

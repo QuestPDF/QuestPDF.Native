@@ -31,15 +31,15 @@ jobs:
           bin/fetch-ninja
           python3 tools/git-sync-deps
 
-          EMSDK_PATH="/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk"
+          EMSDK_PATH="/Users/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk"
 
-          source "/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk/emsdk_env.sh"
+          source "/Users/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk/emsdk_env.sh"
 
-          echo "/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk" >> $GITHUB_PATH
-          export PATH="/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk:${PATH}"
+          echo "/Users/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk" >> $GITHUB_PATH
+          export PATH="/Users/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk:${PATH}"
 
-          echo "/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk/upstream/emscripten" >> $GITHUB_PATH
-          export PATH="/home/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk/upstream/emscripten:${PATH}"
+          echo "/Users/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk/upstream/emscripten" >> $GITHUB_PATH
+          export PATH="/Users/runner/work/QuestPDF.Native/QuestPDF.Native/skia/third_party/externals/emsdk/upstream/emscripten:${PATH}"
 
           em++ --version
 

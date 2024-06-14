@@ -59,7 +59,7 @@ jobs:
           mkdir -p out/release 
           cd out/release
           touch line bidirectional case character sentence word
-          chmod -R u+w .
+          chmod -R u+rw .
           cd ../../
           
           COMMON_ARGS='

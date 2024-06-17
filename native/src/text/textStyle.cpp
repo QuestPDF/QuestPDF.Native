@@ -4,6 +4,11 @@
 
 extern "C" {
 
+struct FontFeature {
+    int tag;
+    int value;
+};
+
 struct TextStyleConfiguration {
     static const int FONT_FAMILIES_LENGTH = 16;
 
@@ -26,6 +31,9 @@ struct TextStyleConfiguration {
     SkScalar letterSpacing;
     SkScalar wordSpacing;
     SkScalar baselineOffset;
+
+    static const int FONT_FEATURES_LENGTH = 16;
+    FontFeature* fontFeatures[FONT_FEATURES_LENGTH];
 };
 
 QUEST_API skia::textlayout::TextStyle *text_style_create(TextStyleConfiguration configuration) {
@@ -48,6 +56,22 @@ QUEST_API skia::textlayout::TextStyle *text_style_create(TextStyleConfiguration 
 
     textStyle->setFontFamilies(fontFamilies);
     // end
+
+    for (auto & fontFeature : configuration.fontFeatures) {
+        if(fontFeature == nullptr)
+            continue;
+
+        if(fontFeature->tag == 0)
+            continue;
+
+        char decodedTag[4];
+        decodedTag[0] = (fontFeature->tag >> 24) & 0xFF;
+        decodedTag[1] = (fontFeature->tag >> 16) & 0xFF;
+        decodedTag[2] = (fontFeature->tag >> 8) & 0xFF;
+        decodedTag[3] = fontFeature->tag & 0xFF;
+
+        textStyle->addFontFeature(SkString(decodedTag), fontFeature->value);
+    }
 
     if (configuration.foregroundColor != 0) {
         SkPaint paint;

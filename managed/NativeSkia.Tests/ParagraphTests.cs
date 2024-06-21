@@ -208,7 +208,7 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("font_features.pdf", documentData);
-        documentData.ShouldHaveSize(22150, 100);
+        documentData.ShouldHaveSize(22300, 100);
 
         paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
     }

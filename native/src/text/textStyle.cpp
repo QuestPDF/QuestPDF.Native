@@ -4,6 +4,11 @@
 
 extern "C" {
 
+struct TextStyleFontFeature {
+    char* name;
+    int value;
+};
+
 struct TextStyleConfiguration {
     static const int FONT_FAMILIES_LENGTH = 16;
 
@@ -12,6 +17,7 @@ struct TextStyleConfiguration {
     bool isItalic;
 
     char* fontFamilies[FONT_FAMILIES_LENGTH];
+    TextStyleFontFeature fontFeatures[FONT_FAMILIES_LENGTH];
 
     SkColor foregroundColor;
     SkColor backgroundColor;
@@ -47,7 +53,7 @@ QUEST_API skia::textlayout::TextStyle *text_style_create(TextStyleConfiguration 
     }
 
     textStyle->setFontFamilies(fontFamilies);
-    // end
+    // end font families
 
     if (configuration.foregroundColor != 0) {
         SkPaint paint;
@@ -77,6 +83,13 @@ QUEST_API skia::textlayout::TextStyle *text_style_create(TextStyleConfiguration 
     textStyle->setLetterSpacing(configuration.letterSpacing);
     textStyle->setWordSpacing(configuration.wordSpacing);
     textStyle->setBaselineShift(configuration.baselineOffset);
+
+    for (auto & fontFeature : configuration.fontFeatures) {
+        if (fontFeature.name == nullptr)
+            continue;
+
+        textStyle->addFontFeature(SkString(fontFeature.name), fontFeature.value);
+    }
 
     return textStyle;
 }

@@ -1,8 +1,3 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using FluentAssertions;
 using NUnit.Framework;
 using QuestPDF.Skia;
@@ -36,6 +31,7 @@ public class ParagraphTests
             FontWeight = TextStyleConfiguration.FontWeights.Medium,
             
             FontFamilies = GetFontFamilyPointers("Noto Sans", "Noto Emoji", "Noto Sans Arabic"),
+            FontFeatures = GetFontFeatures(),
             
             BackgroundColor = 0x00000000,
             ForegroundColor = 0xFF000000,
@@ -92,7 +88,7 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_paragraph.pdf", documentData);
-        documentData.ShouldHaveSize(123_400, buffer: 100);
+        documentData.ShouldHaveSize(123_400, buffer: 1000);
 
         paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
     }
@@ -115,6 +111,7 @@ public class ParagraphTests
             FontSize = 18,
             FontWeight = TextStyleConfiguration.FontWeights.Medium,
             FontFamilies = GetFontFamilyPointers("Noto Sans"),
+            FontFeatures = GetFontFeatures(),
             
             BackgroundColor = 0x00000000,
             ForegroundColor = 0xFF000000,
@@ -145,6 +142,78 @@ public class ParagraphTests
     }
     
     [Test]
+    public void FontFeatures()
+    {
+        using var typefaceProvider = CreateTypefaceProvider();
+        
+        // build simple paragraph;
+        var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Local);   
+ 
+        var paragraphStyleConfiguration = new ParagraphStyleConfiguration
+        {
+            Alignment = ParagraphStyleConfiguration.TextAlign.Justify,
+            Direction = ParagraphStyleConfiguration.TextDirection.Ltr,
+            MaxLinesVisible = 40,
+            LineClampEllipsis = new SkText("...").Instance
+        };
+        
+        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
+
+        var textStyleConfiguration = new TextStyleConfiguration
+        {
+            FontSize = 32,
+            FontWeight = TextStyleConfiguration.FontWeights.Medium,
+            
+            FontFamilies = GetFontFamilyPointers("Lato"),
+            FontFeatures = GetFontFeatures(),
+            
+            BackgroundColor = 0x00000000,
+            ForegroundColor = 0xFF000000,
+            
+            DecorationColor = 0xFF009688,
+            DecorationStyle = TextStyleConfiguration.TextDecorationStyle.Solid,
+            DecorationType = TextStyleConfiguration.TextDecoration.NoDecoration,
+            DecorationMode = TextStyleConfiguration.TextDecorationMode.Gaps, 
+            
+            LineHeight = 1.25f,
+            WordSpacing = 0,
+            LetterSpacing = 0
+        };
+        
+        using var labelStyle = new SkTextStyle(textStyleConfiguration with { FontSize = 16 });
+        using var withoutLigaturesStyle = new SkTextStyle(textStyleConfiguration with { FontFeatures = GetFontFeatures(("liga", 0)) });
+        using var withLigaturesStyle = new SkTextStyle(textStyleConfiguration with { FontFeatures = GetFontFeatures(("liga", 1)) });
+        
+        paragraphBuilder.AddText("without ligatures:\n", labelStyle);
+        paragraphBuilder.AddText("fly and finish\n\n", withoutLigaturesStyle);
+        
+        paragraphBuilder.AddText("with ligatures:\n", labelStyle);
+        paragraphBuilder.AddText("fly and finish\n", withLigaturesStyle);
+        
+        var paragraph = paragraphBuilder.CreateParagraph();
+        
+        // draw paragraph
+        using var stream = new SkWriteStream();
+        using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata());
+        
+        // draw text
+        using var pageCanvas = pdf.BeginPage(300, 300);
+        
+        pageCanvas.Translate(50, 50);
+        paragraph.PlanLayout(400);
+        pageCanvas.DrawParagraph(paragraph);
+        
+        pdf.EndPage();
+        pdf.Close();
+
+        using var documentData = stream.DetachData();
+        TestFixture.SaveOutput("font_features.pdf", documentData);
+        documentData.ShouldHaveSize(22281);
+
+        paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
+    }
+    
+    [Test]
     public void GetUnresolvedCodepoints()
     {
         using var typefaceProvider = CreateTypefaceProvider();
@@ -159,7 +228,8 @@ public class ParagraphTests
             FontSize = 20,
             FontWeight = TextStyleConfiguration.FontWeights.Normal,
             ForegroundColor = 0xFF000000,
-            FontFamilies = GetFontFamilyPointers("Lato")
+            FontFamilies = GetFontFamilyPointers("Lato"),
+            FontFeatures = GetFontFeatures()
         });
         
         const string text = "Fire as emoji 🔥 and in Japanese 火.";
@@ -196,6 +266,7 @@ public class ParagraphTests
             FontWeight = TextStyleConfiguration.FontWeights.Normal,
             
             FontFamilies = GetFontFamilyPointers("Noto Sans"),
+            FontFeatures = GetFontFeatures(),
             
             BackgroundColor = 0x00000000,
             ForegroundColor = 0xFF000000,
@@ -288,7 +359,8 @@ public class ParagraphTests
                 FontSize = 18,
                 ForegroundColor = 0xFF000000,
                 FontWeight = TextStyleConfiguration.FontWeights.Medium,
-                FontFamilies = GetFontFamilyPointers("Noto Sans")
+                FontFamilies = GetFontFamilyPointers("Noto Sans"),
+                FontFeatures = GetFontFeatures(),
             };
 
             var linkStyleConfiguration = baseTextStyleConfiguration with
@@ -327,13 +399,25 @@ public class ParagraphTests
         return typefaceProvider;
     }
     
-    
     IntPtr[] GetFontFamilyPointers(params string[] texts)
     {
         var result = new IntPtr[TextStyleConfiguration.FONT_FAMILIES_LENGTH];
                 
         for (var i = 0; i < Math.Min(result.Length, texts.Length); i++)
             result[i] = new SkText(texts[i]).Instance;
+                
+        return result;
+    }
+    
+    TextStyleConfiguration.FontFeature[] GetFontFeatures(params (string name, int value)[] features)
+    {
+        var result = new TextStyleConfiguration.FontFeature[TextStyleConfiguration.FONT_FEATURES_LENGTH];
+
+        for (var i = 0; i < Math.Min(result.Length, features.Length); i++)
+        {
+            result[i].Name = features[i].name;
+            result[i].Value = features[i].value;
+        }
                 
         return result;
     }

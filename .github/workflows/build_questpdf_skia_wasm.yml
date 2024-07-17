@@ -26,7 +26,7 @@ jobs:
           echo "${PWD}/depot_tools" >> $GITHUB_PATH
           export PATH="${PWD}/depot_tools:${PATH}"
         
-          git clone https://github.com/google/skia.git --branch chrome/m127 --single-branch
+          git clone https://github.com/google/skia.git --single-branch
           cd skia
           bin/fetch-ninja
           python3 tools/git-sync-deps

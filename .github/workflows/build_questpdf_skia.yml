@@ -13,23 +13,27 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        - name: win-x64
-          runs-on: windows-latest-xlarge
-        - name: win-x86
-          runs-on: windows-latest-xlarge
+        # - name: win-x64
+        #   runs-on: windows-latest-xlarge
+        # - name: win-x86
+        #   runs-on: windows-latest-xlarge
         - name: linux-x64
           runs-on: ubuntu-latest-xlarge
           container: ubuntu:18.04
+          with:
+            node-version: '18.x'
         - name: linux-arm64
           runs-on: ubuntu-latest-xlarge-arm64
           container: ubuntu:18.04
-        - name: linux-musl-x64
-          runs-on: ubuntu-latest-xlarge
-          container: alpine:3.17
-        - name: osx-x64
-          runs-on: macos-latest-large
-        - name: osx-arm64
-          runs-on: macos-latest-xlarge
+          with:
+            node-version: '18.x'
+        # - name: linux-musl-x64
+        #   runs-on: ubuntu-latest-xlarge
+        #   container: alpine:3.17
+        # - name: osx-x64
+        #   runs-on: macos-latest-large
+        # - name: osx-arm64
+        #   runs-on: macos-latest-xlarge
 
     steps:
       - uses: actions/checkout@v3

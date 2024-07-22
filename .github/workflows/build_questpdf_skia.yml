@@ -29,13 +29,12 @@ jobs:
         # - name: osx-x64
         #   runs-on: macos-latest-large
         # - name: osx-arm64
-        #   runs-on: macos-latest-xlarge
+        #   runs-on: macos-latest-xlarge\
+
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true    
 
     steps:
-      - uses: actions/setup-node@v3
-        with: 
-          node-version: '18.x'
-    
       - uses: actions/checkout@v3
       
 

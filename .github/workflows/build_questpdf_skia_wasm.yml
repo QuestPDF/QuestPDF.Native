@@ -124,13 +124,13 @@ jobs:
             -DCMAKE_C_COMPILER=clang 
             -DCMAKE_BUILD_TYPE=Release"
             
-          cmake $CMAKE_ARGS
+          emcmake cmake $CMAKE_ARGS
 
 
       - name: Build CMake
         shell: bash
         run: >
-          cmake 
+          emcc cmake 
           --build ${PWD}/native/build 
           --config Release
 

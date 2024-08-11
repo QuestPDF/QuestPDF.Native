@@ -130,7 +130,7 @@ jobs:
       - name: Build CMake
         shell: bash
         run: >
-          emcc cmake 
+          cmake 
           --build ${PWD}/native/build 
           --config Release
 

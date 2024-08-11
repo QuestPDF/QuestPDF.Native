@@ -37,6 +37,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     find_library(COREGRAPHICS_LIBRARY CoreGraphics)
     find_library(CORETEXT_LIBRARY CoreText)
     target_link_libraries(QuestPdfSkia PRIVATE ${SKIA_LIBRARY} ${CORETEXT_LIBRARY} ${COREGRAPHICS_LIBRARY} ${COREFOUNDATION_LIBRARY})
+
+    # reduce output package size
+    add_custom_command(TARGET QuestPdfSkia POST_BUILD COMMAND ${CMAKE_STRIP} -x $<TARGET_FILE:QuestPdfSkia>)
 endif()
 
 
@@ -44,6 +47,9 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     file(GLOB SKIA_LIBRARY "${SKIA_DIR}/out/release/*.a")
     target_link_libraries(QuestPdfSkia PRIVATE ${SKIA_LIBRARY})
+
+    # reduce output package size
+    add_custom_command(TARGET QuestPdfSkia POST_BUILD COMMAND ${CMAKE_STRIP} -x $<TARGET_FILE:QuestPdfSkia>)
 endif()
 
 
@@ -65,7 +71,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif()
 
 
-# reduce output package size
-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    add_custom_command(TARGET QuestPdfSkia POST_BUILD COMMAND ${CMAKE_STRIP} -x $<TARGET_FILE:QuestPdfSkia>)
+# WebAssembly (Wasm) configuration
+if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+    file(GLOB SKIA_LIBRARY "${SKIA_DIR}/out/release/*.a")
+    target_link_libraries(QuestPdfSkia PRIVATE ${SKIA_LIBRARY})
 endif()

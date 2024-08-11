@@ -22,11 +22,11 @@ jobs:
       - name: Build Skia
         shell: bash
         run: |        
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git --single-branch
           echo "${PWD}/depot_tools" >> $GITHUB_PATH
           export PATH="${PWD}/depot_tools:${PATH}"
         
-          git clone https://github.com/google/skia.git --single-branch
+          git clone https://github.com/google/skia.git --branch chrome/m128 --single-branch
           cd skia
           bin/fetch-ninja
           python3 tools/git-sync-deps

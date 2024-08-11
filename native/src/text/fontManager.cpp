@@ -34,6 +34,16 @@ sk_sp<SkFontMgr> font_manager_create_default_internal() {
 
 #endif
 
+#ifdef __wasm__
+
+#include "include/ports/SkFontMgr_empty.h"
+
+sk_sp<SkFontMgr> font_manager_create_default_internal() {
+    return SkFontMgr_New_Custom_Empty();
+}
+
+#endif
+
 extern "C" {
 
 QUEST_API SkFontMgr *font_manager_create_local(char* path) {

@@ -1,6 +1,6 @@
 #if defined(_WIN32)
 #define QUEST_API __declspec(dllexport)
-#elif defined(__EMSCRIPTEN__)
+#elif defined(__wasm__)
 #include <emscripten.h>
 #define QUEST_API EMSCRIPTEN_KEEPALIVE
 #else

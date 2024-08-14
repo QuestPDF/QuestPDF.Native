@@ -141,6 +141,12 @@ jobs:
           mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
           find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" -o -name "*.wasm" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;
 
+      - name: Upload build artifacts2
+        uses: actions/upload-artifact@v3
+        with:
+          name: questpdf-native-libraries
+          path: skia/out
+
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3

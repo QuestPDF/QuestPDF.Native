@@ -76,7 +76,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     set_target_properties(mywasmlibrary PROPERTIES
         OUTPUT_NAME "libQuestPdfSkia"
         SUFFIX ".wasm"
-        LINK_FLAGS "-s SIDE_MODULE=1"
+        LINK_FLAGS "-Os -s SIDE_MODULE=1 -s STANDALONE_WASM --no-entry"
     )
 
     file(GLOB SKIA_LIBRARY "${SKIA_DIR}/out/release/*.a")

@@ -73,7 +73,7 @@ endif()
 
 # WebAssembly configuration
 if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-    set_target_properties(mywasmlibrary PROPERTIES
+    set_target_properties(QuestPdfSkia PROPERTIES
         OUTPUT_NAME "libQuestPdfSkia"
         SUFFIX ".wasm"
         LINK_FLAGS "-Os -s SIDE_MODULE=1 -s STANDALONE_WASM --no-entry"

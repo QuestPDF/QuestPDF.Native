@@ -73,6 +73,12 @@ endif()
 
 # WebAssembly configuration
 if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+    set_target_properties(mywasmlibrary PROPERTIES
+        OUTPUT_NAME "libQuestPdfSkia"
+        SUFFIX ".wasm"
+        LINK_FLAGS "-s SIDE_MODULE=1"
+    )
+
     file(GLOB SKIA_LIBRARY "${SKIA_DIR}/out/release/*.a")
     target_link_libraries(QuestPdfSkia PRIVATE ${SKIA_LIBRARY})
 endif()

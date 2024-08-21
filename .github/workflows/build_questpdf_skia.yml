@@ -118,6 +118,13 @@ jobs:
           python-version: '3.x'
 
 
+      - name: Install Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+  
+      - name: Verify Bazelisk installation
+        run: bazel version
+
+
       - name: Install Skia Build System
         if: matrix.runtime.name != 'linux-musl-x64'
         shell: bash

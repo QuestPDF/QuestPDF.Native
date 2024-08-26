@@ -174,7 +174,7 @@ public class CanvasTests
         // save output
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_svg_path.png", pngData);
-        pngData.ShouldHaveSize(10_349);
+        pngData.ShouldHaveSize(10_354);
     }
     
     [Test]

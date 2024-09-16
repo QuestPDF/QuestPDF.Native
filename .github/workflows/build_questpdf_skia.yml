@@ -179,6 +179,8 @@ jobs:
             skia_pdf_subset_harfbuzz=true
             skia_enable_pdf=true
             skia_compile_modules=false
+            skia_enable_ganesh=false
+            skia_lex=false
             extra_cflags=["-fPIC", "-fno-rtti"]'
             
           if [[ "${{ matrix.runtime.name }}" == linux-* ]]; then

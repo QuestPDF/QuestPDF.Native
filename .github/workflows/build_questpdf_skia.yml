@@ -108,7 +108,7 @@ jobs:
         run: |
           apk update
           apk upgrade
-          apk add bash wget git python3 build-base cmake clang llvm15 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto tar
+          apk add bash wget git python3 build-base cmake clang llvm15 icu-libs linux-headers bsd-compat-headers gn fontconfig font-noto tar xz
 
           
       - name: Install 3.x

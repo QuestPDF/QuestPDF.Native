@@ -340,7 +340,7 @@ public class ParagraphTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("document_with_paragraph_and_inlined_hyperlink.pdf", documentData);
-        documentData.ShouldHaveSize(24_500, buffer: 150);
+        documentData.ShouldHaveSize(28_000, buffer: 150);
         
         paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
         

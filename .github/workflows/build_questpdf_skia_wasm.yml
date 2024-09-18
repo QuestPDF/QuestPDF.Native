@@ -26,7 +26,7 @@ jobs:
           echo "${PWD}/depot_tools" >> $GITHUB_PATH
           export PATH="${PWD}/depot_tools:${PATH}"
         
-          git clone https://github.com/google/skia.git --branch chrome/m128 --single-branch
+          git clone https://github.com/google/skia.git --branch chrome/m130 --single-branch
           cd skia
           bin/fetch-ninja
           python3 tools/git-sync-deps
@@ -79,8 +79,8 @@ jobs:
             skia_use_dng_sdk=false
             skia_use_harfbuzz=true
             skia_use_icu=false
-            skia_use_icu4x=true
-            skia_use_libgrapheme=false
+            skia_use_icu4x=false
+            skia_use_libgrapheme=true
             skia_use_fontconfig=false
             skia_use_gl=false
             skia_use_libjpeg_turbo_decode=true

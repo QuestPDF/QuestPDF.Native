@@ -122,10 +122,10 @@ jobs:
         shell: bash
         run: >
           git clone https://github.com/qpdf/qpdf --branch stable --single-branch
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          cmake --build build --parallel --target libqpdf libqpdf_static
-          cmake --install build --component lib
-          cmake --install build --component dev
+          make -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          make --build build --parallel --target libqpdf libqpdf_static
+          make --install build --component lib
+          make --install build --component dev
 
 
       - name: Install Skia Build System

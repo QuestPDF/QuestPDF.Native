@@ -1,4 +1,4 @@
-name: Build Skia + QuestPDF
+name: Build QuestPDF + Skia + qpdf
 
 on:
   workflow_dispatch:

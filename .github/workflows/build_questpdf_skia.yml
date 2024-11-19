@@ -13,21 +13,21 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        - name: win-x64
-          runs-on: windows-latest-xlarge
-        - name: win-x86
-          runs-on: windows-latest-xlarge
-        - name: linux-x64
-          runs-on: ubuntu-latest-xlarge
-          container: ubuntu:18.04
-        - name: linux-arm64
-          runs-on: ubuntu-latest-xlarge-arm64
-          container: ubuntu:18.04
-        - name: linux-musl-x64
-          runs-on: ubuntu-latest-xlarge
-          container: alpine:3.17
-        - name: osx-x64
-          runs-on: macos-latest-large
+        # - name: win-x64
+        #   runs-on: windows-latest-xlarge
+        # - name: win-x86
+        #   runs-on: windows-latest-xlarge
+        # - name: linux-x64
+        #   runs-on: ubuntu-latest-xlarge
+        #   container: ubuntu:18.04
+        # - name: linux-arm64
+        #   runs-on: ubuntu-latest-xlarge-arm64
+        #   container: ubuntu:18.04
+        # - name: linux-musl-x64
+        #   runs-on: ubuntu-latest-xlarge
+        #   container: alpine:3.17
+        # - name: osx-x64
+        #   runs-on: macos-latest-large
         - name: osx-arm64
           runs-on: macos-latest-xlarge
 
@@ -130,7 +130,7 @@ jobs:
       - name: Build Skia
         shell: bash
         run: |
-          git clone https://github.com/google/skia.git --branch chrome/m132 --single-branch
+          git clone https://github.com/google/skia.git --branch chrome/m129 --single-branch
           cd skia
           git apply ../patches/*.patch
           

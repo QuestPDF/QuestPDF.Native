@@ -72,7 +72,6 @@ QUEST_API skia::textlayout::TextStyle *text_style_create(TextStyleConfiguration 
     textStyle->setDecorationMode(configuration.decorationMode);
     textStyle->setDecorationStyle(configuration.decorationStyle);
     textStyle->setDecorationThicknessMultiplier(configuration.decorationThickness);
-    textStyle->setDecorationMode(skia::textlayout::kGaps);
 
     // when lineHeight is 0, use the default line height from the font metrics
     if (configuration.lineHeight != 0) {

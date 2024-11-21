@@ -130,7 +130,7 @@ jobs:
       - name: Build Skia
         shell: bash
         run: |
-          git clone https://github.com/google/skia.git --branch chrome/m128 --single-branch
+          git clone https://github.com/google/skia.git --branch chrome/m132 --single-branch
           cd skia
           git apply ../patches/*.patch
           

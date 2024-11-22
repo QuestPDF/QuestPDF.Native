@@ -40,6 +40,7 @@ public class ParagraphTests
             DecorationStyle = TextStyleConfiguration.TextDecorationStyle.Solid,
             DecorationType = TextStyleConfiguration.TextDecoration.NoDecoration,
             DecorationMode = TextStyleConfiguration.TextDecorationMode.Gaps, 
+            DecorationThickness = 1f,
             
             LineHeight = 1.25f,
             WordSpacing = 0,

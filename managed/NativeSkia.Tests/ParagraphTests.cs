@@ -174,7 +174,8 @@ public class ParagraphTests
             DecorationColor = 0xFF009688,
             DecorationStyle = TextStyleConfiguration.TextDecorationStyle.Solid,
             DecorationType = TextStyleConfiguration.TextDecoration.NoDecoration,
-            DecorationMode = TextStyleConfiguration.TextDecorationMode.Gaps, 
+            DecorationMode = TextStyleConfiguration.TextDecorationMode.Gaps,
+            DecorationThickness = 1f,
             
             LineHeight = 1.25f,
             WordSpacing = 0,
@@ -276,6 +277,7 @@ public class ParagraphTests
             DecorationStyle = TextStyleConfiguration.TextDecorationStyle.Solid,
             DecorationType = TextStyleConfiguration.TextDecoration.NoDecoration,
             DecorationMode = TextStyleConfiguration.TextDecorationMode.Gaps, 
+            DecorationThickness = 1f,
             
             WordSpacing = 0,
             LetterSpacing = 0
@@ -368,7 +370,8 @@ public class ParagraphTests
             {
                 ForegroundColor = 0xFF0088FF,
                 DecorationType = TextStyleConfiguration.TextDecoration.Underline,
-                DecorationColor = 0xFF0088FF
+                DecorationColor = 0xFF0088FF,
+                DecorationThickness = 1f,
             };
             
             using var normalTextStyle = new SkTextStyle(baseTextStyleConfiguration);

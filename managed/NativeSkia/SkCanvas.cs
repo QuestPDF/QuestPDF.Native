@@ -66,6 +66,11 @@ internal sealed class SkCanvas : IDisposable
     {
         API.canvas_draw_picture(Instance, picture.Instance);
     }
+
+    public void DrawDrawable(SkDrawable drawable)
+    {
+        API.canvas_draw_drawable(Instance, drawable.Instance);
+    }
     
     public void DrawParagraph(SkParagraph paragraph)
     {
@@ -174,6 +179,9 @@ internal sealed class SkCanvas : IDisposable
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void canvas_draw_picture(IntPtr canvas, IntPtr picture);
         
+        [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void canvas_draw_drawable(IntPtr canvas, IntPtr drawable);
+
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void canvas_draw_filled_rectangle(IntPtr canvas, SkRect position, uint color);
     

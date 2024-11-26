@@ -13,8 +13,12 @@ QUEST_API SkCanvas *picture_recorder_begin_recording(SkPictureRecorder *pictureR
     return pictureRecorder->beginRecording(width, height);
 }
 
-QUEST_API SkPicture *picture_recorder_end_recording(SkPictureRecorder *pictureRecorder) {
+QUEST_API SkPicture *picture_recorder_end_recording_with_picture(SkPictureRecorder *pictureRecorder) {
     return pictureRecorder->finishRecordingAsPicture().release();
+}
+
+QUEST_API SkDrawable *picture_recorder_end_recording_with_drawable(SkPictureRecorder *pictureRecorder) {
+    return pictureRecorder->finishRecordingAsDrawable().release();
 }
 
 QUEST_API void picture_recorder_delete(SkPictureRecorder *pictureRecorder) {

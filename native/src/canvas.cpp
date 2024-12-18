@@ -97,10 +97,6 @@ QUEST_API void canvas_draw_picture(SkCanvas *canvas, SkPicture *picture) {
     canvas->drawPicture(sk_ref_sp(picture));
 }
 
-QUEST_API void canvas_draw_drawable(SkCanvas *canvas, SkDrawable *drawable) {
-    canvas->drawDrawable(drawable);
-}
-
 QUEST_API void canvas_draw_paragraph(SkCanvas *canvas, skia::textlayout::Paragraph *paragraph) {
     paragraph->paint(canvas, 0, 0);
 }

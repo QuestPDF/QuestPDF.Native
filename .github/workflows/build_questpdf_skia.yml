@@ -79,7 +79,7 @@ jobs:
         run: |
           apt install --yes software-properties-common
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-          add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-15 main"
+          add-apt-repository "deb http://apt.llvm.org/disco/ llvm-toolchain-disco-15 main"
           
           apt update --yes
           apt install --yes clang-15 lldb-15 lld-15
@@ -107,7 +107,7 @@ jobs:
         shell: bash
         run: |
           wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
-          apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+          apt-add-repository 'deb https://apt.kitware.com/ubuntu/ disco main'
           apt update
           apt install cmake --yes
           cmake --version

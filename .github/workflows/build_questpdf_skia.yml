@@ -8,6 +8,7 @@ jobs:
     name: ${{ matrix.runtime.name }}
     runs-on: ${{ matrix.runtime.runs-on }}
     container: ${{ matrix.runtime.container }}
+    timeout-minutes: 20
       
     strategy:
       fail-fast: false
@@ -33,6 +34,7 @@ jobs:
 
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true    
+      DEBIAN_FRONTEND: noninteractive
 
     steps:
       - uses: actions/checkout@v4

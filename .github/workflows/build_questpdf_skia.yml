@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  main:
     name: ${{ matrix.runtime.name }}
     runs-on: ${{ matrix.runtime.runs-on }}
     container: ${{ matrix.runtime.container }}
@@ -13,29 +13,29 @@ jobs:
       fail-fast: false
       matrix:
         runtime: 
-        - name: win-x64
-          runs-on: windows-latest-xlarge
-        - name: win-x86
-          runs-on: windows-latest-xlarge
+        # - name: win-x64
+        #   runs-on: windows-latest-xlarge
+        # - name: win-x86
+        #   runs-on: windows-latest-xlarge
         - name: linux-x64
           runs-on: ubuntu-latest-xlarge
-          container: ubuntu:18.04
+          container: ubuntu:19.04
         - name: linux-arm64
           runs-on: ubuntu-latest-xlarge-arm64
-          container: ubuntu:18.04
-        - name: linux-musl-x64
-          runs-on: ubuntu-latest-xlarge
-          container: alpine:3.17
-        - name: osx-x64
-          runs-on: macos-latest-large
-        - name: osx-arm64
-          runs-on: macos-latest-xlarge
+          container: ubuntu:19.04
+        # - name: linux-musl-x64
+        #   runs-on: ubuntu-latest-xlarge
+        #   container: alpine:3.17
+        # - name: osx-x64
+        #   runs-on: macos-latest-large
+        # - name: osx-arm64
+        #   runs-on: macos-latest-xlarge
 
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true    
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
 
       - name: Install Build Tools
@@ -130,7 +130,7 @@ jobs:
       - name: Build Skia
         shell: bash
         run: |
-          git clone https://github.com/google/skia.git --branch chrome/m132 --single-branch
+          git clone https://github.com/google/skia.git --branch chrome/m133 --single-branch
           cd skia
           git apply ../patches/*.patch
           
@@ -237,9 +237,9 @@ jobs:
 
           
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: questpdf-native-libraries
+          name: questpdf-native-libraries-${{ matrix.runtime.name }}
           path: output
             
 
@@ -264,7 +264,26 @@ jobs:
 
           
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
+        with:
+          name: questpdf-test-results-${{ matrix.runtime.name }}
+          path: testOutput
+
+  merge:
+    runs-on: ubuntu-latest
+    needs: main
+    steps:
+      - name: Merge native libraries
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: questpdf-native-libraries
+          pattern: questpdf-native-libraries-*
+          delete-merged: true
+
+
+      - name: Merge test results
+        uses: actions/upload-artifact/merge@v4
         with:
           name: questpdf-test-results
-          path: testOutput
+          pattern: questpdf-test-results-*
+          delete-merged: true

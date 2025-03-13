@@ -70,7 +70,7 @@ QUEST_API void canvas_annotate_destination_link(SkCanvas *canvas, float width, f
 
 QUEST_API void canvas_draw_image(SkCanvas *canvas, SkImage *image, float width, float height) {
     constexpr SkSamplingOptions samplingOptions(SkFilterMode::kLinear, SkMipmapMode::kLinear);
-    canvas->drawImageRect(sk_ref_sp(image), SkRect::MakeWH(width, height), samplingOptions);
+    canvas->drawImageRect(image, SkRect::MakeWH(width, height), samplingOptions);
 }
 
 QUEST_API void canvas_draw_filled_rectangle(SkCanvas *canvas, SkRect rect, SkColor color) {
@@ -94,7 +94,7 @@ QUEST_API void canvas_draw_stroke_rectangle(SkCanvas *canvas, SkRect rect, float
 }
 
 QUEST_API void canvas_draw_picture(SkCanvas *canvas, SkPicture *picture) {
-    canvas->drawPicture(sk_ref_sp(picture));
+    canvas->drawPicture(picture);
 }
 
 QUEST_API void canvas_draw_paragraph(SkCanvas *canvas, skia::textlayout::Paragraph *paragraph) {

@@ -32,6 +32,7 @@ struct PdfDocumentMetadata {
     char *keywords;
     char *creator;
     char *producer;
+    char *flang;
 
     DateTime creationDate;
     DateTime modificationDate;
@@ -67,6 +68,7 @@ SkPDF::Metadata map_pdf_metadata(PdfDocumentMetadata metadata) {
     result.fKeywords = metadata.keywords;
     result.fCreator = metadata.creator;
     result.fProducer = metadata.producer;
+    result.fLang = metadata.flang;
 
     result.fCreation = map_datetime(metadata.creationDate);
     result.fModified = map_datetime(metadata.modificationDate);

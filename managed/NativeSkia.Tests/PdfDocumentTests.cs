@@ -37,6 +37,7 @@ public class PdfDocumentTests
             Keywords = new SkText("keywords"),
             Creator = new SkText("Japanese creator: 日本語"),
             Producer = new SkText("Arabic producer: اللغة العربية"),
+            Language = new SkText("en-US"),
             
             CreationDate = new SkDateTime(DateTimeOffset.Now - TimeSpan.FromHours(1234)),
             ModificationDate = new SkDateTime(DateTimeOffset.Now - TimeSpan.FromHours(123)),
@@ -60,7 +61,7 @@ public class PdfDocumentTests
 
         using var documentData = stream.DetachData();
         TestFixture.SaveOutput("simple_document.pdf", documentData);
-        documentData.ShouldHaveSize(6_029);
+        documentData.ShouldHaveSize(6_043);
     }
     
     [Test]

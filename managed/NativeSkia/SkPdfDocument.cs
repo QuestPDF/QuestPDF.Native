@@ -11,6 +11,7 @@ internal struct SkPdfDocumentMetadata
     public IntPtr Keywords; // string
     public IntPtr Creator; // string
     public IntPtr Producer; // string
+    public IntPtr Language; // string
 
     public SkDateTime CreationDate;
     public SkDateTime ModificationDate;

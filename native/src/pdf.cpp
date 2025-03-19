@@ -10,7 +10,7 @@
 #include "include/core/SkString.h"
 #include "include/codec/SkCodec.h"
 #include "include/docs/SkPDFDocument.h"
-
+#include "include/docs/SkPDFJpegHelpers.h"
 
 extern "C" {
 
@@ -75,6 +75,9 @@ SkPDF::Metadata map_pdf_metadata(PdfDocumentMetadata metadata) {
     result.fCompressionLevel = metadata.compressDocument ? SkPDF::Metadata::CompressionLevel::LowButFast : SkPDF::Metadata::CompressionLevel::None;
     result.fRasterDPI = metadata.rasterDPI;
     result.fEncodingQuality = 101;
+
+    result.jpegDecoder = SkPDF::JPEG::Decode;
+    result.jpegEncoder = SkPDF::JPEG::Encode;
 
     return result;
 }

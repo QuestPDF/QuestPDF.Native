@@ -5,6 +5,8 @@ namespace QuestPDF.Skia;
 
 internal static class SkNativeDependencyCompatibilityChecker
 {
+    const int ExpectedNativeLibraryVersion = 1;
+    
     private static bool IsCompatibilityChecked = false;
         
     public static void Test()
@@ -21,6 +23,9 @@ internal static class SkNativeDependencyCompatibilityChecker
 
         if (innerException == null)
         {
+            if (!IsCorrectVersionLoaded())
+                throw new Exception($"{exceptionBaseMessage}{paragraph}The loaded native library version is incompatible with the current QuestPDF version. To resolve this issue, please: 1) Clean and rebuild your solution, 2) Remove the bin and obj folders, and 3) Ensure all projects in your solution use the same QuestPDF NuGet package version.");
+            
             IsCompatibilityChecked = true;
             return;
         }
@@ -67,6 +72,18 @@ internal static class SkNativeDependencyCompatibilityChecker
         }
     }
     
+    private static bool IsCorrectVersionLoaded()
+    {
+        try
+        {
+            return API.get_questpdf_version() == ExpectedNativeLibraryVersion;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    
     private static Exception? CheckIfExceptionIsThrownWhenLoadingNativeDependencies()
     {
         try
@@ -92,6 +109,9 @@ internal static class SkNativeDependencyCompatibilityChecker
     
     private static class API
     {
+        [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int get_questpdf_version();
+        
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int check_compatibility_by_calculating_sum(int a, int b);
     }

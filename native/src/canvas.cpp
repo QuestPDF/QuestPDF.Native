@@ -97,8 +97,8 @@ QUEST_API void canvas_draw_picture(SkCanvas *canvas, SkPicture *picture) {
     canvas->drawPicture(picture);
 }
 
-QUEST_API void canvas_draw_paragraph(SkCanvas *canvas, skia::textlayout::Paragraph *paragraph) {
-    paragraph->paint(canvas, 0, 0);
+QUEST_API void canvas_draw_paragraph(SkCanvas *canvas, skia::textlayout::Paragraph *paragraph, int lineFrom, int lineTo) {
+    paragraph->paintLines(canvas, lineFrom, lineTo);
 }
 
 QUEST_API void canvas_draw_svg_path(SkCanvas *canvas, char *svg, SkColor color) {

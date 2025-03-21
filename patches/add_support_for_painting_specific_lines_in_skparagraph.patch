@@ -12,16 +12,24 @@ index c5d03e9269..baaad9e14f 100644
  
      virtual void paint(ParagraphPainter* painter, SkScalar x, SkScalar y) = 0;
 diff --git a/modules/skparagraph/src/ParagraphImpl.cpp b/modules/skparagraph/src/ParagraphImpl.cpp
-index ac8e21543e..5df41420b8 100644
+index ac8e21543e..531a701803 100644
 --- a/modules/skparagraph/src/ParagraphImpl.cpp
 +++ b/modules/skparagraph/src/ParagraphImpl.cpp
-@@ -240,6 +240,18 @@ void ParagraphImpl::layout(SkScalar rawWidth) {
+@@ -240,6 +240,26 @@ void ParagraphImpl::layout(SkScalar rawWidth) {
      //SkDebugf("layout('%s', %f): %f %f\n", fText.c_str(), rawWidth, fMinIntrinsicWidth, fMaxIntrinsicWidth);
  }
  
 +void ParagraphImpl::paintLines(SkCanvas* canvas, int from, int to) {
-+    if (canvas == nullptr || from < 0 || to >= fLines.size() || from > to) {
++    if (canvas == nullptr || from > to) {
 +        return;
++    }
++
++    if (from < 0) {
++        from = 0;
++    }
++
++    if (to >= fLines.size()) {
++        to = fLines.size() - 1;
 +    }
 +
 +    CanvasParagraphPainter painter(canvas);

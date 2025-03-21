@@ -10,16 +10,16 @@ QUEST_API void paragraph_plan_layout(skia::textlayout::Paragraph *paragraph, flo
     paragraph->layout(availableWidth);
 }
 
-QUEST_API void paragraph_get_line_metrics(skia::textlayout::Paragraph *paragraph, SkRect **outputArray, int *outputArrayLength) {
+QUEST_API void paragraph_get_line_metrics(skia::textlayout::Paragraph *paragraph, SkSize **outputArray, int *outputArrayLength) {
     std::vector<skia::textlayout::LineMetrics> lineMetrics;
     paragraph->getLineMetrics(lineMetrics);
 
     *outputArrayLength = lineMetrics.size();
-    *outputArray = new SkRect[*outputArrayLength];
+    *outputArray = new SkSize[*outputArrayLength];
 
     for (int i = 0; i < *outputArrayLength; ++i) {
         auto metrics = lineMetrics[i];
-        (*outputArray)[i] = SkRect::MakeLTRB(metrics.fLeft, metrics.fBaseline - metrics.fAscent, metrics.fLeft + metrics.fWidth, metrics.fHeight + metrics.fDescent);
+        (*outputArray)[i] = SkSize::Make(metrics.fWidth, metrics.fHeight);
     }
 }
 

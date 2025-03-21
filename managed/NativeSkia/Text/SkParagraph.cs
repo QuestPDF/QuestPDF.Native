@@ -17,18 +17,18 @@ internal sealed class SkParagraph : IDisposable
         API.paragraph_plan_layout(Instance, availableWidth);
     }
     
-    public SkRect[] GetLineMetrics()
+    public SkSize[] GetLineMetrics()
     {
         API.paragraph_get_line_metrics(Instance, out var array, out var arrayLength);
         
-        var managedArray = new SkRect[arrayLength];
+        var managedArray = new SkSize[arrayLength];
         
-        var size = Marshal.SizeOf<SkRect>();
+        var size = Marshal.SizeOf<SkSize>();
         
         for (var i = 0; i < arrayLength; i++)
         {
             var ptr = IntPtr.Add(array, i * size);
-            managedArray[i] = Marshal.PtrToStructure<SkRect>(ptr);
+            managedArray[i] = Marshal.PtrToStructure<SkSize>(ptr);
         }
 
         Marshal.FreeHGlobal(array);

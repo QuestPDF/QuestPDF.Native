@@ -162,25 +162,15 @@ QUEST_API void canvas_clip_rectangle(SkCanvas *canvas, SkRect clipArea) {
     canvas->clipRect(clipArea);
 }
 
-struct CanvasMatrix {
-    float scaleX;
-    float translateX;
+QUEST_API void canvas_get_matrix9(SkCanvas *canvas, SkScalar values[9]) {
+    canvas->getLocalToDeviceAs3x3().get9(values);
+}
 
-    float scaleY;
-    float translateY;
-};
+QUEST_API void canvas_set_matrix9(SkCanvas *canvas, SkScalar values[9]) {
+    SkMatrix matrix;
+    matrix.set9(values);
 
-QUEST_API CanvasMatrix canvas_get_matrix(SkCanvas *canvas) {
-    const auto matrix = canvas->getTotalMatrix();
-
-    CanvasMatrix result = {
-            .scaleX =  matrix.getScaleX(),
-            .translateX =  matrix.getTranslateX(),
-            .scaleY =  matrix.getScaleY(),
-            .translateY =  matrix.getTranslateY()
-    };
-
-    return result;
+    canvas->setMatrix(SkM44(matrix));
 }
 
 }

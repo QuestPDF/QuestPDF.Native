@@ -207,7 +207,7 @@ public class CanvasTests
     }
     
     [Test]
-    public void Get()
+    public void GetMatrix()
     {
         // prepare
         using var bitmap = new SkBitmap(350, 400);
@@ -218,15 +218,41 @@ public class CanvasTests
         canvas.Translate(35, 45);
         canvas.Scale(4, 5);
         
-        var currentMatrix = canvas.GetCurrentTotalMatrix();
+        var currentMatrix = canvas.GetCurrentMatrix();
 
-        var expectedValue = new SkCanvas.CanvasMatrix
+        var expectedValue = new SkCanvasMatrix()
         {
             ScaleX = 8,
             ScaleY = 15,
             TranslateX = 85,
-            TranslateY = 160
+            TranslateY = 160,
+            Perspective3 = 1
         };
+        
+        currentMatrix.Should().BeEquivalentTo(expectedValue);
+    }
+    
+    [Test]
+    public void SetMatrix()
+    {
+        // prepare
+        using var bitmap = new SkBitmap(350, 400);
+        using var canvas = SkCanvas.CreateFromBitmap(bitmap);
+
+        var newValue = new SkCanvasMatrix
+        {
+            ScaleX = 2,
+            ScaleY = 3,
+            TranslateX = 85,
+            TranslateY = 160,
+            Perspective3 = 1
+        };
+        
+        canvas.SetCurrentMatrix(newValue);
+        canvas.Translate(10, 20);
+        
+        var expectedValue = newValue with { TranslateX = 105, TranslateY = 220 };
+        var currentMatrix = canvas.GetCurrentMatrix();
         
         currentMatrix.Should().BeEquivalentTo(expectedValue);
     }

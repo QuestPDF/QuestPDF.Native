@@ -30,7 +30,7 @@ QUEST_API skia::textlayout::ParagraphBuilder *paragraph_builder_create(Paragraph
         paragraphStyle.setMaxLines(infiniteLines);
     }
 
-    auto paragraphBuilder = skia::textlayout::ParagraphBuilder::make(paragraphStyle, sk_sp(fontCollection), sk_sp(unicode));
+    auto paragraphBuilder = skia::textlayout::ParagraphBuilder::make(paragraphStyle, sk_ref_sp(fontCollection), sk_ref_sp(unicode));
     return paragraphBuilder.release();
 }
 

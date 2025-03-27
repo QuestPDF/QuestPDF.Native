@@ -23,7 +23,7 @@ public class ParagraphTests
             LineClampEllipsis = new SkText("...").Instance
         };
         
-        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
+        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, SkUnicode.Global, fontCollection);
 
         var textStyleConfiguration = new TextStyleConfiguration
         {
@@ -105,7 +105,7 @@ public class ParagraphTests
             Direction = ParagraphStyleConfiguration.TextDirection.Ltr
         };
         
-        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
+        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, SkUnicode.Global, fontCollection);
 
         using var textStyle = new SkTextStyle(new TextStyleConfiguration
         {
@@ -158,7 +158,7 @@ public class ParagraphTests
             LineClampEllipsis = new SkText("...").Instance
         };
         
-        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
+        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, SkUnicode.Global, fontCollection);
 
         var textStyleConfiguration = new TextStyleConfiguration
         {
@@ -223,7 +223,7 @@ public class ParagraphTests
         using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Local);
 
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration();
-        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
+        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, SkUnicode.Global, fontCollection);
 
         using var textStyle = new SkTextStyle(new TextStyleConfiguration
         {
@@ -260,7 +260,7 @@ public class ParagraphTests
             LineClampEllipsis = new SkText(" [...]").Instance
         };
         
-        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
+        using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, SkUnicode.Global, fontCollection);
 
         var textStyleConfiguration = new TextStyleConfiguration
         {
@@ -355,7 +355,7 @@ public class ParagraphTests
                 Direction = ParagraphStyleConfiguration.TextDirection.Ltr,
             };
             
-            using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, fontCollection);
+            using var paragraphBuilder = SkParagraphBuilder.Create(paragraphStyleConfiguration, SkUnicode.Global, fontCollection);
             
             var baseTextStyleConfiguration = new TextStyleConfiguration
             {

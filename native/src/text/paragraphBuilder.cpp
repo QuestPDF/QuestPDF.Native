@@ -3,6 +3,7 @@
 #include "modules/skparagraph/include/ParagraphStyle.h"
 #include "modules/skparagraph/include/ParagraphBuilder.h"
 #include "modules/skparagraph/include/TextStyle.h"
+#include "modules/skunicode/include/SkUnicode.h"
 
 extern "C" {
 
@@ -13,7 +14,7 @@ struct ParagraphStyleConfiguration {
     char* lineClampEllipsis;
 };
 
-QUEST_API skia::textlayout::ParagraphBuilder *paragraph_builder_create(ParagraphStyleConfiguration configuration, skia::textlayout::FontCollection *fontCollection) {
+QUEST_API skia::textlayout::ParagraphBuilder *paragraph_builder_create(ParagraphStyleConfiguration configuration, SkUnicode *unicode, skia::textlayout::FontCollection *fontCollection) {
     skia::textlayout::ParagraphStyle paragraphStyle = skia::textlayout::ParagraphStyle();
     paragraphStyle.setTextAlign(configuration.alignment);
     paragraphStyle.setTextDirection(configuration.direction);
@@ -29,7 +30,7 @@ QUEST_API skia::textlayout::ParagraphBuilder *paragraph_builder_create(Paragraph
         paragraphStyle.setMaxLines(infiniteLines);
     }
 
-    auto paragraphBuilder = skia::textlayout::ParagraphBuilder::make(paragraphStyle, sk_ref_sp(fontCollection));
+    auto paragraphBuilder = skia::textlayout::ParagraphBuilder::make(paragraphStyle, sk_sp(fontCollection), sk_sp(unicode));
     return paragraphBuilder.release();
 }
 

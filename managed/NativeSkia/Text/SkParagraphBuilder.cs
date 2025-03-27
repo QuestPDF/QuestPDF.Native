@@ -88,9 +88,9 @@ internal sealed class SkParagraphBuilder : IDisposable
     
     public ParagraphStyleConfiguration Configuration { get; private set; }
 
-    public static SkParagraphBuilder Create(ParagraphStyleConfiguration paragraphStyleConfiguration, SkFontCollection fontCollection)
+    public static SkParagraphBuilder Create(ParagraphStyleConfiguration paragraphStyleConfiguration, SkUnicode unicode, SkFontCollection fontCollection)
     {
-        var instance = API.paragraph_builder_create(paragraphStyleConfiguration, fontCollection.Instance);
+        var instance = API.paragraph_builder_create(paragraphStyleConfiguration, unicode.Instance, fontCollection.Instance);
         SkiaAPI.EnsureNotNull(instance);
         
         return new SkParagraphBuilder
@@ -138,7 +138,7 @@ internal sealed class SkParagraphBuilder : IDisposable
     private static class API
     {
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr paragraph_builder_create(ParagraphStyleConfiguration paragraphStyleConfiguration, IntPtr fontCollection);
+        public static extern IntPtr paragraph_builder_create(ParagraphStyleConfiguration paragraphStyleConfiguration, IntPtr unicode, IntPtr fontCollection);
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void paragraph_builder_add_text(IntPtr paragraphBuilder, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8StringMarshaller))] string text, IntPtr textStyle);

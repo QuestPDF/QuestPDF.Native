@@ -162,15 +162,61 @@ QUEST_API void canvas_clip_rectangle(SkCanvas *canvas, SkRect clipArea) {
     canvas->clipRect(clipArea);
 }
 
-QUEST_API void canvas_get_matrix9(SkCanvas *canvas, SkScalar values[9]) {
-    canvas->getLocalToDeviceAs3x3().get9(values);
+struct SkCanvasMatrix
+{
+    float ScaleX;
+    float SkewX;
+    float TranslateX;
+
+    float SkewY;
+    float ScaleY;
+    float TranslateY;
+
+    float Perspective1;
+    float Perspective2;
+    float Perspective3;
+};
+
+
+QUEST_API SkCanvasMatrix canvas_get_matrix9(SkCanvas *canvas) {
+    SkScalar array[9];
+    canvas->getLocalToDeviceAs3x3().get9(array);
+
+    SkCanvasMatrix matrix;
+    matrix.ScaleX = array[0];
+    matrix.SkewX = array[1];
+    matrix.TranslateX = array[2];
+
+    matrix.SkewY = array[3];
+    matrix.ScaleY = array[4];
+    matrix.TranslateY = array[5];
+
+    matrix.Perspective1 = array[6];
+    matrix.Perspective2 = array[7];
+    matrix.Perspective3 = array[8];
+
+    return matrix;
 }
 
-QUEST_API void canvas_set_matrix9(SkCanvas *canvas, SkScalar values[9]) {
-    SkMatrix matrix;
-    matrix.set9(values);
+QUEST_API void canvas_set_matrix9(SkCanvas *canvas, SkCanvasMatrix matrix) {
+    SkScalar array[9];
 
-    canvas->setMatrix(SkM44(matrix));
+    array[0] = matrix.ScaleX;
+    array[1] = matrix.SkewX;
+    array[2] = matrix.TranslateX;
+
+    array[3] = matrix.SkewY;
+    array[4] = matrix.ScaleY;
+    array[5] = matrix.TranslateY;
+
+    array[6] = matrix.Perspective1;
+    array[7] = matrix.Perspective2;
+    array[8] = matrix.Perspective3;
+
+    SkMatrix skMatrix;
+    skMatrix.set9(array);
+
+    canvas->setMatrix(SkM44(skMatrix));
 }
 
 }

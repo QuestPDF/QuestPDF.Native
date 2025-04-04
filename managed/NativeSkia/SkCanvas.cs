@@ -3,7 +3,7 @@ using QuestPDF.Skia.Text;
 
 namespace QuestPDF.Skia;
 
-[StructLayout(LayoutKind.Sequential, Pack = 4)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct SkCanvasMatrix
 {
     public float ScaleX;
@@ -133,8 +133,7 @@ internal sealed class SkCanvas : IDisposable
     
     public SkCanvasMatrix GetCurrentMatrix()
     { 
-        API.canvas_get_matrix9(Instance, out var matrix);
-        return matrix;
+        return API.canvas_get_matrix9(Instance);
     }
     
     public void SetCurrentMatrix(SkCanvasMatrix matrix)
@@ -221,7 +220,7 @@ internal sealed class SkCanvas : IDisposable
         public static extern void canvas_annotate_destination_link(IntPtr canvas, float width, float height, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8StringMarshaller))] string destinationName);
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void canvas_get_matrix9(IntPtr canvas, out SkCanvasMatrix matrix);
+        public static extern SkCanvasMatrix canvas_get_matrix9(IntPtr canvas);
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void canvas_set_matrix9(IntPtr canvas, SkCanvasMatrix matrix);

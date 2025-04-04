@@ -3,7 +3,6 @@ using QuestPDF.Skia.Text;
 
 namespace QuestPDF.Skia;
 
-[StructLayout(LayoutKind.Sequential)]
 internal struct SkCanvasMatrix
 {
     public float ScaleX;
@@ -133,13 +132,42 @@ internal sealed class SkCanvas : IDisposable
     
     public SkCanvasMatrix GetCurrentMatrix()
     {
-        API.canvas_get_matrix9(Instance, out var result);
-        return result;
+        API.canvas_get_matrix9(Instance, out var array);
+
+        return new SkCanvasMatrix
+        {
+            ScaleX = array[0],
+            SkewX = array[1],
+            TranslateX = array[2],
+    
+            SkewY = array[3],
+            ScaleY = array[4],
+            TranslateY = array[5],
+    
+            Perspective1 = array[6],
+            Perspective2 = array[7],
+            Perspective3 = array[8]
+        };
     }
     
     public void SetCurrentMatrix(SkCanvasMatrix matrix)
     {
-        API.canvas_set_matrix9(Instance, matrix);
+        var array = new[]
+        {
+            matrix.ScaleX,
+            matrix.SkewX,
+            matrix.TranslateX,
+    
+            matrix.SkewY,
+            matrix.ScaleY,
+            matrix.TranslateY,
+    
+            matrix.Perspective1,
+            matrix.Perspective2,
+            matrix.Perspective3
+        };
+        
+        API.canvas_set_matrix9(Instance, array);
     }
     
     ~SkCanvas()
@@ -221,9 +249,9 @@ internal sealed class SkCanvas : IDisposable
         public static extern void canvas_annotate_destination_link(IntPtr canvas, float width, float height, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8StringMarshaller))] string destinationName);
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void canvas_get_matrix9(IntPtr canvas, out SkCanvasMatrix matrix);
+        public static extern void canvas_get_matrix9(IntPtr canvas, out float[] matrix);
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void canvas_set_matrix9(IntPtr canvas, SkCanvasMatrix matrix);
+        public static extern void canvas_set_matrix9(IntPtr canvas, float[] matrix);
     }
 }

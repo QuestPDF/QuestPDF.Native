@@ -20,9 +20,9 @@ internal sealed class SkParagraph : IDisposable
     public SkSize[] GetLineMetrics()
     {
         API.paragraph_get_line_metrics(Instance, out var array, out var arrayLength);
-        
+
         var managedArray = new SkSize[arrayLength];
-        
+
         var size = Marshal.SizeOf<SkSize>();
         
         for (var i = 0; i < arrayLength; i++)
@@ -31,7 +31,8 @@ internal sealed class SkParagraph : IDisposable
             managedArray[i] = Marshal.PtrToStructure<SkSize>(ptr);
         }
 
-        Marshal.FreeHGlobal(array);
+        API.paragraph_delete_line_metrics(array);
+
         return managedArray;
     }
     
@@ -41,8 +42,8 @@ internal sealed class SkParagraph : IDisposable
         
         var managedArray = new int[arrayLength];
         Marshal.Copy(array, managedArray,  0, arrayLength);
-        Marshal.FreeHGlobal(array);
-        
+        API.paragraph_delete_unresolved_codepoints(array);
+
         return managedArray;
     }
     
@@ -60,7 +61,7 @@ internal sealed class SkParagraph : IDisposable
             managedArray[i] = Marshal.PtrToStructure<SkRect>(ptr);
         }
 
-        Marshal.FreeHGlobal(array);
+        API.paragraph_delete_positions(array);
         return managedArray;
     }
     
@@ -78,7 +79,7 @@ internal sealed class SkParagraph : IDisposable
             managedArray[i] = Marshal.PtrToStructure<SkRect>(ptr);
         }
 
-        Marshal.FreeHGlobal(array);
+        API.paragraph_delete_positions(array);
         return managedArray;
     }
     
@@ -115,5 +116,14 @@ internal sealed class SkParagraph : IDisposable
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void paragraph_delete(IntPtr paragraph);
+
+        [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void paragraph_delete_line_metrics(IntPtr array);
+
+        [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void paragraph_delete_unresolved_codepoints(IntPtr array);
+
+        [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void paragraph_delete_positions(IntPtr array);
     }
 }

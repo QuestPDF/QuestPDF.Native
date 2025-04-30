@@ -23,6 +23,10 @@ QUEST_API void paragraph_get_line_metrics(skia::textlayout::Paragraph *paragraph
     }
 }
 
+QUEST_API void paragraph_delete_line_metrics(SkSize *array) {
+    delete[] array;
+}
+
 QUEST_API void paragraph_get_unresolved_codepoints(skia::textlayout::Paragraph *paragraph, SkUnichar **outputArray, int *outputArrayLength) {
     const auto codepoints = paragraph->unresolvedCodepoints();
 
@@ -35,6 +39,10 @@ QUEST_API void paragraph_get_unresolved_codepoints(skia::textlayout::Paragraph *
         (*outputArray)[index++] = codepoint;
 }
 
+QUEST_API void paragraph_delete_unresolved_codepoints(SkUnichar *array) {
+    delete[] array;
+}
+
 QUEST_API void paragraph_get_placeholder_positions(skia::textlayout::Paragraph *paragraph, SkRect **outputArray, int *outputArrayLength) {
     const auto placeholders = paragraph->getRectsForPlaceholders();
 
@@ -43,6 +51,10 @@ QUEST_API void paragraph_get_placeholder_positions(skia::textlayout::Paragraph *
 
     for (int i = 0; i < *outputArrayLength; ++i)
         (*outputArray)[i] = placeholders[i].rect;
+}
+
+QUEST_API void paragraph_delete_positions(SkRect *array) {
+    delete[] array;
 }
 
 QUEST_API void paragraph_get_text_range_positions(skia::textlayout::Paragraph *paragraph, int rangeStart, int rangeEnd, SkRect **outputArray, int *outputArrayLength) {

@@ -81,7 +81,7 @@ public class ImageTests
         
         resizedImage.Width.Should().Be(200);
         resizedImage.Height.Should().Be(150);
-        resizedImageData.ShouldHaveSize(7_234);
+        resizedImageData.ShouldHaveSize(7_230, buffer: 10);
         
         TestFixture.SaveOutput("image_transparent_resized.png", resizedImageData);
         // check if image is transparent

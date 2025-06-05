@@ -1,5 +1,7 @@
 name: Build Skia + QuestPDF WASM
 
+permissions: {}
+
 on:
   workflow_dispatch:
 

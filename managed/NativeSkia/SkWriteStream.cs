@@ -42,12 +42,10 @@ internal sealed class SkWriteStream : IDisposable
     
     public void Dispose()
     {
-        if (CallbackHandle.IsAllocated)
-            CallbackHandle.Free();
-        
         if (Instance == IntPtr.Zero)
             return;
         
+        CallbackHandle.Free();
         API.write_stream_delete(Instance);
         Instance = IntPtr.Zero;
     }

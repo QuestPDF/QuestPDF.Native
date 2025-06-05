@@ -19,16 +19,18 @@ public class SvgCanvasTests
         using var svgImage = new SkSvgImage(svgContent, SkResourceProvider.Local, SkFontManager.Global);
         
         // draw svg in a pdf document
-        using var svgOutputStream = new SkWriteStream();
-        using var svgCanvas = SkSvgCanvas.CreateSvg(800, 600, svgOutputStream);
+        using var memoryStream = new MemoryStream();
+        using var skiaStream = new SkWriteStream(memoryStream);
+        using var svgCanvas = SkSvgCanvas.CreateSvg(800, 600, skiaStream);
         
         svgCanvas.DrawImage(image, 800, 600);
         svgCanvas.DrawSvg(svgImage, 800, 600);
         
         svgCanvas.Dispose();
+        skiaStream.Flush();
         
         // save
-        using var svgData = svgOutputStream.DetachData();
+        var svgData = memoryStream.ToArray();
         TestFixture.SaveOutput("canvas_svg.svg", svgData);
         svgData.ShouldHaveSize(367_118);
     }

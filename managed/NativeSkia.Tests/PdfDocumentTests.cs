@@ -11,8 +11,10 @@ public class PdfDocumentTests
     public void EmptyMetadata()
     {
         var metadata = new SkPdfDocumentMetadata();
-        using var stream = new SkWriteStream();
-        using var pdf = SkPdfDocument.Create(stream, metadata);
+
+        using var memoryStream = new MemoryStream();
+        using var skiaStream = new SkWriteStream(memoryStream);
+        using var pdf = SkPdfDocument.Create(skiaStream, metadata);
         
         using var canvas = pdf.BeginPage(400, 600);
         
@@ -20,8 +22,9 @@ public class PdfDocumentTests
 
         pdf.EndPage();
         pdf.Close();
+        skiaStream.Flush();
 
-        using var documentData = stream.DetachData();
+        var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_without_metadata.pdf", documentData);
         documentData.ShouldHaveSize(718);
     }
@@ -47,8 +50,9 @@ public class PdfDocumentTests
             RasterDPI = 123
         };
         
-        using var stream = new SkWriteStream();
-        using var pdf = SkPdfDocument.Create(stream, metadata);
+        using var memoryStream = new MemoryStream();
+        using var skiaStream = new SkWriteStream(memoryStream);
+        using var pdf = SkPdfDocument.Create(skiaStream, metadata);
         
         using var canvas = pdf.BeginPage(400, 600);
         
@@ -58,8 +62,9 @@ public class PdfDocumentTests
         
         pdf.EndPage();
         pdf.Close();
+        skiaStream.Flush();
 
-        using var documentData = stream.DetachData();
+        var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("simple_document.pdf", documentData);
         documentData.ShouldHaveSize(6_040, buffer: 10);
     }
@@ -69,8 +74,9 @@ public class PdfDocumentTests
     {
         using var webpageImage = SkImage.FromData(SkData.FromFile("Input/webpage.jpg"));
 
-        using var stream = new SkWriteStream();
-        using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata());
+        using var memoryStream = new MemoryStream();
+        using var skiaStream = new SkWriteStream(memoryStream);
+        using var pdf = SkPdfDocument.Create(skiaStream, new SkPdfDocumentMetadata());
         
         using var canvas = pdf.BeginPage(700, 340);
         
@@ -80,8 +86,9 @@ public class PdfDocumentTests
         
         pdf.EndPage();
         pdf.Close();
+        skiaStream.Flush();
 
-        using var documentData = stream.DetachData();
+        var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_with_url.pdf", documentData);
         documentData.ShouldHaveSize(249_687);
     }
@@ -89,10 +96,9 @@ public class PdfDocumentTests
     [Test]
     public void InternalAnnotationAndLink()
     {
-        using var webpageImage = SkImage.FromData(SkData.FromFile("Input/webpage.jpg"));
-
-        using var stream = new SkWriteStream();
-        using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata());
+        using var memoryStream = new MemoryStream();
+        using var skiaStream = new SkWriteStream(memoryStream);
+        using var pdf = SkPdfDocument.Create(skiaStream, new SkPdfDocumentMetadata());
         
         // first page
         using var firstPageCanvas = pdf.BeginPage(300, 500);
@@ -112,8 +118,9 @@ public class PdfDocumentTests
         
         pdf.EndPage();
         pdf.Close();
+        skiaStream.Flush();
 
-        using var documentData = stream.DetachData();
+        var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_with_internal_destination_and_link.pdf", documentData);
         documentData.ShouldHaveSize(1_393);
     }

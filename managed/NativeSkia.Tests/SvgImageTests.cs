@@ -32,8 +32,9 @@ public class SvgImageTests
         using var svg = new SkSvgImage(svgContent, SkResourceProvider.Local, SkFontManager.Local);
         
         // create document
-        using var stream = new SkWriteStream();
-        using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata() { CompressDocument = true });
+        using var memoryStream = new MemoryStream();
+        using var skiaStream = new SkWriteStream(memoryStream);
+        using var pdf = SkPdfDocument.Create(skiaStream, new SkPdfDocumentMetadata() { CompressDocument = true });
         
         // draw svg in a pdf document
         using var pageCanvas = pdf.BeginPage(800, 600);
@@ -41,8 +42,9 @@ public class SvgImageTests
         
         pdf.EndPage();
         pdf.Close();
+        skiaStream.Flush();
 
-        using var documentData = stream.DetachData();
+        var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_svg.pdf", documentData);
         documentData.ShouldHaveSize(3_323);
     }

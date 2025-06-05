@@ -25,6 +25,14 @@ add_library(QuestPdfSkia SHARED ${SOURCES})
 #add_executable(QuestPdfSkia ${SOURCES})
 
 
+# built with -fno-rtti
+if (MSVC)
+    target_compile_options(QuestPdfSkia PRIVATE /GR-)
+else()
+    target_compile_options(QuestPdfSkia PRIVATE -fno-rtti)
+endif()
+
+
 # include Skia library code
 set(SKIA_DIR ${SKIA_DIR})
 include_directories(${SKIA_DIR}/)

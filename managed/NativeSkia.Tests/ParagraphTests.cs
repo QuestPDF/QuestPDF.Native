@@ -66,8 +66,9 @@ public class ParagraphTests
         var paragraph = paragraphBuilder.CreateParagraph();
         
         // draw paragraph
-        using var stream = new SkWriteStream();
-        using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata());
+        using var memoryStream = new MemoryStream();
+        using var skiaStream = new SkWriteStream(memoryStream);
+        using var pdf = SkPdfDocument.Create(skiaStream, new SkPdfDocumentMetadata());
         
         // draw text
         using var pageCanvas = pdf.BeginPage(500, 800);
@@ -86,8 +87,9 @@ public class ParagraphTests
         
         pdf.EndPage();
         pdf.Close();
+        skiaStream.Flush();
 
-        using var documentData = stream.DetachData();
+        var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_paragraph.pdf", documentData);
         documentData.ShouldHaveSize(123_400, buffer: 1000);
 
@@ -195,8 +197,9 @@ public class ParagraphTests
         var paragraph = paragraphBuilder.CreateParagraph();
         
         // draw paragraph
-        using var stream = new SkWriteStream();
-        using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata());
+        using var memoryStream = new MemoryStream();
+        using var skiaStream = new SkWriteStream(memoryStream);
+        using var pdf = SkPdfDocument.Create(skiaStream, new SkPdfDocumentMetadata());
         
         // draw text
         using var pageCanvas = pdf.BeginPage(300, 300);
@@ -207,8 +210,9 @@ public class ParagraphTests
         
         pdf.EndPage();
         pdf.Close();
+        skiaStream.Flush();
 
-        using var documentData = stream.DetachData();
+        var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("font_features.pdf", documentData);
         documentData.ShouldHaveSize(22300, 100);
 
@@ -296,8 +300,9 @@ public class ParagraphTests
         var paragraph = paragraphBuilder.CreateParagraph();
         
         // draw paragraph
-        using var stream = new SkWriteStream();
-        using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata() { CompressDocument = true });
+        using var memoryStream = new MemoryStream();
+        using var skiaStream = new SkWriteStream(memoryStream);
+        using var pdf = SkPdfDocument.Create(skiaStream, new SkPdfDocumentMetadata() { CompressDocument = true });
         
         // draw text
         using var pageCanvas = pdf.BeginPage(500, 800);
@@ -308,8 +313,9 @@ public class ParagraphTests
         
         pdf.EndPage();
         pdf.Close();
+        skiaStream.Flush();
 
-        using var documentData = stream.DetachData();
+        var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_subscript.pdf", documentData);
         documentData.ShouldHaveSize(8_600, buffer: 100);
         
@@ -322,8 +328,9 @@ public class ParagraphTests
         using var typefaceProvider = CreateTypefaceProvider();
         using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Local);
         
-        using var stream = new SkWriteStream();
-        using var pdf = SkPdfDocument.Create(stream, new SkPdfDocumentMetadata());
+        using var memoryStream = new MemoryStream();
+        using var skiaStream = new SkWriteStream(memoryStream);
+        using var pdf = SkPdfDocument.Create(skiaStream, new SkPdfDocumentMetadata());
 
         using var pageCanvas = pdf.BeginPage(350, 500);
 
@@ -340,8 +347,9 @@ public class ParagraphTests
 
         pdf.EndPage();
         pdf.Close();
+        skiaStream.Flush();
 
-        using var documentData = stream.DetachData();
+        var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_with_paragraph_and_inlined_hyperlink.pdf", documentData);
         documentData.ShouldHaveSize(28_000, buffer: 150);
         

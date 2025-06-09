@@ -64,7 +64,7 @@ QUEST_API skia::textlayout::TextStyle *text_style_create(TextStyleConfiguration 
     if (configuration.backgroundColor != 0) {
         SkPaint paint;
         paint.setColor(configuration.backgroundColor);
-        textStyle->setBackgroundColor(paint);
+        textStyle->setBackgroundPaint(paint);
     }
 
     textStyle->setDecorationColor(configuration.decorationColor);

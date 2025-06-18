@@ -25,8 +25,8 @@ extern "C" {
 
     QUEST_API void paint_set_linear_gradient(SkPaint* paint, SkRect rect, SkColor* colors, int colorsCount) {
         const SkPoint points[2] = {
-            SkPoint(rect.left(), rect.top()),
-            SkPoint(rect.right(), rect.bottom())
+            SkPoint::Make(rect.left(), rect.top()),
+            SkPoint::Make(rect.right(), rect.bottom())
         };
 
         const auto shader = SkGradientShader::MakeLinear(

@@ -4,16 +4,17 @@
 #include "include/core/SkImage.h"
 #include "include/core/SkBitmap.h"
 #include "include/core/SkCanvas.h"
-#include "include/core/SkCanvas.h"
 #include "include/core/SkData.h"
+#include "include/core/SkRRect.h"
 #include "include/core/SkAnnotation.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPath.h"
+#include "include/pathops/SkPathOps.h"
 #include "include/core/SkPathBuilder.h"
 #include "include/core/SkMatrix.h"
-#include "include/core/SkPathEffect.h"
 #include "include/codec/SkCodec.h"
-#include "include/core/SkPicture.h"
+#include "include/core/SkPathEffect.h"
+#include "include/effects/SkBlurMaskFilter.h"
 #include "include/effects/Sk2DPathEffect.h"
 #include "include/utils/SkParsePath.h"
 #include "modules/skparagraph/include/Paragraph.h"
@@ -68,29 +69,199 @@ QUEST_API void canvas_annotate_destination_link(SkCanvas *canvas, float width, f
     data->unref();
 }
 
+QUEST_API void canvas_draw_line(SkCanvas *canvas, SkPoint start, SkPoint end, SkPaint* paint) {
+    canvas->drawLine(start, end, *paint);
+}
+
+QUEST_API void canvas_draw_rectangle(SkCanvas *canvas, SkRect rect, SkPaint* paint) {
+    canvas->drawRect(rect, *paint);
+}
+
+struct SKRoundedRect {
+    SkRect rect;
+    SkVector topLeftRadius;
+    SkVector topRightRadius;
+    SkVector bottomRightRadius;
+    SkVector bottomLeftRadius;
+};
+
+SkPath createRoundedRectPath(const SKRoundedRect &roundedRect) {
+    SkPath path;
+
+    const auto rect = roundedRect.rect;
+    const auto left = rect.fLeft;
+    const auto top = rect.fTop;
+    const auto right = rect.fRight;
+    const auto bottom = rect.fBottom;
+    const auto width = rect.width();
+    const auto height = rect.height();
+
+    // copy radii so we can adjust them if needed
+    auto topLeft = roundedRect.topLeftRadius;
+    auto topRight = roundedRect.topRightRadius;
+    auto bottomRight = roundedRect.bottomRightRadius;
+    auto bottomLeft = roundedRect.bottomLeftRadius;
+
+    // clamp negative radii to zero
+    topLeft.fX = std::max(0.0f, topLeft.fX);
+    topLeft.fY = std::max(0.0f, topLeft.fY);
+    topRight.fX = std::max(0.0f, topRight.fX);
+    topRight.fY = std::max(0.0f, topRight.fY);
+
+    bottomRight.fX = std::max(0.0f, bottomRight.fX);
+    bottomRight.fY = std::max(0.0f, bottomRight.fY);
+    bottomLeft.fX = std::max(0.0f, bottomLeft.fX);
+    bottomLeft.fY = std::max(0.0f, bottomLeft.fY);
+
+    // calculate scale factors for each edge
+    auto scaleX = 1.0f;
+    auto scaleY = 1.0f;
+
+    // check horizontal edges
+    auto topSum = topLeft.fX + topRight.fX;
+    auto bottomSum = bottomLeft.fX + bottomRight.fX;
+
+    if (topSum > width) {
+        scaleX = std::min(scaleX, width / topSum);
+    }
+    if (bottomSum > width) {
+        scaleX = std::min(scaleX, width / bottomSum);
+    }
+
+    // check vertical edges
+    auto leftSum = topLeft.fY + bottomLeft.fY;
+    auto rightSum = topRight.fY + bottomRight.fY;
+
+    if (leftSum > height) {
+        scaleY = std::min(scaleY, height / leftSum);
+    }
+    if (rightSum > height) {
+        scaleY = std::min(scaleY, height / rightSum);
+    }
+
+    // apply scale factors to all radii
+    topLeft.fX *= scaleX;
+    topRight.fX *= scaleX;
+    bottomRight.fX *= scaleX;
+    bottomLeft.fX *= scaleX;
+
+    topLeft.fY *= scaleY;
+    topRight.fY *= scaleY;
+    bottomRight.fY *= scaleY;
+    bottomLeft.fY *= scaleY;
+
+    // magic constant for cubic bezier approximation of a quarter circle
+    const auto kBezierConstant = 0.552284749831f;
+
+    // start at the top-left corner (after the radius)
+    path.moveTo(left + topLeft.fX, top);
+
+    // top edge
+    path.lineTo(right - topRight.fX, top);
+
+    // top-right corner
+    if (topRight.fX > 0 && topRight.fY > 0) {
+        path.cubicTo(
+            right - topRight.fX + topRight.fX * kBezierConstant, top,
+            right, top + topRight.fY - topRight.fY * kBezierConstant,
+            right, top + topRight.fY
+        );
+    }
+
+    // right edge
+    path.lineTo(right, bottom - bottomRight.fY);
+
+    // bottom-right corner
+    if (bottomRight.fX > 0 && bottomRight.fY > 0) {
+        path.cubicTo(
+            right, bottom - bottomRight.fY + bottomRight.fY * kBezierConstant,
+            right - bottomRight.fX + bottomRight.fX * kBezierConstant, bottom,
+            right - bottomRight.fX, bottom
+        );
+    }
+
+    // bottom edge
+    path.lineTo(left + bottomLeft.fX, bottom);
+
+    // bottom-left corner
+    if (bottomLeft.fX > 0 && bottomLeft.fY > 0) {
+        path.cubicTo(
+            left + bottomLeft.fX - bottomLeft.fX * kBezierConstant, bottom,
+            left, bottom - bottomLeft.fY + bottomLeft.fY * kBezierConstant,
+            left, bottom - bottomLeft.fY
+        );
+    }
+
+    // left edge
+    path.lineTo(left, top + topLeft.fY);
+
+    // top-left corner
+    if (topLeft.fX > 0 && topLeft.fY > 0) {
+        path.cubicTo(
+            left, top + topLeft.fY - topLeft.fY * kBezierConstant,
+            left + topLeft.fX - topLeft.fX * kBezierConstant, top,
+            left + topLeft.fX, top
+        );
+    }
+
+    // close the path
+    path.close();
+
+    return path;
+}
+
+void path_optimize(const SkPath& source, SkPath* target) {
+    SkPath emptyPath;
+    SkPath optimizedPath;
+    Simplify(source, target);
+}
+
+QUEST_API void canvas_draw_complex_border(SkCanvas *canvas, SKRoundedRect innerRect, SKRoundedRect outerRect, SkPaint* paint) {
+    const auto innerPath = createRoundedRectPath(innerRect);
+    const auto outerPath = createRoundedRectPath(outerRect);
+
+    SkPath borderPath;
+    borderPath.addPath(outerPath);
+    borderPath.reverseAddPath(innerPath);
+
+    SkPath optimizedBorderPath;
+    path_optimize(borderPath, &optimizedBorderPath);
+
+    canvas->drawPath(optimizedBorderPath, *paint);
+}
+
+struct SKBoxShadow {
+    float offsetX;
+    float offsetY;
+    float blur;
+    SkColor color;
+};
+
+QUEST_API void canvas_draw_shadow(SkCanvas *canvas, SKRoundedRect contentRect, SKRoundedRect shadowRect, SKBoxShadow shadow) {
+    const auto contentPath = createRoundedRectPath(contentRect);
+    const auto shadowPath = createRoundedRectPath(shadowRect);
+
+    if (shadow.color == 0)
+        return;
+
+    SkPaint shadowPaint;
+    shadowPaint.setColor(shadow.color);
+
+    if (shadow.blur > 0)
+        shadowPaint.setMaskFilter(SkMaskFilter::MakeBlur(kNormal_SkBlurStyle, shadow.blur));
+
+    canvas->save();
+
+    canvas->clipPath(contentPath, SkClipOp::kDifference);
+    canvas->translate(shadow.offsetX, shadow.offsetY);
+    canvas->drawPath(shadowPath, shadowPaint);
+
+    canvas->restore();
+}
+
 QUEST_API void canvas_draw_image(SkCanvas *canvas, SkImage *image, float width, float height) {
     constexpr SkSamplingOptions samplingOptions(SkFilterMode::kLinear, SkMipmapMode::kLinear);
     canvas->drawImageRect(image, SkRect::MakeWH(width, height), samplingOptions);
-}
-
-QUEST_API void canvas_draw_filled_rectangle(SkCanvas *canvas, SkRect rect, SkColor color) {
-    SkPaint paint;
-    paint.setColor(color);
-    paint.setAntiAlias(true);
-
-    canvas->drawRect(rect, paint);
-}
-
-QUEST_API void canvas_draw_stroke_rectangle(SkCanvas *canvas, SkRect rect, float strokeWidth, SkColor color) {
-    SkPaint paint;
-
-    paint.setColor(color);
-    paint.setAntiAlias(true);
-
-    paint.setStroke(true);
-    paint.setStrokeWidth(strokeWidth);
-
-    canvas->drawRect(rect, paint);
 }
 
 QUEST_API void canvas_draw_picture(SkCanvas *canvas, SkPicture *picture) {
@@ -162,8 +333,12 @@ QUEST_API void canvas_clip_rectangle(SkCanvas *canvas, SkRect clipArea) {
     canvas->clipRect(clipArea);
 }
 
-struct SkCanvasMatrix
-{
+QUEST_API void canvas_clip_rounded_rectangle(SkCanvas *canvas, SKRoundedRect rect) {
+    const auto path = createRoundedRectPath(rect);
+    canvas->clipPath(path);
+}
+
+struct SkCanvasMatrix {
     float ScaleX;
     float SkewX;
     float TranslateX;
@@ -176,7 +351,6 @@ struct SkCanvasMatrix
     float Perspective2;
     float Perspective3;
 };
-
 
 QUEST_API SkCanvasMatrix canvas_get_matrix9(SkCanvas *canvas) {
     SkScalar array[9];

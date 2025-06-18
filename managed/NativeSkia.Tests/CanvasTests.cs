@@ -198,7 +198,7 @@ public class CanvasTests
         canvas.DrawOverflowArea(neededSpace);
         canvas.Restore();
         
-        canvas.DrawStrokeRectangle(neededSpace, 2f,0xFFF44336);
+        canvas.DrawStrokeRectangle(neededSpace, 2f, 0xFFF44336);
         
         // save output
         using var pngData = bitmap.EncodeAsPng();

@@ -1,23 +1,8 @@
+using System;
 using System.Runtime.InteropServices;
 using QuestPDF.Skia.Text;
 
 namespace QuestPDF.Skia;
-
-[StructLayout(LayoutKind.Sequential)]
-internal struct SkCanvasMatrix
-{
-    public float ScaleX;
-    public float SkewX;
-    public float TranslateX;
-    
-    public float SkewY;
-    public float ScaleY;
-    public float TranslateY;
-
-    public float Perspective1;
-    public float Perspective2;
-    public float Perspective3;
-}
 
 internal sealed class SkCanvas : IDisposable
 {
@@ -63,14 +48,24 @@ internal sealed class SkCanvas : IDisposable
         API.canvas_rotate(Instance, degrees);
     }
     
-    public void DrawFilledRectangle(SkRect position, uint color)
+    public void DrawLine(SkPoint start, SkPoint end, SkPaint paint)
     {
-        API.canvas_draw_filled_rectangle(Instance, position, color);
+        API.canvas_draw_line(Instance, start, end, paint.Instance);
+    }
+
+    public void DrawRectangle(SkRect position, SkPaint paint)
+    {
+        API.canvas_draw_rectangle(Instance, position, paint.Instance);
     }
     
-    public void DrawStrokeRectangle(SkRect position, float strokeWidth, uint strokeColor)
+    public void DrawComplexBorder(SkRoundedRect innerRect, SkRoundedRect outerRect, SkPaint paint)
     {
-        API.canvas_draw_stroke_rectangle(Instance, position, strokeWidth, strokeColor);
+        API.canvas_draw_complex_border(Instance, innerRect, outerRect, paint.Instance);
+    }
+    
+    public void DrawShadow(SkRoundedRect contentRect, SkRoundedRect shadowRect, SkBoxShadow shadow)
+    {
+        API.canvas_draw_shadow(Instance, contentRect, shadowRect, shadow);
     }
     
     public void DrawImage(SkImage image, float width, float height)
@@ -116,6 +111,11 @@ internal sealed class SkCanvas : IDisposable
         API.canvas_clip_rectangle(Instance, clipArea);
     }
     
+    public void ClipRoundedRectangle(SkRoundedRect rect)
+    {
+        API.canvas_clip_rounded_rectangle(Instance, rect);
+    }
+    
     public void AnnotateUrl(float width, float height, string url)
     {
         API.canvas_annotate_url(Instance, width, height, url);
@@ -155,8 +155,9 @@ internal sealed class SkCanvas : IDisposable
             API.canvas_delete(Instance);
         
         Instance = IntPtr.Zero;
+        GC.SuppressFinalize(this);
     }
-
+    
     private static class API
     {
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -187,10 +188,16 @@ internal sealed class SkCanvas : IDisposable
         public static extern void canvas_draw_picture(IntPtr canvas, IntPtr picture);
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void canvas_draw_filled_rectangle(IntPtr canvas, SkRect position, uint color);
-    
+        public static extern void canvas_draw_line(IntPtr canvas, SkPoint start, SkPoint end, IntPtr paint);
+        
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void canvas_draw_stroke_rectangle(IntPtr canvas, SkRect position, float strokeWidth, uint color);
+        public static extern void canvas_draw_rectangle(IntPtr canvas, SkRect position, IntPtr paint);
+        
+        [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void canvas_draw_complex_border(IntPtr canvas, SkRoundedRect innerRect, SkRoundedRect outerRect, IntPtr paint);
+        
+        [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void canvas_draw_shadow(IntPtr canvas, SkRoundedRect contentRect, SkRoundedRect shadowRect, SkBoxShadow shadow);
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void canvas_draw_paragraph(IntPtr canvas, IntPtr paragraph, int lineFrom, int lineTo);
@@ -209,6 +216,9 @@ internal sealed class SkCanvas : IDisposable
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void canvas_clip_rectangle(IntPtr canvas, SkRect clipArea);
+        
+        [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void canvas_clip_rounded_rectangle(IntPtr canvas, SkRoundedRect rect);
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void canvas_annotate_url(IntPtr canvas, float width, float height, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8StringMarshaller))] string url);

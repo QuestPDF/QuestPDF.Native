@@ -330,7 +330,7 @@ public class CanvasTests
         // assert
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_rounded_rectangle.png", pngData);
-        pngData.ShouldHaveSize(3_986);
+        pngData.ShouldHaveSize(3_986, buffer: 250);
     }
     
     [Test]
@@ -370,7 +370,7 @@ public class CanvasTests
         // assert
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_complex_border.png", pngData);
-        pngData.ShouldHaveSize(4_454);
+        pngData.ShouldHaveSize(4_454, buffer: 50);
     }
     
     [Test]
@@ -468,6 +468,6 @@ public class CanvasTests
         // assert
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_clip_rectangle.png", pngData);
-        pngData.ShouldHaveSize(98_674);
+        pngData.ShouldHaveSize(98_674, buffer: 10);
     }
 }

@@ -63,9 +63,9 @@ internal sealed class SkCanvas : IDisposable
         API.canvas_draw_complex_border(Instance, innerRect, outerRect, paint.Instance);
     }
     
-    public void DrawShadow(SkRoundedRect contentRect, SkRoundedRect shadowRect, SkBoxShadow shadow)
+    public void DrawShadow(SkRoundedRect shadowRect, SkBoxShadow shadow)
     {
-        API.canvas_draw_shadow(Instance, contentRect, shadowRect, shadow);
+        API.canvas_draw_shadow(Instance, shadowRect, shadow);
     }
     
     public void DrawImage(SkImage image, float width, float height)
@@ -197,7 +197,7 @@ internal sealed class SkCanvas : IDisposable
         public static extern void canvas_draw_complex_border(IntPtr canvas, SkRoundedRect innerRect, SkRoundedRect outerRect, IntPtr paint);
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void canvas_draw_shadow(IntPtr canvas, SkRoundedRect contentRect, SkRoundedRect shadowRect, SkBoxShadow shadow);
+        public static extern void canvas_draw_shadow(IntPtr canvas, SkRoundedRect shadowRect, SkBoxShadow shadow);
         
         [DllImport(SkiaAPI.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void canvas_draw_paragraph(IntPtr canvas, IntPtr paragraph, int lineFrom, int lineTo);

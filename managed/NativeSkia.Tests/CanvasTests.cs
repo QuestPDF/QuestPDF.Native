@@ -213,11 +213,13 @@ public class CanvasTests
         using var bitmap = new SkBitmap(350, 400);
         using var canvas = SkCanvas.CreateFromBitmap(bitmap);
         
+        // perform transformations
         canvas.Translate(15, 25);
         canvas.Scale(2, 3);
         canvas.Translate(35, 45);
         canvas.Scale(4, 5);
         
+        // assert
         var currentMatrix = canvas.GetCurrentMatrix();
 
         var expectedValue = new SkCanvasMatrix()
@@ -248,12 +250,224 @@ public class CanvasTests
             Perspective3 = 1
         };
         
+        // perform transformations
         canvas.SetCurrentMatrix(newValue);
         canvas.Translate(10, 20);
         
+        // assert
         var expectedValue = newValue with { TranslateX = 105, TranslateY = 220 };
         var currentMatrix = canvas.GetCurrentMatrix();
         
         currentMatrix.Should().BeEquivalentTo(expectedValue);
+    }
+    
+    [Test]
+    public void DrawLine()
+    {
+        // prepare
+        using var bitmap = new SkBitmap(400, 300);
+        using var canvas = SkCanvas.CreateFromBitmap(bitmap);
+        
+        canvas.DrawFilledRectangle(new SkRect(0, 0, 400, 400), 0xFFFFFFFF);
+        canvas.Translate(25, 25);
+
+        // draw
+        using var paintThin = new SkPaint();
+        paintThin.SetSolidColor(0xFF2196F3);
+        paintThin.SetStroke(4);
+        canvas.DrawLine(new SkPoint(0, 0), new SkPoint(350, 100), paintThin);
+        
+        using var paintThick = new SkPaint();
+        paintThick.SetSolidColor(0xFF4CAF50);
+        paintThick.SetStroke(12);
+        canvas.DrawLine(new SkPoint(0, 50), new SkPoint(350, 150), paintThick);
+        
+        using var paintDashed = new SkPaint();
+        paintDashed.SetSolidColor(0xFFFFC107);
+        paintDashed.SetStroke(8);
+        paintDashed.SetDashedPathEffect([2, 2, 4, 4, 8, 8]);
+        canvas.DrawLine(new SkPoint(0, 100), new SkPoint(350, 200), paintDashed);
+        
+        using var paintGradient = new SkPaint();
+        paintGradient.SetStroke(8);
+        paintGradient.SetLinearGradient(new SkPoint(0, 150), new SkPoint(350, 250), [0xFF2196F3, 0xFF4CAF50, 0xFFFFC107]);
+        canvas.DrawLine(new SkPoint(0, 150), new SkPoint(350, 250), paintGradient);
+        
+        // assert
+        using var pngData = bitmap.EncodeAsPng();
+        TestFixture.SaveOutput("canvas_line.png", pngData);
+        pngData.ShouldHaveSize(12_711);
+    }
+    
+    [Test]
+    public void DrawRoundedRectangle()
+    {
+        // prepare
+        using var bitmap = new SkBitmap(300, 300);
+        using var canvas = SkCanvas.CreateFromBitmap(bitmap);
+        
+        canvas.DrawFilledRectangle(new SkRect(0, 0, 300, 300), 0xFFFFFFFF);
+        canvas.Translate(50, 50);
+        
+        // draw
+        using var boxPaint = new SkPaint(); 
+        boxPaint.SetLinearGradient(new SkPoint(0, 0), new SkPoint(200, 200), [0xFF2196F3, 0xFF4CAF50, 0xFFFFC107]);
+
+        var roundedRect = new SkRoundedRect
+        {
+            Rect = new SkRect(0, 0, 200, 200),
+            TopLeftRadius = new SkPoint(0, 0),
+            TopRightRadius = new SkPoint(10, 10),
+            BottomLeftRadius = new SkPoint(20, 20),
+            BottomRightRadius = new SkPoint(40, 40)
+        };
+
+        canvas.Save();
+        canvas.ClipRoundedRectangle(roundedRect);
+        canvas.DrawRectangle(roundedRect.Rect, boxPaint);
+        canvas.Restore();
+
+        // assert
+        using var pngData = bitmap.EncodeAsPng();
+        TestFixture.SaveOutput("canvas_rounded_rectangle.png", pngData);
+        pngData.ShouldHaveSize(3_986);
+    }
+    
+    [Test]
+    public void DrawComplexBorder()
+    {
+        // prepare
+        using var bitmap = new SkBitmap(300, 300);
+        using var canvas = SkCanvas.CreateFromBitmap(bitmap);
+        
+        canvas.DrawFilledRectangle(new SkRect(0, 0, 300, 300), 0xFFFFFFFF);
+        canvas.Translate(50, 50);
+        
+        // draw
+        using var boxPaint = new SkPaint(); 
+        boxPaint.SetLinearGradient(new SkPoint(0, 0), new SkPoint(200, 200), [0xFF2196F3, 0xFF4CAF50, 0xFFFFC107]);
+
+        var outerRect = new SkRoundedRect
+        {
+            Rect = new SkRect(0, 0, 200, 200),
+            TopLeftRadius = new SkPoint(0, 0),
+            TopRightRadius = new SkPoint(10, 10),
+            BottomLeftRadius = new SkPoint(20, 20),
+            BottomRightRadius = new SkPoint(40, 40)
+        };
+        
+        var innerRect = new SkRoundedRect
+        {
+            Rect = new SkRect(10, 10, 190, 190),
+            TopLeftRadius = new SkPoint(0, 0),
+            TopRightRadius = new SkPoint(0, 0),
+            BottomLeftRadius = new SkPoint(10, 10),
+            BottomRightRadius = new SkPoint(30, 30)
+        };
+
+        canvas.DrawComplexBorder(innerRect, outerRect, boxPaint);
+
+        // assert
+        using var pngData = bitmap.EncodeAsPng();
+        TestFixture.SaveOutput("canvas_complex_border.png", pngData);
+        pngData.ShouldHaveSize(4_454);
+    }
+    
+    [Test]
+    public void DrawShadow()
+    {
+        // prepare
+        using var bitmap = new SkBitmap(800, 400);
+        using var canvas = SkCanvas.CreateFromBitmap(bitmap);
+        
+        canvas.DrawFilledRectangle(new SkRect(0, 0, 800, 400), 0xFFFFFFFF);
+        
+        // draw
+        using var boxPaint = new SkPaint(); 
+        boxPaint.SetSolidColor(0xFF795548);
+
+        var roundedRect = new SkRoundedRect
+        {
+            Rect = new SkRect(0, 0, 200, 200),
+            TopLeftRadius = new SkPoint(0, 0),
+            TopRightRadius = new SkPoint(10, 10),
+            BottomLeftRadius = new SkPoint(20, 20),
+            BottomRightRadius = new SkPoint(40, 40)
+        };
+        
+        // rectangle 1
+        canvas.Translate(100, 100);
+        canvas.DrawShadow(roundedRect, new SkBoxShadow
+        {
+            Color = 0xFF000000,
+            OffsetX = 5,
+            OffsetY = 5,
+            Blur = 0
+        });
+        
+        canvas.Save();
+        canvas.ClipRoundedRectangle(roundedRect);
+        canvas.DrawRectangle(roundedRect.Rect, boxPaint);
+        canvas.Restore();
+        
+        // rectangle 2
+        canvas.Translate(400, 0);
+        canvas.DrawShadow(roundedRect, new SkBoxShadow
+        {
+            Color = 0xFF000000,
+            OffsetX = 0,
+            OffsetY = 0,
+            Blur = 10
+        });
+        
+        canvas.Save();
+        canvas.ClipRoundedRectangle(roundedRect);
+        canvas.DrawRectangle(roundedRect.Rect, boxPaint);
+        canvas.Restore();
+        
+        // assert
+        using var pngData = bitmap.EncodeAsPng();
+        TestFixture.SaveOutput("canvas_shadow.png", pngData);
+        pngData.ShouldHaveSize(7_948);
+    }
+    
+    [Test]
+    public void ClipRectangle()
+    {
+        // prepare
+        using var bitmap = new SkBitmap(400, 300);
+        using var canvas = SkCanvas.CreateFromBitmap(bitmap);
+        
+        canvas.DrawFilledRectangle(new SkRect(0, 0, 400, 300), 0xFFFFFFFF);
+        
+        // draw
+        var roundedRect = new SkRoundedRect
+        {
+            Rect = new SkRect(25, 25, 375, 275),
+            TopLeftRadius = new SkPoint(0, 0),
+            TopRightRadius = new SkPoint(10, 10),
+            BottomLeftRadius = new SkPoint(20, 20),
+            BottomRightRadius = new SkPoint(40, 40)
+        };
+
+        var outerRect = new SkRect(100, 0, 300, 300);
+        
+        using var imageData = SkData.FromFile("Input/image.jpg");
+        using var image = SkImage.FromData(imageData);
+        
+        canvas.Save();
+        canvas.ClipRoundedRectangle(roundedRect);  
+        canvas.DrawImage(image, 400, 300);
+        canvas.Restore();
+        
+        canvas.Save();
+        canvas.ClipRectangle(outerRect);
+        canvas.DrawImage(image, 400, 300);
+        canvas.Restore();
+         
+        // assert
+        using var pngData = bitmap.EncodeAsPng();
+        TestFixture.SaveOutput("canvas_clip_rectangle.png", pngData);
+        pngData.ShouldHaveSize(98_674);
     }
 }

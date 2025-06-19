@@ -237,23 +237,21 @@ struct SKBoxShadow {
     SkColor color;
 };
 
-QUEST_API void canvas_draw_shadow(SkCanvas *canvas, SKRoundedRect contentRect, SKRoundedRect shadowRect, SKBoxShadow shadow) {
-    const auto contentPath = createRoundedRectPath(contentRect);
-    const auto shadowPath = createRoundedRectPath(shadowRect);
-
+QUEST_API void canvas_draw_shadow(SkCanvas *canvas, SKRoundedRect shadowRect, SKBoxShadow shadow) {
     if (shadow.color == 0)
         return;
 
     SkPaint shadowPaint;
     shadowPaint.setColor(shadow.color);
+    shadowPaint.setAntiAlias(true);
 
     if (shadow.blur > 0)
         shadowPaint.setMaskFilter(SkMaskFilter::MakeBlur(kNormal_SkBlurStyle, shadow.blur));
 
     canvas->save();
-
-    canvas->clipPath(contentPath, SkClipOp::kDifference);
     canvas->translate(shadow.offsetX, shadow.offsetY);
+
+    const auto shadowPath = createRoundedRectPath(shadowRect);
     canvas->drawPath(shadowPath, shadowPaint);
 
     canvas->restore();
@@ -330,12 +328,12 @@ QUEST_API void canvas_clip_overflow_area(SkCanvas *canvas, SkRect availableSpace
 }
 
 QUEST_API void canvas_clip_rectangle(SkCanvas *canvas, SkRect clipArea) {
-    canvas->clipRect(clipArea);
+    canvas->clipRect(clipArea, true);
 }
 
 QUEST_API void canvas_clip_rounded_rectangle(SkCanvas *canvas, SKRoundedRect rect) {
     const auto path = createRoundedRectPath(rect);
-    canvas->clipPath(path);
+    canvas->clipPath(path, true);
 }
 
 struct SkCanvasMatrix {

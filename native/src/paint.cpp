@@ -10,7 +10,7 @@
 extern "C" {
 
     QUEST_API SkPaint *paint_create() {
-        auto paint = new SkPaint();
+        const auto paint = new SkPaint();
         paint->setAntiAlias(true);
         return paint;
     }

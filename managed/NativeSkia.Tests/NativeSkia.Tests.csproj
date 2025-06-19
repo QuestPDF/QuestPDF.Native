@@ -7,7 +7,7 @@
         <IsPackable>false</IsPackable>
 
         <TargetFrameworks>net8.0;net6.0;net462;netcoreapp3.1;net48</TargetFrameworks>
-        <LangVersion>10</LangVersion>
+        <LangVersion>12</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

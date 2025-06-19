@@ -23,7 +23,7 @@ extern "C" {
         paint->setColor(color);
     }
 
-    QUEST_API void paint_set_linear_gradient(SkPaint* paint, SkRect rect, SkColor* colors, int colorsCount) {
+    QUEST_API void paint_set_linear_gradient(SkPaint* paint, SkRect rect, int colorsLength, SkColor* colors) {
         const SkPoint points[2] = {
             SkPoint::Make(rect.left(), rect.top()),
             SkPoint::Make(rect.right(), rect.bottom())
@@ -33,7 +33,7 @@ extern "C" {
             points,
             colors,
             nullptr,
-            colorsCount,
+            colorsLength,
             SkTileMode::kClamp
         );
 

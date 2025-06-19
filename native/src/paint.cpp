@@ -23,10 +23,9 @@ extern "C" {
         paint->setColor(color);
     }
 
-    QUEST_API void paint_set_linear_gradient(SkPaint* paint, SkRect rect, int colorsLength, SkColor* colors) {
+    QUEST_API void paint_set_linear_gradient(SkPaint* paint, SkPoint start, SkPoint end, int colorsLength, SkColor* colors) {
         const SkPoint points[2] = {
-            SkPoint::Make(rect.left(), rect.top()),
-            SkPoint::Make(rect.right(), rect.bottom())
+            start, end
         };
 
         const auto shader = SkGradientShader::MakeLinear(

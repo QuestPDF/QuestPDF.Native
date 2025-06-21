@@ -167,6 +167,9 @@ SkPath createRoundedRectPath(const SKRoundedRect &roundedRect) {
             right, top + topRight.fY
         );
     }
+    else {
+            path.lineTo(right, top + topRight.fY);
+    }
 
     // right edge
     path.lineTo(right, bottom - bottomRight.fY);
@@ -178,6 +181,9 @@ SkPath createRoundedRectPath(const SKRoundedRect &roundedRect) {
             right - bottomRight.fX + bottomRight.fX * kBezierConstant, bottom,
             right - bottomRight.fX, bottom
         );
+    }
+    else {
+        path.lineTo(right - bottomRight.fX, bottom);
     }
 
     // bottom edge
@@ -191,6 +197,9 @@ SkPath createRoundedRectPath(const SKRoundedRect &roundedRect) {
             left, bottom - bottomLeft.fY
         );
     }
+    else {
+        path.lineTo(left, bottom - bottomLeft.fY);
+    }
 
     // left edge
     path.lineTo(left, top + topLeft.fY);
@@ -202,6 +211,9 @@ SkPath createRoundedRectPath(const SKRoundedRect &roundedRect) {
             left + topLeft.fX - topLeft.fX * kBezierConstant, top,
             left + topLeft.fX, top
         );
+    }
+    else {
+        path.lineTo(left + topLeft.fX, top);
     }
 
     // close the path

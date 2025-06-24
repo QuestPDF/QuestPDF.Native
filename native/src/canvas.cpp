@@ -139,6 +139,21 @@ SkPath createRoundedRectPath(const SKRoundedRect &roundedRect) {
         scaleY = std::min(scaleY, height / rightSum);
     }
 
+    // check if all corners are circular
+    const auto epsilon = 1e-3f;
+
+    const auto allCornersAreCircular =
+        (std::abs(topLeft.fX - topLeft.fY) < epsilon) &&
+        (std::abs(topRight.fX - topRight.fY) < epsilon) &&
+        (std::abs(bottomRight.fX - bottomRight.fY) < epsilon) &&
+        (std::abs(bottomLeft.fX - bottomLeft.fY) < epsilon);
+
+    if (allCornersAreCircular) {
+        const auto uniformScale = std::min(scaleX, scaleY);
+        scaleX = uniformScale;
+        scaleY = uniformScale;
+    }
+
     // apply scale factors to all radii
     topLeft.fX *= scaleX;
     topRight.fX *= scaleX;

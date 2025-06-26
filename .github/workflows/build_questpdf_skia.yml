@@ -165,7 +165,9 @@ jobs:
           cat src/pdf/SkPDFMetadata.cpp
           ls ../patches/*.patch
           git apply --verbose --3way --ignore-whitespace ../patches/*.patch
+          echo "printing result"
           cat src/pdf/SkPDFMetadata.cpp
+          echo "finished"
           breakExecution
           
           bin/fetch-ninja

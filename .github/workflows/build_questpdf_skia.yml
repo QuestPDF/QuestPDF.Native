@@ -164,7 +164,7 @@ jobs:
           cd skia
           cat src/pdf/SkPDFMetadata.cpp
           ls ../patches/*.patch
-          git apply --verbose --3way --whitespace=nowarn ../patches/*.patch
+          git apply --verbose --3way --ignore-whitespace ../patches/*.patch
           cat src/pdf/SkPDFMetadata.cpp
           breakExecution
           

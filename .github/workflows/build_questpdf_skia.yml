@@ -161,7 +161,11 @@ jobs:
         run: |
           git clone https://github.com/google/skia.git --branch chrome/m138 --single-branch
           cd skia
+          cat src/pdf/SkPDFMetadata.cpp
+          ls ../patches/*.patch
           git apply --verbose --3way --whitespace=nowarn ../patches/*.patch
+          cat src/pdf/SkPDFMetadata.cpp
+          breakExecution
           
           bin/fetch-ninja
           python3 tools/git-sync-deps

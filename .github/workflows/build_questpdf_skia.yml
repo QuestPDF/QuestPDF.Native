@@ -168,7 +168,6 @@ jobs:
           echo "printing result"
           cat src/pdf/SkPDFMetadata.cpp
           echo "finished"
-          breakExecution
           
           bin/fetch-ninja
           python3 tools/git-sync-deps

@@ -159,12 +159,11 @@ jobs:
       - name: Build Skia
         shell: bash
         run: |
-          git config --global core.autocrlf input
           git clone https://github.com/google/skia.git --branch chrome/m139 --single-branch
           cd skia
           cat src/pdf/SkPDFMetadata.cpp
           ls ../patches/*.patch
-          git apply --verbose --3way --ignore-whitespace ../patches/*.patch
+          git apply --ignore-whitespace ../patches/*.patch
           echo "printing result"
           cat src/pdf/SkPDFMetadata.cpp
           echo "finished"

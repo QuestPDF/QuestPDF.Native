@@ -191,6 +191,7 @@ jobs:
             skia_use_libgrapheme=true
             skia_use_fontconfig=false
             skia_use_gl=false
+            skia_use_zlib=true
             skia_use_libjpeg_turbo_decode=true
             skia_use_libjpeg_turbo_encode=true
             skia_use_libpng_encode=true

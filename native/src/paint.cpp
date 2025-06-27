@@ -45,8 +45,7 @@ extern "C" {
     }
 
     QUEST_API void paint_set_dashed_path_effect(SkPaint* paint, const int length, const SkScalar* intervals) {
-        const auto intervalsSpan = SkSpan(intervals, length);
-        const auto effect = SkDashPathEffect::Make(intervalsSpan, 0);
+        const auto effect = SkDashPathEffect::Make(intervals, length, 0);
         paint->setPathEffect(effect);
     }
 }

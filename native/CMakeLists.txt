@@ -72,9 +72,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     file(GLOB SKIA_LIBRARY "${SKIA_DIR}/out/release/*.lib")
     target_link_libraries(QuestPdfSkia PRIVATE ${SKIA_LIBRARY})
 
-    find_library(FONTSUB_LIB fontsub)
-    find_library(DWRITE_LIB dwrite)
-    target_link_libraries(QuestPdfSkia PRIVATE ${FONTSUB_LIB} ${DWRITE_LIB})
+    set(WINDOWS_SDK_PATH "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.26100.0/um/${WIN_ARCH}")
+    target_link_libraries(QuestPdfSkia PRIVATE "${WINDOWS_SDK_PATH}/fontsub.lib")
+    target_link_libraries(QuestPdfSkia PRIVATE "${WINDOWS_SDK_PATH}/dwrite.lib")
 endif()
 
 

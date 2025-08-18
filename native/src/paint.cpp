@@ -1,3 +1,4 @@
+#include "include/core/SkSpan.h"
 #include "include/core/SkPathEffect.h"
 #include "include/effects/SkDashPathEffect.h"
 #include "include/effects/SkGradientShader.h"

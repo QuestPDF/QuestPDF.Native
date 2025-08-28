@@ -40,6 +40,8 @@ struct PdfDocumentMetadata {
     bool supportPDFA;
     bool compressDocument;
     SkScalar rasterDPI;
+
+    SkPDF::StructureElementNode* semanticNodeRoot;
 };
 
 }
@@ -80,6 +82,9 @@ SkPDF::Metadata map_pdf_metadata(PdfDocumentMetadata metadata) {
 
     result.jpegDecoder = SkPDF::JPEG::Decode;
     result.jpegEncoder = SkPDF::JPEG::Encode;
+
+    result.fStructureElementTreeRoot = metadata.semanticNodeRoot;
+    result.fOutline = SkPDF::Metadata::Outline::StructureElementHeaders;
 
     return result;
 }

@@ -1,6 +1,7 @@
 #include "export.h"
 
 #include <iostream>
+
 #include "include/core/SkImage.h"
 #include "include/core/SkBitmap.h"
 #include "include/core/SkCanvas.h"
@@ -19,6 +20,7 @@
 #include "include/utils/SkParsePath.h"
 #include "modules/skparagraph/include/Paragraph.h"
 #include "modules/svg/include/SkSVGDOM.h"
+#include "include/docs/SkPDFDocument.h"
 
 extern "C" {
 
@@ -416,6 +418,10 @@ QUEST_API void canvas_set_matrix9(SkCanvas *canvas, SkCanvasMatrix matrix) {
     skMatrix.set9(array);
 
     canvas->setMatrix(SkM44(skMatrix));
+}
+
+QUEST_API void canvas_set_semantic_node_id(SkCanvas* canvas, int nodeId) {
+    SkPDF::SetNodeId(canvas, nodeId);
 }
 
 }

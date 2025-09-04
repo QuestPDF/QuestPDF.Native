@@ -21,14 +21,14 @@ QUEST_API SkPDF::StructureElementNode* pdf_structure_element_create(int nodeId, 
 }
 
 QUEST_API void pdf_structure_element_set_children(SkPDF::StructureElementNode* parent, SkPDF::StructureElementNode** children, int childCount) {
-    if (!parent) return;
-
     parent->fChildVector = std::vector<std::unique_ptr<SkPDF::StructureElementNode>>(children, children + childCount);
 }
 
-QUEST_API void pdf_structure_element_delete(const SkPDF::StructureElementNode* element) {
-    if (!element) return;
+QUEST_API void pdf_structure_element_add_attribute_integer(SkPDF::StructureElementNode* node, const char* owner, const char* name, const int value) {
+    node->fAttributes.appendInt(owner, name, value);
+}
 
+QUEST_API void pdf_structure_element_delete(const SkPDF::StructureElementNode* element) {
     delete element;
 }
 

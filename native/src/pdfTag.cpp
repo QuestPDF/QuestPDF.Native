@@ -24,8 +24,26 @@ QUEST_API void pdf_structure_element_set_children(SkPDF::StructureElementNode* p
     parent->fChildVector = std::vector<std::unique_ptr<SkPDF::StructureElementNode>>(children, children + childCount);
 }
 
+QUEST_API void pdf_structure_element_add_attribute_text(SkPDF::StructureElementNode* node, const char* owner, const char* name, const char* value) {
+    node->fAttributes.appendName(owner, name, value);
+}
+
 QUEST_API void pdf_structure_element_add_attribute_integer(SkPDF::StructureElementNode* node, const char* owner, const char* name, const int value) {
     node->fAttributes.appendInt(owner, name, value);
+}
+
+QUEST_API void pdf_structure_element_add_attribute_float(SkPDF::StructureElementNode* node, const char* owner, const char* name, const float value) {
+    node->fAttributes.appendFloat(owner, name, value);
+}
+
+QUEST_API void pdf_structure_element_add_attribute_float_array(SkPDF::StructureElementNode* node, const char* owner, const char* name, const float* array, int arrayLength) {
+    const auto value = std::vector<float>(array, array + arrayLength);
+    node->fAttributes.appendFloatArray(owner, name, value);
+}
+
+QUEST_API void pdf_structure_element_add_attribute_node_ids(SkPDF::StructureElementNode* node, const char* owner, const char* name, const int* array, int arrayLength) {
+    const auto value = std::vector<int>(array, array + arrayLength);
+    node->fAttributes.appendNodeIdArray(owner, name, value);
 }
 
 QUEST_API void pdf_structure_element_delete(const SkPDF::StructureElementNode* element) {

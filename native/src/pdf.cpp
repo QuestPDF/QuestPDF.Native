@@ -37,7 +37,9 @@ struct PdfDocumentMetadata {
     DateTime creationDate;
     DateTime modificationDate;
 
-    bool supportPDFA;
+    SkPDF::Metadata::PDFA_Conformance PDFAConformance;
+    SkPDF::Metadata::PDFUA_Conformance PDFUAConformance;
+
     bool compressDocument;
     SkScalar rasterDPI;
 
@@ -75,7 +77,8 @@ SkPDF::Metadata map_pdf_metadata(PdfDocumentMetadata metadata) {
     result.fCreation = map_datetime(metadata.creationDate);
     result.fModified = map_datetime(metadata.modificationDate);
 
-    result.fPDFA = metadata.supportPDFA;
+    result.fPDFAConformance = metadata.PDFAConformance;
+    result.fPDFUAConformance = metadata.PDFUAConformance;
     result.fCompressionLevel = metadata.compressDocument ? SkPDF::Metadata::CompressionLevel::LowButFast : SkPDF::Metadata::CompressionLevel::None;
     result.fRasterDPI = metadata.rasterDPI;
     result.fEncodingQuality = 101;

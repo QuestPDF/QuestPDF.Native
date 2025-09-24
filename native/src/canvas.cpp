@@ -53,8 +53,18 @@ QUEST_API void canvas_scale(SkCanvas *canvas, float factorX, float factorY) {
     canvas->scale(factorX, factorY);
 }
 
-QUEST_API void canvas_annotate_url(SkCanvas *canvas, float width, float height, char *url) {
-    auto data = SkData::MakeWithCString(url).release();
+const auto delimiter = "::questpdf_delimiter::";
+
+QUEST_API void canvas_annotate_url(SkCanvas *canvas, float width, float height, char *url, char *description) {
+    auto input = SkString();
+    input.append(url);
+
+    if (description != nullptr) {
+        input.append(delimiter);
+        input.append(description);
+    }
+
+    auto data = SkData::MakeWithCString(input.c_str()).release();
     SkAnnotateRectWithURL(canvas, SkRect::MakeWH(width, height), data);
     data->unref();
 }
@@ -65,8 +75,16 @@ QUEST_API void canvas_annotate_destination(SkCanvas *canvas, char *destinationNa
     data->unref();
 }
 
-QUEST_API void canvas_annotate_destination_link(SkCanvas *canvas, float width, float height, char *destinationName) {
-    const auto data = SkData::MakeWithCString(destinationName).release();
+QUEST_API void canvas_annotate_destination_link(SkCanvas *canvas, float width, float height, char *destinationName, char *description) {
+    auto input = SkString();
+    input.append(destinationName);
+
+    if (description != nullptr) {
+        input.append(delimiter);
+        input.append(description);
+    }
+
+    auto data = SkData::MakeWithCString(input.c_str()).release();
     SkAnnotateLinkToDestination(canvas, SkRect::MakeWH(width, height), data);
     data->unref();
 }

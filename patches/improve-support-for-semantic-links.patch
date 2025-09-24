@@ -1,8 +1,34 @@
+From 6a9ceeb177e47eb0f964f86fb9e25826a1927281 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marcin=20Zi=C4=85bek?= <marcin@ziabek.com>
+Date: Wed, 24 Sep 2025 18:14:35 +0200
+Subject: [PATCH] improve-support-for-semantic-links
+
+---
+ src/pdf/SkPDFDocument.cpp | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
+
 diff --git a/src/pdf/SkPDFDocument.cpp b/src/pdf/SkPDFDocument.cpp
 index ac82078af7..62d8742c14 100644
 --- a/src/pdf/SkPDFDocument.cpp
 +++ b/src/pdf/SkPDFDocument.cpp
-@@ -334,6 +334,26 @@ static SkPDFIndirectReference append_destinations(
+@@ -317,59 +317,87 @@ static void populate_link_annotation(SkPDFDict* annotation, const SkRect& r) {
+ }
+ 
+ static SkPDFIndirectReference append_destinations(
+         SkPDFDocument* doc,
+         const std::vector<SkPDFNamedDestination>& namedDestinations)
+ {
+     SkPDFDict destinations;
+     for (const SkPDFNamedDestination& dest : namedDestinations) {
+         auto pdfDest = SkPDFMakeArray();
+         pdfDest->reserve(5);
+         pdfDest->appendRef(dest.fPage);
+         pdfDest->appendName("XYZ");
+         pdfDest->appendScalar(dest.fPoint.x());
+         pdfDest->appendScalar(dest.fPoint.y());
+         pdfDest->appendInt(0);  // Leave zoom unchanged
+         destinations.insertObject(ToValidUtf8String(*dest.fName), std::move(pdfDest));
+     }
      return doc->emit(destinations);
  }
  
@@ -29,7 +55,11 @@ index ac82078af7..62d8742c14 100644
  std::unique_ptr<SkPDFArray> SkPDFDocument::getAnnotations() {
      std::unique_ptr<SkPDFArray> array;
      size_t count = fCurrentPageLinks.size();
-@@ -345,14 +365,22 @@ std::unique_ptr<SkPDFArray> SkPDFDocument::getAnnotations() {
+     if (0 == count) {
+         return array;  // is nullptr
+     }
+     array = SkPDFMakeArray();
+     array->reserve(count);
      for (const auto& link : fCurrentPageLinks) {
          SkPDFDict annotation("Annot");
          populate_link_annotation(&annotation, link->fRect);
@@ -54,3 +84,23 @@ index ac82078af7..62d8742c14 100644
          } else {
              SkDEBUGFAIL("Unknown link type.");
          }
+ 
+         SkPDFIndirectReference annotationRef = this->reserveRef();
+         if (link->fElemId) {
+             int structParentKey = this->createStructParentKeyForElemId(link->fElemId, annotationRef);
+             if (structParentKey != -1) {
+                 annotation.insertInt("StructParent", structParentKey);
+             }
+         }
+ 
+         this->emit(annotation, annotationRef);
+         array->appendRef(annotationRef);
+     }
+     return array;
+ }
+ 
+ void SkPDFDocument::onEndPage() {
+     SkASSERT(!fCanvas.imageInfo().dimensions().isZero());
+-- 
+2.46.1
+

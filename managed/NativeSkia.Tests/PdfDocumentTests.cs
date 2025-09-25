@@ -45,7 +45,9 @@ public class PdfDocumentTests
             CreationDate = new SkDateTime(DateTimeOffset.Now - TimeSpan.FromHours(1234)),
             ModificationDate = new SkDateTime(DateTimeOffset.Now - TimeSpan.FromHours(123)),
             
-            SupportPDFA = true,
+            PDFA_Conformance = PDFA_Conformance.PDFA_3B,
+            PDFUA_Conformance = PDFUA_Conformance.PDFUA_1,
+            
             CompressDocument = true,
             RasterDPI = 123
         };
@@ -66,7 +68,7 @@ public class PdfDocumentTests
 
         var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("simple_document.pdf", documentData);
-        documentData.ShouldHaveSize(6_040, buffer: 10);
+        documentData.ShouldHaveSize(7_190, buffer: 20);
     }
     
     [Test]
@@ -90,7 +92,7 @@ public class PdfDocumentTests
 
         var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_with_url.pdf", documentData);
-        documentData.ShouldHaveSize(249_687);
+        documentData.ShouldHaveSize(249_663);
     }
     
     [Test]
@@ -122,6 +124,6 @@ public class PdfDocumentTests
 
         var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_with_internal_destination_and_link.pdf", documentData);
-        documentData.ShouldHaveSize(1_393);
+        documentData.ShouldHaveSize(1_375);
     }
 }

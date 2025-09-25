@@ -84,7 +84,7 @@ public class PdfDocumentTests
         
         canvas.Translate(50, 50);
         canvas.DrawImage(webpageImage, 600, 240);
-        canvas.AnnotateUrl(600, 240, "https://www.questpdf.com");
+        canvas.AnnotateUrl(600, 240, "https://www.questpdf.com", "QuestPDF website");
         
         pdf.EndPage();
         pdf.Close();
@@ -92,7 +92,7 @@ public class PdfDocumentTests
 
         var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_with_url.pdf", documentData);
-        documentData.ShouldHaveSize(249_663);
+        documentData.ShouldHaveSize(249_716);
     }
     
     [Test]
@@ -107,7 +107,7 @@ public class PdfDocumentTests
         
         firstPageCanvas.Translate(100, 200);
         firstPageCanvas.DrawFilledRectangle(new SkRect(0, 0, 100, 100), 0xFF673AB7);
-        firstPageCanvas.AnnotateDestinationLink(100, 100, "page_2_destination");
+        firstPageCanvas.AnnotateDestinationLink(100, 100, "page_2_destination", "Page 2");
         
         pdf.EndPage();
         
@@ -124,6 +124,6 @@ public class PdfDocumentTests
 
         var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_with_internal_destination_and_link.pdf", documentData);
-        documentData.ShouldHaveSize(1_375);
+        documentData.ShouldHaveSize(1_412);
     }
 }

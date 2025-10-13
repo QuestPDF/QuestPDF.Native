@@ -116,14 +116,14 @@ jobs:
           cmake --version
 
           
-      - name: Install Python 3.8
+      - name: Install Python 3.10
         if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
         shell: bash
         run: |
             apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
-            wget https://www.python.org/ftp/python/3.8.18/Python-3.8.18.tgz
-            tar xzf Python-3.8.18.tgz
-            cd Python-3.8.18
+            wget https://www.python.org/ftp/python/3.10.19/Python-3.10.19.tgz
+            tar xzf Python-3.10.19.tgz
+            cd Python-3.10.19
             
             ./configure --enable-optimizations
             make --silent

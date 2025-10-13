@@ -68,9 +68,9 @@ QUEST_API void svg_get_size(SkSVGDOM *svg, SkSvgSize *size, SkRect* viewBox) {
     size->height = svg->getRoot()->getHeight().value();
     size->heightUnit = convertUnit(svg->getRoot()->getHeight().unit());
 
-    auto inputViewBox = svg->getRoot()->getViewBox().getMaybeNull();
+    auto inputViewBox = svg->getRoot()->getViewBox();
 
-    if (inputViewBox != nullptr)
+    if (inputViewBox.has_value())
         viewBox->setLTRB(inputViewBox->left(), inputViewBox->top(), inputViewBox->right(), inputViewBox->bottom());
 }
 

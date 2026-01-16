@@ -1,0 +1,228 @@
+diff --git a/src/pdf/SkPDFFont.cpp b/src/pdf/SkPDFFont.cpp
+index 204a3441eb..08574c5bfb 100644
+--- a/src/pdf/SkPDFFont.cpp
++++ b/src/pdf/SkPDFFont.cpp
+@@ -48,40 +48,41 @@
+ #include "src/core/SkMask.h"
+ #include "src/core/SkMaskFilterBase.h"
+ #include "src/core/SkPathEffectBase.h"
+ #include "src/core/SkStrike.h"
+ #include "src/core/SkStrikeSpec.h"
+ #include "src/core/SkTHash.h"
+ #include "src/pdf/SkPDFBitmap.h"
+ #include "src/pdf/SkPDFDevice.h"
+ #include "src/pdf/SkPDFDocumentPriv.h"
+ #include "src/pdf/SkPDFFormXObject.h"
+ #include "src/pdf/SkPDFGraphicState.h"
+ #include "src/pdf/SkPDFMakeCIDGlyphWidthsArray.h"
+ #include "src/pdf/SkPDFMakeToUnicodeCmap.h"
+ #include "src/pdf/SkPDFSubsetFont.h"
+ #include "src/pdf/SkPDFType1Font.h"
+ #include "src/pdf/SkPDFUtils.h"
+ 
+ #include <limits.h>
+ #include <algorithm>
+ #include <cstddef>
++#include <cstring>
+ #include <initializer_list>
+ #include <memory>
+ #include <optional>
+ #include <utility>
+ 
+ using namespace skia_private;
+ 
+ void SkPDFFont::GetType1GlyphNames(const SkTypeface& face, SkString* dst) {
+     face.getPostScriptGlyphNames(dst);
+ }
+ 
+ namespace {
+ // PDF's notion of symbolic vs non-symbolic is related to the character set, not
+ // symbols vs. characters.  Rarely is a font the right character set to call it
+ // non-symbolic, so always call it symbolic.  (PDF 1.4 spec, section 5.7.1)
+ static const int32_t kPdfSymbolic = 4;
+ 
+ // scale from em-units to base-1000, returning as a SkScalar
+ inline SkScalar from_font_units(SkScalar scaled, uint16_t emSize) {
+     return emSize == 1000 ? scaled : scaled * 1000 / emSize;
+@@ -421,68 +422,181 @@ void SkPDFFont::PopulateCommonFontDescriptor(SkPDFDict* descriptor,
+     descriptor->insertScalar("StemV",
+             scaleFromFontUnits(metrics.fStemV, emSize));
+     descriptor->insertScalar("CapHeight",
+             scaleFromFontUnits(metrics.fCapHeight, emSize));
+     descriptor->insertInt("ItalicAngle", metrics.fItalicAngle);
+     descriptor->insertObject("FontBBox",
+                              SkPDFMakeArray(scaleFromFontUnits(metrics.fBBox.left(), emSize),
+                                             scaleFromFontUnits(metrics.fBBox.bottom(), emSize),
+                                             scaleFromFontUnits(metrics.fBBox.right(), emSize),
+                                             scaleFromFontUnits(metrics.fBBox.top(), emSize)));
+     if (defaultWidth > 0) {
+         descriptor->insertScalar("MissingWidth",
+                 scaleFromFontUnits(defaultWidth, emSize));
+     }
+ }
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ //  Type0Font
+ ///////////////////////////////////////////////////////////////////////////////
+ 
++// Read a big-endian uint16 from a byte pointer.
++static inline uint16_t read_big_endian_u16(const uint8_t* data) {
++    return static_cast<uint16_t>((static_cast<uint16_t>(data[0]) << 8) | data[1]);
++}
++
++// Get the number of glyphs from a TrueType font's 'maxp' table.
++// Returns 0 if the font data is invalid or the table is not found.
++static uint16_t get_ttf_glyph_count(const SkData* fontData) {
++    if (!fontData || fontData->size() < 12) {
++        return 0;
++    }
++
++    const uint8_t* data = static_cast<const uint8_t*>(fontData->data());
++    size_t length = fontData->size();
++
++    // Read number of tables from the font header
++    uint16_t numTables = read_big_endian_u16(data + 4);
++    if (length < 12u + static_cast<size_t>(numTables) * 16u) {
++        return 0;
++    }
++
++    // Search for 'maxp' table (tag = 0x6D617870)
++    const uint8_t* tableDir = data + 12;
++    for (uint16_t i = 0; i < numTables; ++i, tableDir += 16) {
++        uint32_t tag = static_cast<uint32_t>(
++            (static_cast<uint32_t>(tableDir[0]) << 24) |
++            (static_cast<uint32_t>(tableDir[1]) << 16) |
++            (static_cast<uint32_t>(tableDir[2]) << 8) |
++            tableDir[3]);
++        if (tag == 0x6D617870) {  // 'maxp'
++            uint32_t offset = static_cast<uint32_t>(
++                (static_cast<uint32_t>(tableDir[8]) << 24) |
++                (static_cast<uint32_t>(tableDir[9]) << 16) |
++                (static_cast<uint32_t>(tableDir[10]) << 8) |
++                tableDir[11]);
++            uint32_t tableLength = static_cast<uint32_t>(
++                (static_cast<uint32_t>(tableDir[12]) << 24) |
++                (static_cast<uint32_t>(tableDir[13]) << 16) |
++                (static_cast<uint32_t>(tableDir[14]) << 8) |
++                tableDir[15]);
++            if (tableLength >= 6 && offset + tableLength <= length) {
++                // numGlyphs is at offset 4 in the maxp table
++                return read_big_endian_u16(data + offset + 4);
++            }
++            return 0;
++        }
++    }
++    return 0;
++}
++
++// Creates a CIDSet stream for PDF/A-1 compliance.
++//
++// Per PDF Reference and ISO 19005-1 (PDF/A-1), the CIDSet is a stream containing
++// a bit array where each bit corresponds to a CID. A bit set to 1 indicates the
++// corresponding CID is present in the font subset.
++//
++// Since Skia uses Identity CID-to-GID mapping (CID == GID), and HarfBuzz subsetting
++// with HB_SUBSET_FLAGS_RETAIN_GIDS preserves original glyph IDs, we must mark ALL
++// CIDs from 0 to numGlyphs-1 as present. This is because:
++// 1. The font declares numGlyphs in its 'maxp' table
++// 2. With Identity mapping, CIDs 0 through numGlyphs-1 map directly to GIDs
++// 3. All these GIDs exist in the font (even if some are empty/space glyphs)
++//
++// The CIDSet bit array format (PDF Reference 5.6.3):
++// - Bit 0 (MSB of first byte) corresponds to CID 0
++// - Bit 7 (LSB of first byte) corresponds to CID 7
++// - And so on for subsequent bytes
++static sk_sp<SkData> make_cid_set(const SkData* subsetFontData, uint16_t numGlyphs) {
++    if (numGlyphs == 0) {
++        // Return minimal valid CIDSet with just CID 0 marked
++        auto data = SkData::MakeUninitialized(1);
++        static_cast<uint8_t*>(data->writable_data())[0] = 0x80;  // CID 0 present
++        return data;
++    }
++
++    // Calculate size: need ceil(numGlyphs / 8) bytes
++    size_t cidSetSize = (static_cast<size_t>(numGlyphs) + 7) / 8;
++    auto cidSetData = SkData::MakeUninitialized(cidSetSize);
++    uint8_t* bytes = static_cast<uint8_t*>(cidSetData->writable_data());
++
++    // Set all bits for CIDs 0 to numGlyphs-1
++    // First, fill all complete bytes with 0xFF
++    size_t fullBytes = numGlyphs / 8;
++    memset(bytes, 0xFF, fullBytes);
++
++    // Handle the last partial byte (if any)
++    uint16_t remainingBits = numGlyphs % 8;
++    if (remainingBits > 0) {
++        // Set only the high 'remainingBits' bits of the last byte
++        // e.g., if remainingBits=3, we want 0b11100000 = 0xE0
++        bytes[fullBytes] = static_cast<uint8_t>(0xFF << (8 - remainingBits));
++    }
++
++    return cidSetData;
++}
++
+ static void emit_subset_type0(const SkPDFFont& font, SkPDFDocument* doc) {
+     const SkTypeface& typeface = font.strike().fPath.fStrikeSpec.typeface();
+     const SkAdvancedTypefaceMetrics* metricsPtr = SkPDFFont::GetMetrics(typeface, doc);
+     SkASSERT(metricsPtr);
+     if (!metricsPtr) {
+         return;
+     }
+     const SkAdvancedTypefaceMetrics& metrics = *metricsPtr;
+     SkASSERT(can_embed(metrics));
+     SkAdvancedTypefaceMetrics::FontType type = font.getType();
+ 
+     auto descriptor = SkPDFMakeDict("FontDescriptor");
+     uint16_t emSize = SkToU16(SkScalarRoundToInt(font.strike().fPath.fUnitsPerEM));
+     SkPDFFont::PopulateCommonFontDescriptor(descriptor.get(), metrics, emSize, 0);
+ 
++    const SkPDF::Metadata& metadata = doc->metadata();
++    bool needsCIDSet = metadata.fPDFAConformance == SkPDF::Metadata::PDFA_Conformance::PDFA_1A ||
++                       metadata.fPDFAConformance == SkPDF::Metadata::PDFA_Conformance::PDFA_1B;
++
+     int ttcIndex;
+     std::unique_ptr<SkStreamAsset> fontAsset = typeface.openStream(&ttcIndex);
+     size_t fontSize = fontAsset ? fontAsset->getLength() : 0;
+     if (0 == fontSize) {
+         SkDebugf("Error: (SkTypeface)(%p)::openStream() returned "
+                  "empty stream (%p) when identified as kType1CID_Font "
+                  "or kTrueType_Font.\n", &typeface, fontAsset.get());
+     } else if (type == SkAdvancedTypefaceMetrics::kTrueType_Font) {
+         sk_sp<SkData> subsetFontData;
+         if (can_subset(metrics)) {
+             SkASSERT(font.firstGlyphID() == 1);
+             subsetFontData = SkPDFSubsetFont(typeface, font.glyphUsage());
+         }
++
++        // Add CIDSet for PDF/A-1 compliance. Must be done AFTER subsetting
++        // so we can read numGlyphs from the subset font's 'maxp' table.
++        if (needsCIDSet && subsetFontData) {
++            uint16_t numGlyphs = get_ttf_glyph_count(subsetFontData.get());
++            sk_sp<SkData> cidSetData = make_cid_set(subsetFontData.get(), numGlyphs);
++            descriptor->insertRef("CIDSet",
++                                 SkPDFStreamOut(nullptr,
++                                               SkMemoryStream::Make(std::move(cidSetData)),
++                                               doc,
++                                               SkPDFSteamCompressionEnabled::Yes));
++        }
++
+         std::unique_ptr<SkStreamAsset> subsetFontAsset;
+         if (subsetFontData) {
+             subsetFontAsset = SkMemoryStream::Make(std::move(subsetFontData));
+         } else {
+             // If subsetting fails, fall back to original font data.
+             subsetFontAsset = std::move(fontAsset);
+         }
+         std::unique_ptr<SkPDFDict> streamDict = SkPDFMakeDict();
+         streamDict->insertInt("Length1", subsetFontAsset->getLength());
+         descriptor->insertRef("FontFile2",
+                               SkPDFStreamOut(std::move(streamDict), std::move(subsetFontAsset),
+                                              doc, SkPDFSteamCompressionEnabled::Yes));
+     } else if (type == SkAdvancedTypefaceMetrics::kType1CID_Font) {
+         std::unique_ptr<SkPDFDict> streamDict = SkPDFMakeDict();
+         streamDict->insertName("Subtype", "CIDFontType0C");
+         descriptor->insertRef("FontFile3",
+                               SkPDFStreamOut(std::move(streamDict), std::move(fontAsset),
+                                              doc, SkPDFSteamCompressionEnabled::Yes));
+     } else {
+         SkASSERT(false);

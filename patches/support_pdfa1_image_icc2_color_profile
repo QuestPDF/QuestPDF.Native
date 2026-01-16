@@ -1,0 +1,193 @@
+diff --git a/src/pdf/SkPDFBitmap.cpp b/src/pdf/SkPDFBitmap.cpp
+index 10c4201009..73a416dba1 100644
+--- a/src/pdf/SkPDFBitmap.cpp
++++ b/src/pdf/SkPDFBitmap.cpp
+@@ -183,40 +183,60 @@ SkPDFUnion write_icc_profile(SkPDFDocument* doc, sk_sp<SkData>&& icc, int channe
+             iccStreamDict->insertInt("N", channels);
+             iccStreamRef = SkPDFStreamOut(std::move(iccStreamDict), SkMemoryStream::Make(icc), doc);
+             doc->fICCProfileMap.set(SkPDFIccProfileKey{icc, channels}, iccStreamRef);
+         }
+     }
+ 
+     std::unique_ptr<SkPDFArray> iccPDF = SkPDFMakeArray();
+     iccPDF->appendName("ICCBased");
+     iccPDF->appendRef(iccStreamRef);
+     return SkPDFUnion::Object(std::move(iccPDF));
+ }
+ 
+ bool icc_channel_mismatch(const skcms_ICCProfile* iccProfile, int expectedChannels) {
+     int iccChannels = -1;
+     if (iccProfile) {
+         iccChannels = skcms_GetInputChannelCount(iccProfile);
+     }
+     return 0 < iccChannels && expectedChannels != iccChannels;
+ }
+ 
++// PDF/A-1 requires ICCv2 profiles. Later PDF/A versions (2, 3) support ICCv4.
++// This helper checks if we're generating PDF/A-1a or PDF/A-1b.
++bool is_pdfa1(const SkPDFDocument* doc) {
++    auto conformance = doc->metadata().fPDFAConformance;
++    return conformance == SkPDF::Metadata::PDFA_Conformance::PDFA_1A ||
++           conformance == SkPDF::Metadata::PDFA_Conformance::PDFA_1B;
++}
++
++// Check if ICC profile data is version 4 or higher.
++// ICC profile header: bytes 8-11 contain the version (major.minor.bugfix.zero).
++// Major version is at byte 8. ICCv2 has major=2, ICCv4 has major=4.
++bool is_icc_v4_or_newer(const SkData* iccData) {
++    if (!iccData || iccData->size() < 12) {
++        return false;
++    }
++    const uint8_t* bytes = static_cast<const uint8_t*>(iccData->data());
++    uint8_t majorVersion = bytes[8];
++    return majorVersion >= 4;
++}
++
+ size_t do_deflated_image(const SkPixmap& pm,
+                          SkPDFDocument* doc,
+                          bool isOpaque,
+                          SkPDFIndirectReference ref) {
+     SkPDF::Metadata::CompressionLevel compressionLevel = doc->metadata().fCompressionLevel;
+     SkPDFStreamFormat format = compressionLevel == SkPDF::Metadata::CompressionLevel::None
+                              ? SkPDFStreamFormat::Uncompressed
+                              : SkPDFStreamFormat::Flate;
+     SkDynamicMemoryWStream dynamic;
+     SkNullWStream writeOnly;
+     SkWStream* buffer = ref ? static_cast<SkWStream*>(&dynamic) : &writeOnly;
+     SkWStream* stream = buffer;
+     std::optional<SkDeflateWStream> deflateWStream;
+     if (format == SkPDFStreamFormat::Flate) {
+         deflateWStream.emplace(buffer, SkToInt(compressionLevel));
+         stream = &*deflateWStream;
+     }
+     SkPDFUnion colorSpace = SkPDFUnion::Name("DeviceGray");
+     int channels;
+     switch (pm.colorType()) {
+@@ -245,41 +265,45 @@ size_t do_deflated_image(const SkPixmap& pm,
+                 for (int x = 0; x < pm.width(); ++x) {
+                     SkColor color = *src++;
+                     if (SkColorGetA(color) == SK_AlphaTRANSPARENT) {
+                         color = get_neighbor_avg_color(pm, x, y);
+                     }
+                     *dst++ = SkColorGetR(color);
+                     *dst++ = SkColorGetG(color);
+                     *dst++ = SkColorGetB(color);
+                     if (dst == bufferStop) {
+                         stream->write(byteBuffer, sizeof(byteBuffer));
+                         dst = byteBuffer;
+                     }
+                 }
+             }
+             stream->write(byteBuffer, dst - byteBuffer);
+     }
+     if (deflateWStream) {
+         deflateWStream->finalize();
+     }
+ 
+-    if (pm.colorSpace()) {
++    if (pm.colorSpace() && !is_pdfa1(doc)) {
++        // For PDF/A-1, we cannot embed ICC profiles here because SkWriteICCProfile
++        // creates ICCv4 profiles which are not compliant with PDF/A-1 (requires ICCv2).
++        // We don't have access to the original ICC profile bytes in this path.
++        // Fall back to DeviceRGB/DeviceGray for PDF/A-1.
+         skcms_ICCProfile iccProfile;
+         pm.colorSpace()->toProfile(&iccProfile);
+         if (!icc_channel_mismatch(&iccProfile, channels)) {
+             sk_sp<SkData> iccData = SkWriteICCProfile(&iccProfile, "");
+             colorSpace = write_icc_profile(doc, std::move(iccData), channels);
+         }
+     }
+ 
+     size_t length = buffer->bytesWritten();
+     SkPDFIndirectReference sMask;
+     if (!isOpaque && ref) {
+         sMask = doc->reserveRef();
+     }
+     emit_image_stream(doc, ref, [&dynamic](SkWStream* stream) { dynamic.writeToAndReset(stream); },
+                       pm.info().dimensions(), std::move(colorSpace), sMask, length, format);
+     if (!isOpaque) {
+         length += do_deflated_alpha(pm, doc, sMask);
+     }
+     return length;
+ }
+@@ -298,55 +322,65 @@ size_t do_jpeg(sk_sp<SkData> data, SkColorSpace* imageColorSpace, SkPDFDocument*
+     if (!codec) {
+         return 0;
+     }
+ 
+     SkISize jpegSize = codec->dimensions();
+     const SkEncodedInfo& encodedInfo = SkCodecPriv::GetEncodedInfo(codec.get());
+     SkEncodedInfo::Color jpegColorType = encodedInfo.color();
+     SkEncodedOrigin exifOrientation = codec->getOrigin();
+ 
+     bool yuv = jpegColorType == SkEncodedInfo::kYUV_Color;
+     bool goodColorType = yuv || jpegColorType == SkEncodedInfo::kGray_Color;
+     if (jpegSize != size  // Safety check.
+             || !goodColorType
+             || kTopLeft_SkEncodedOrigin != exifOrientation) {
+         return 0;
+     }
+ 
+     int channels = yuv ? 3 : 1;
+     SkPDFUnion colorSpace = yuv ? SkPDFUnion::Name("DeviceRGB") : SkPDFUnion::Name("DeviceGray");
+ 
+-    if (sk_sp<SkData> encodedIccProfileData = encodedInfo.profileData();
+-        encodedIccProfileData && !icc_channel_mismatch(encodedInfo.profile(), channels))
+-    {
+-        colorSpace = write_icc_profile(doc, std::move(encodedIccProfileData), channels);
+-    } else if (const skcms_ICCProfile* codecIccProfile = codec->getICCProfile();
+-               codecIccProfile && !icc_channel_mismatch(codecIccProfile, channels))
+-    {
+-        sk_sp<SkData> codecIccData = SkWriteICCProfile(codecIccProfile, "");
+-        colorSpace = write_icc_profile(doc, std::move(codecIccData), channels);
+-    } else if (imageColorSpace) {
+-        skcms_ICCProfile imageIccProfile;
+-        imageColorSpace->toProfile(&imageIccProfile);
+-        if (!icc_channel_mismatch(&imageIccProfile, channels)) {
+-            sk_sp<SkData> imageIccData = SkWriteICCProfile(&imageIccProfile, "");
+-            colorSpace = write_icc_profile(doc, std::move(imageIccData), channels);
++    // For PDF/A-1, prefer using original embedded ICC profile data directly to preserve
++    // the original profile version, but only if it's ICCv2 (PDF/A-1 requires ICCv2).
++    // For other PDF types, re-encode via SkWriteICCProfile which creates ICCv4 profiles.
++    if (is_pdfa1(doc)) {
++        // PDF/A-1 path: use original ICC profile bytes only if it's ICCv2.
++        sk_sp<SkData> encodedIccProfileData = encodedInfo.profileData();
++        if (encodedIccProfileData &&
++            !icc_channel_mismatch(encodedInfo.profile(), channels) &&
++            !is_icc_v4_or_newer(encodedIccProfileData.get())) {
++            colorSpace = write_icc_profile(doc, std::move(encodedIccProfileData), channels);
++        }
++        // If no embedded profile or ICCv4, fall through to DeviceRGB/DeviceGray (already set).
++    } else {
++        // Default Skia path: re-encode ICC profiles to ICCv4.
++        const skcms_ICCProfile* codecIccProfile = codec->getICCProfile();
++        if (codecIccProfile && !icc_channel_mismatch(codecIccProfile, channels)) {
++            sk_sp<SkData> codecIccData = SkWriteICCProfile(codecIccProfile, "");
++            colorSpace = write_icc_profile(doc, std::move(codecIccData), channels);
++        } else if (imageColorSpace) {
++            skcms_ICCProfile imageIccProfile;
++            imageColorSpace->toProfile(&imageIccProfile);
++            if (!icc_channel_mismatch(&imageIccProfile, channels)) {
++                sk_sp<SkData> imageIccData = SkWriteICCProfile(&imageIccProfile, "");
++                colorSpace = write_icc_profile(doc, std::move(imageIccData), channels);
++            }
+         }
+     }
+ 
+     emit_image_stream(doc, ref,
+                       [&data](SkWStream* dst) { dst->write(data->data(), data->size()); },
+                       jpegSize, std::move(colorSpace),
+                       SkPDFIndirectReference(), SkToInt(data->size()), SkPDFStreamFormat::DCT);
+     return data->size();
+ }
+ 
+ SkBitmap to_pixels(const SkImage* image) {
+     SkBitmap bm;
+     int w = image->width(),
+         h = image->height();
+     switch (image->colorType()) {
+         case kAlpha_8_SkColorType:
+             bm.allocPixels(SkImageInfo::MakeA8(w, h));
+             break;
+         case kGray_8_SkColorType:
+             bm.allocPixels(SkImageInfo::Make(w, h, kGray_8_SkColorType, kOpaque_SkAlphaType));

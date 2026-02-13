@@ -401,3 +401,5 @@ FodyWeavers.xsd
 .idea
 .DS_STORE
 cmake-build-*
+_codeql_*
+**/_codeql_*

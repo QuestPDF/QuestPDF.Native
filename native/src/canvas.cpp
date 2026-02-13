@@ -15,6 +15,7 @@
 #include "include/core/SkMatrix.h"
 #include "include/codec/SkCodec.h"
 #include "include/core/SkPathEffect.h"
+#include "src/core/SkPathPriv.h"
 #include "include/effects/SkBlurMaskFilter.h"
 #include "include/effects/Sk2DPathEffect.h"
 #include "include/utils/SkParsePath.h"
@@ -106,7 +107,7 @@ struct SKRoundedRect {
 };
 
 SkPath createRoundedRectPath(const SKRoundedRect &roundedRect) {
-    SkPath path;
+    SkPathBuilder pathBuilder;
 
     const auto rect = roundedRect.rect;
     const auto left = rect.fLeft;
@@ -189,91 +190,85 @@ SkPath createRoundedRectPath(const SKRoundedRect &roundedRect) {
     const auto kBezierConstant = 0.552284749831f;
 
     // start at the top-left corner (after the radius)
-    path.moveTo(left + topLeft.fX, top);
+    pathBuilder.moveTo(left + topLeft.fX, top);
 
     // top edge
-    path.lineTo(right - topRight.fX, top);
+    pathBuilder.lineTo(right - topRight.fX, top);
 
     // top-right corner
     if (topRight.fX > 0 && topRight.fY > 0) {
-        path.cubicTo(
+        pathBuilder.cubicTo(
             right - topRight.fX + topRight.fX * kBezierConstant, top,
             right, top + topRight.fY - topRight.fY * kBezierConstant,
             right, top + topRight.fY
         );
     }
     else {
-            path.lineTo(right, top + topRight.fY);
+            pathBuilder.lineTo(right, top + topRight.fY);
     }
 
     // right edge
-    path.lineTo(right, bottom - bottomRight.fY);
+    pathBuilder.lineTo(right, bottom - bottomRight.fY);
 
     // bottom-right corner
     if (bottomRight.fX > 0 && bottomRight.fY > 0) {
-        path.cubicTo(
+        pathBuilder.cubicTo(
             right, bottom - bottomRight.fY + bottomRight.fY * kBezierConstant,
             right - bottomRight.fX + bottomRight.fX * kBezierConstant, bottom,
             right - bottomRight.fX, bottom
         );
     }
     else {
-        path.lineTo(right - bottomRight.fX, bottom);
+        pathBuilder.lineTo(right - bottomRight.fX, bottom);
     }
 
     // bottom edge
-    path.lineTo(left + bottomLeft.fX, bottom);
+    pathBuilder.lineTo(left + bottomLeft.fX, bottom);
 
     // bottom-left corner
     if (bottomLeft.fX > 0 && bottomLeft.fY > 0) {
-        path.cubicTo(
+        pathBuilder.cubicTo(
             left + bottomLeft.fX - bottomLeft.fX * kBezierConstant, bottom,
             left, bottom - bottomLeft.fY + bottomLeft.fY * kBezierConstant,
             left, bottom - bottomLeft.fY
         );
     }
     else {
-        path.lineTo(left, bottom - bottomLeft.fY);
+        pathBuilder.lineTo(left, bottom - bottomLeft.fY);
     }
 
     // left edge
-    path.lineTo(left, top + topLeft.fY);
+    pathBuilder.lineTo(left, top + topLeft.fY);
 
     // top-left corner
     if (topLeft.fX > 0 && topLeft.fY > 0) {
-        path.cubicTo(
+        pathBuilder.cubicTo(
             left, top + topLeft.fY - topLeft.fY * kBezierConstant,
             left + topLeft.fX - topLeft.fX * kBezierConstant, top,
             left + topLeft.fX, top
         );
     }
     else {
-        path.lineTo(left + topLeft.fX, top);
+        pathBuilder.lineTo(left + topLeft.fX, top);
     }
 
     // close the path
-    path.close();
+    pathBuilder.close();
 
-    return path;
-}
-
-void path_optimize(const SkPath& source, SkPath* target) {
-    SkPath emptyPath;
-    SkPath optimizedPath;
-    Simplify(source, target);
+    return pathBuilder.detach();
 }
 
 QUEST_API void canvas_draw_complex_border(SkCanvas *canvas, SKRoundedRect innerRect, SKRoundedRect outerRect, SkPaint* paint) {
     const auto innerPath = createRoundedRectPath(innerRect);
     const auto outerPath = createRoundedRectPath(outerRect);
 
-    SkPath borderPath;
-    borderPath.addPath(outerPath);
-    borderPath.reverseAddPath(innerPath);
+    SkPathBuilder borderPathBuilder;
+    borderPathBuilder.addPath(outerPath);
+    SkPathPriv::ReverseAddPath(&borderPathBuilder, innerPath);
+    borderPathBuilder.addPath(innerPath);
 
-    SkPath optimizedBorderPath;
-    path_optimize(borderPath, &optimizedBorderPath);
 
+    auto optimizedBorderPath = Simplify(borderPathBuilder.detach()).value();
     canvas->drawPath(optimizedBorderPath, *paint);
 }
 
@@ -367,11 +362,11 @@ QUEST_API void canvas_clip_overflow_area(SkCanvas *canvas, SkRect availableSpace
             std::min(availableSpace.right(), requiredSpace.right()),
             std::min(availableSpace.bottom(), requiredSpace.bottom()));
 
-    SkPath path;
-    path.addRect(requiredSpace, SkPathDirection::kCW);
-    path.addRect(removeArea, SkPathDirection::kCCW);
+    SkPathBuilder pathBuilder;
+    pathBuilder.addRect(requiredSpace, SkPathDirection::kCW);
+    pathBuilder.addRect(removeArea, SkPathDirection::kCCW);
 
-    canvas->clipPath(path);
+    canvas->clipPath(pathBuilder.detach());
 }
 
 QUEST_API void canvas_clip_rectangle(SkCanvas *canvas, SkRect clipArea) {

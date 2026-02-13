@@ -7,6 +7,7 @@
 #include "include/core/SkStream.h"
 #include "include/core/SkDocument.h"
 #include "include/docs/SkXPSDocument.h"
+#include "include/encode/SkPngEncoder.h"
 
 #include <xpsobjectmodel.h>
 

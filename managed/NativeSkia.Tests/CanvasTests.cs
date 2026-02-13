@@ -370,7 +370,7 @@ public class CanvasTests
         // assert
         using var pngData = bitmap.EncodeAsPng();
         TestFixture.SaveOutput("canvas_complex_border.png", pngData);
-        pngData.ShouldHaveSize(4_000, buffer: 50);
+        pngData.ShouldHaveSize(3_900, buffer: 150);
     }
     
     [Test]

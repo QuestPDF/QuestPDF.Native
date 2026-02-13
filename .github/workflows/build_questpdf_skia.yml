@@ -85,7 +85,7 @@ jobs:
           add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main"
           
           apt update --yes
-          apt install --yes clang-15 lldb-15 lld-15
+          apt install --yes clang-15 lldb-15 lld-15 libstdc++-10-dev
           
           update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
           update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100

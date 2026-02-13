@@ -1,0 +1,3 @@
+/home/runner/work/QuestPDF.Native/QuestPDF.Native/native/_codeql_build_dir/CMakeFiles/QuestPdfSkia.dir
+/home/runner/work/QuestPDF.Native/QuestPDF.Native/native/_codeql_build_dir/CMakeFiles/edit_cache.dir
+/home/runner/work/QuestPDF.Native/QuestPDF.Native/native/_codeql_build_dir/CMakeFiles/rebuild_cache.dir

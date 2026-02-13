@@ -265,7 +265,6 @@ QUEST_API void canvas_draw_complex_border(SkCanvas *canvas, SKRoundedRect innerR
     SkPathBuilder borderPathBuilder;
     borderPathBuilder.addPath(outerPath);
     SkPathPriv::ReverseAddPath(&borderPathBuilder, innerPath);
-    borderPathBuilder.addPath(innerPath);
 
 
     auto optimizedBorderPath = Simplify(borderPathBuilder.detach()).value();

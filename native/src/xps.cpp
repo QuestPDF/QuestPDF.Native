@@ -20,7 +20,7 @@ QUEST_API SkDocument *xps_document_create(SkWStream *stream, SkScalar dpi) {
     if (!SUCCEEDED(hr))
         return nullptr;
 
-    SkXPS::Options ;
+    SkXPS::Options xpsOptions;
     xpsOptions.dpi = dpi;
 
     xpsOptions.pngEncoder = [](SkWStream* dst, const SkPixmap& src) {

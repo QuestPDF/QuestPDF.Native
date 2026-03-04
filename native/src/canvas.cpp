@@ -10,6 +10,7 @@
 #include "include/core/SkAnnotation.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPath.h"
+#include "include/pathops/SkPathOps.h"
 #include "include/core/SkPathBuilder.h"
 #include "include/core/SkMatrix.h"
 #include "include/codec/SkCodec.h"
@@ -265,7 +266,9 @@ QUEST_API void canvas_draw_complex_border(SkCanvas *canvas, SKRoundedRect innerR
     borderPathBuilder.addPath(outerPath);
     SkPathPriv::ReverseAddPath(&borderPathBuilder, innerPath);
 
-    canvas->drawPath(borderPathBuilder.detach(), *paint);
+    auto borderPath = borderPathBuilder.detach();
+    auto optimizedBorderPath = Simplify(borderPath).value_or(borderPath);
+    canvas->drawPath(optimizedBorderPath, *paint);
 }
 
 struct SKBoxShadow {

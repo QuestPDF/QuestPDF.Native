@@ -151,7 +151,7 @@ jobs:
         if: matrix.runtime.name != 'linux-musl-x64'
         shell: bash
         run: |
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git --single-branch --depth 1
           echo "${PWD}/depot_tools" >> $GITHUB_PATH
           export PATH="${PWD}/depot_tools:${PATH}"
 
@@ -159,7 +159,7 @@ jobs:
       - name: Build Skia
         shell: bash
         run: |
-          git clone https://github.com/google/skia.git --branch chrome/m144 --single-branch
+          git clone https://github.com/google/skia.git --branch chrome/m144 --single-branch --depth 1
           cd skia
           git apply --ignore-whitespace ../patches/*.patch
           

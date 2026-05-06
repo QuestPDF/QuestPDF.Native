@@ -339,9 +339,16 @@ public class ParagraphTests
         pageCanvas.Translate(25, 25);
         
         var linkBoxes = paragraph.GetTextRangePositions(45, 57);
-        
+
         foreach (var linkBox in linkBoxes)
-            pageCanvas.DrawStrokeRectangle(linkBox,  3,0xFFFF0000);
+        {
+            pageCanvas.DrawStrokeRectangle(linkBox, 3, 0xFFFF0000);
+            
+            pageCanvas.Save();
+            pageCanvas.Translate(linkBox.Left, linkBox.Top);
+            pageCanvas.AnnotateUrl(linkBox.Width, linkBox.Height, "https://www.questpdf.com", null);
+            pageCanvas.Restore();
+        }   
         
         pageCanvas.DrawParagraph(paragraph);
 
@@ -351,7 +358,7 @@ public class ParagraphTests
 
         var documentData = memoryStream.ToArray();
         TestFixture.SaveOutput("document_with_paragraph_and_inlined_hyperlink.pdf", documentData);
-        documentData.ShouldHaveSize(24_500, buffer: 150);
+        documentData.ShouldHaveSize(25_000, buffer: 150);
         
         paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
         

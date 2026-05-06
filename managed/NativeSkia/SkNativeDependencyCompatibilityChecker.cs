@@ -5,7 +5,7 @@ namespace QuestPDF.Skia;
 
 internal static class SkNativeDependencyCompatibilityChecker
 {
-    const int ExpectedNativeLibraryVersion = 13;
+    const int ExpectedNativeLibraryVersion = 14;
     
     private static bool IsCompatibilityChecked = false;
         

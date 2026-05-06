@@ -19,7 +19,7 @@ QUEST_API void paragraph_get_line_metrics(skia::textlayout::Paragraph *paragraph
 
     for (int i = 0; i < *outputArrayLength; ++i) {
         auto metrics = lineMetrics[i];
-        (*outputArray)[i] = SkSize::Make(metrics.fWidth, metrics.fHeight);
+        (*outputArray)[i] = SkSize::Make(metrics.fWidth, metrics.fAscent + metrics.fDescent);
     }
 }
 

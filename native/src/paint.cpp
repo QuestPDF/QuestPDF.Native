@@ -1,8 +1,6 @@
-#include "include/core/SkSpan.h"
 #include "include/core/SkPathEffect.h"
 #include "include/effects/SkDashPathEffect.h"
-#include "include/effects/SkGradientShader.h"
-
+#include "include/effects/SkGradient.h"
 #include "include/core/SkTileMode.h"
 #include "include/core/SkPaint.h"
 
@@ -25,17 +23,16 @@ extern "C" {
     }
 
     QUEST_API void paint_set_linear_gradient(SkPaint* paint, SkPoint start, SkPoint end, int colorsLength, SkColor* colors) {
-        const SkPoint points[2] = {
-            start, end
-        };
+        // SkGradient only accepts SkColor4f
+        SkColor4f colors4f[colorsLength];
 
-        const auto shader = SkGradientShader::MakeLinear(
-            points,
-            colors,
-            nullptr,
-            colorsLength,
-            SkTileMode::kClamp
-        );
+        for (int i = 0; i < colorsLength; i++)
+            colors4f[i] = SkColor4f::FromColor(colors[i]);
+
+        // define gradient
+        const SkPoint points[2] = { start, end };
+        const auto gradient = SkGradient({SkSpan(colors4f, colorsLength), {}, SkTileMode::kClamp}, { });
+        const auto shader = SkShaders::LinearGradient(points, gradient);
 
         paint->setShader(shader);
     }

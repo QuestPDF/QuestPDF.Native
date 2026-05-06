@@ -12,7 +12,7 @@
 #include "include/core/SkData.h"
 #include "include/effects/SkImageFilters.h"
 #include "include/core/SkPaint.h"
-#include "include/effects/SkGradientShader.h"
+#include "include/effects/SkGradient.h"
 #include "include/encode/SkJpegEncoder.h"
 #include "include/encode/SkPngEncoder.h"
 
@@ -90,7 +90,7 @@ QUEST_API SkImageDetails image_get_details(SkImage *image) {
     return details;
 }
 
-QUEST_API SkData *image_get_encoded_data(SkImage *image) {
+QUEST_API const SkData *image_get_encoded_data(SkImage *image) {
     return image->refEncodedData().release();
 }
 
@@ -102,14 +102,20 @@ QUEST_API SkImage *image_generate_placeholder(int imageWidth, int imageHeight, S
 
     // create vertical gradient
     SkPoint points[2] = {SkPoint::Make(0, 0), SkPoint::Make(imageWidth, imageHeight)};
-    SkColor colors[] = {firstColor, secondColor};
-    auto gradient = SkGradientShader::MakeLinear(points, colors, nullptr, 2, SkTileMode::kDecal);
+
+    SkColor4f colors[] = {
+        SkColor4f::FromColor(firstColor),
+        SkColor4f::FromColor(secondColor)
+    };
+
+    const auto gradient = SkGradient({SkSpan(colors, 2), {}, SkTileMode::kClamp}, { });
+    const auto shader = SkShaders::LinearGradient(points, gradient);
 
     // draw gradient
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setDither(true);
-    paint.setShader(gradient);
+    paint.setShader(shader);
     canvas.drawRect(SkRect::MakeWH(imageWidth, imageHeight), paint);
 
     // compress image

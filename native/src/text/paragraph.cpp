@@ -10,20 +10,31 @@ QUEST_API void paragraph_plan_layout(skia::textlayout::Paragraph *paragraph, flo
     paragraph->layout(availableWidth);
 }
 
-QUEST_API void paragraph_get_line_metrics(skia::textlayout::Paragraph *paragraph, SkSize **outputArray, int *outputArrayLength) {
+QUEST_API void paragraph_get_size(skia::textlayout::Paragraph *paragraph, float* totalWidth, float* totalHeight) {
+    *totalWidth = paragraph->getLongestLine();
+    *totalHeight = paragraph->getHeight();
+}
+
+struct LineExtent {
+    float top;
+    float bottom;
+};
+
+QUEST_API void paragraph_get_line_extents(skia::textlayout::Paragraph *paragraph, LineExtent **array, int *arrayLength) {
     std::vector<skia::textlayout::LineMetrics> lineMetrics;
     paragraph->getLineMetrics(lineMetrics);
 
-    *outputArrayLength = lineMetrics.size();
-    *outputArray = new SkSize[*outputArrayLength];
+    *arrayLength = lineMetrics.size();
+    *array = new LineExtent[*arrayLength];
 
-    for (int i = 0; i < *outputArrayLength; ++i) {
-        auto metrics = lineMetrics[i];
-        (*outputArray)[i] = SkSize::Make(metrics.fWidth, metrics.fAscent + metrics.fDescent);
+    for (int i = 0; i < *arrayLength; ++i) {
+        const auto& metrics = lineMetrics[i];
+        (*array)[i].top    = static_cast<float>(metrics.fBaseline - metrics.fAscent);
+        (*array)[i].bottom = static_cast<float>(metrics.fBaseline + metrics.fDescent);
     }
 }
 
-QUEST_API void paragraph_delete_line_metrics(SkSize *array) {
+QUEST_API void paragraph_delete_line_extents(LineExtent *array) {
     delete[] array;
 }
 

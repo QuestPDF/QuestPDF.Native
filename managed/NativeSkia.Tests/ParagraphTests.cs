@@ -138,8 +138,21 @@ public class ParagraphTests
         paragraph.PlanLayout(400);
 
         // values differ slightly between platforms
-        var lineHeights = paragraph.GetLineMetrics().Select(x => x.Height);
-        lineHeights.Should().BeEquivalentTo(new[] { 30, 35, 40 });
+        var size = paragraph.GetSize();
+        size.width.Should().BeApproximately(129f, 0.1f);
+        size.height.Should().Be(105);
+        
+        var lineExtents = paragraph.GetLineExtents();
+        lineExtents.Should().HaveCount(3);
+        
+        lineExtents[0].Top.Should().Be(0);
+        lineExtents[0].Bottom.Should().Be(30);
+        
+        lineExtents[1].Top.Should().Be(30);
+        lineExtents[1].Bottom.Should().Be(65);
+        
+        lineExtents[2].Top.Should().Be(65);
+        lineExtents[2].Bottom.Should().Be(105);
         
         paragraph.GetUnresolvedCodepoints().Should().BeEmpty();
     }

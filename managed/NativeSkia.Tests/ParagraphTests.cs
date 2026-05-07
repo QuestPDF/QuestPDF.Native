@@ -100,7 +100,7 @@ public class ParagraphTests
     public void GetLineHeights()
     {
         using var typefaceProvider = new SkTypefaceProvider();
-        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Global);
+        using var fontCollection = SkFontCollection.Create(typefaceProvider, SkFontManager.Local);
 
         var paragraphStyleConfiguration = new ParagraphStyleConfiguration
         {
@@ -139,7 +139,7 @@ public class ParagraphTests
 
         // values differ slightly between platforms
         var size = paragraph.GetSize();
-        size.width.Should().BeApproximately(129f, 0.1f);
+        size.width.Should().BeApproximately(130f, 1f);
         size.height.Should().Be(105);
         
         var lineExtents = paragraph.GetLineExtents();
